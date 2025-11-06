@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Aseguramiento (Cloud)</title>
+    <!-- 
+      Usamos Tailwind CSS para un diseño moderno y responsivo.
+      También incluimos las librerías para generar el PDF (jsPDF y jsPDF-AutoTable).
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Importar Fuente Estilizada (Dancing Script) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos adicionales para un mejor aspecto */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Clase para la nueva fuente del título */
+        .font-dancing-script {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Estilo para los inputs de número sin flechas */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Estilo para los selects */
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013l128%20128c3.6%203.6%207.8%205.4%2013%205.4s9.4-1.8%2013-5.4l128-128c3.6-3.6%205.4-7.8%205.4-13%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 0.65em auto;
+            padding-right: 2.5rem;
+        }
+        /* Ocultar botones de gestión por defecto */
+        .gestion-btn {
+            display: none;
+        }
+        /* Estilo para la vista previa del sello (crossorigin para Firebase Storage) */
+        #selloPreview {
+            border: 1px dashed #ddd;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <!-- CONTENEDOR DE LOGIN -->
+    <div id="login-container" class="max-w-md mx-auto bg-white shadow-lg rounded-lg p-8 text-center mt-20">
+        <h1 class="text-3xl font-bold text-purple-700 mb-6 font-dancing-script">Informe de Aseguramiento</h1>
+        
+        <!-- Contenedor de estado de Login -->
+        <div id="login-status">
+            <p class="text-gray-600 mb-8">Por favor, inicia sesión para continuar.</p>
+            <!-- 
+                MODIFICADO: 
+                - 'rounded-lg' cambiado a 'rounded-full' (para hacerlo totalmente redondo).
+                - 'shadow-md' cambiado a 'shadow-lg' (sombra más moderna).
+                - Añadido 'hover:shadow-xl', 'hover:-translate-y-0.5' y 'transition-all' 
+                  para un efecto de "elevación" moderno al pasar el ratón.
+            -->
+            <button id="google-login-btn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center justify-center w-full">
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFF" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FFC107" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#FF3D00" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.027C9.505,39.556,16.227,44,24,44z"></path><path fill="#4CAF50" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C39.099,34.799,44,28,44,20C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                Iniciar Sesión con Google
+            </button>
+        </div>
+
+        <!-- Estado de Carga -->
+        <div id="loading-container" class="hidden">
+            <p class="text-gray-600 mb-4">Verificando autenticación...</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto"></div>
+        </div>
+
+    </div>
+
+    <!-- APLICACIÓN (Oculta por defecto) -->
+    <div id="app-container" class="container max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden hidden">
+        
+        <!-- Encabezado -->
+        <div class="bg-purple-700 p-6 flex justify-between items-center flex-wrap">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white flex items-center font-dancing-script mb-2 md:mb-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Informe de Aseguramiento
+                </h1>
+                <!-- Info del Usuario (NUEVO) -->
+                <p id="user-info" class="text-purple-200 text-xs font-medium mt-1 ml-11"></p>
+            </div>
+            <!-- Botón de Logout -->
+            <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-full shadow-md hover:bg-red-600 transition text-sm font-semibold">
+                Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- Botón Limpiar Formulario -->
+        <div class="p-6 md:p-8 pb-0 flex justify-end">
+            <button type="button" id="clearFormBtn"> <!-- La clase se aplica por JS -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75-6.75M4.5 12l6.75 6.75" />
+                </svg>
+                Limpiar Formulario
+            </button>
+        </div>
+
+        <!-- Formulario -->
+        <form id="report-form" class="p-6 md:p-8 pt-6 space-y-6">
+
+            <!-- Sección Contador -->
+            <div class="form-group">
+                <label for="selectContador" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <select id="selectContador" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-50">
+                    <option value="">-- Selecciona Contador Guardado --</option>
+                </select>
+            </div>
+            <fieldset class="border border-gray-200 p-4 rounded-md">
+                <legend class="text-lg font-semibold text-purple-800 mb-4 px-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H7a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Datos del Contador
+                </legend>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group">
+                        <label for="contadorNombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Contador</label>
+                        <input type="text" id="contadorNombre" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contadorRif" class="block text-sm font-medium text-gray-700 mb-1">RIF del Contador</label>
+                        <input type="text" id="contadorRif" placeholder="Ej: V-12345678-9" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                    <div class="form-group">
+                        <label for="contadorCpc" class="block text-sm font-medium text-gray-700 mb-1">Núm. C.P.C.</label>
+                        <input type="text" id="contadorCpc" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                </div>
+
+                <!-- Campo Sello del Contador (MODIFICADO) -->
+                <div class="form-group mt-4">
+                    <label for="contadorSello" class="block text-sm font-medium text-gray-700 mb-1">Sello del Contador (PNG)</label>
+                    <input type="file" id="contadorSello" class="w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-purple-50 file:text-purple-700
+                        hover:file:bg-purple-100" accept="image/png">
+                    <small class="text-xs text-gray-500">Subir PNG. Máx: 5.30cm (ancho) x 2.10cm (alto).</small>
+                    
+                    <!-- Vista previa del sello (MODIFICADA para crossOrigin) -->
+                    <img id="selloPreview" src="" alt="Vista previa del sello" class="mt-2 h-16 object-contain hidden p-2" crossorigin="anonymous" />
+                </div>
+                
+                <div class="text-right mt-4 space-x-2">
+                    <button type="button" id="deleteContadorBtn" class="btn-danger gestion-btn" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <button type="button" id="updateContadorBtn" class="btn-warning gestion-btn" title="Actualizar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <button type="button" id="saveContadorBtn" class="btn-save" title="Guardar como Nuevo">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586L7.707 10.293zM3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" /></svg>
+                    </button>
+                </div>
+            </fieldset>
+
+            <!-- Sección Cliente -->
+             <div class="form-group">
+                <label for="selectCliente" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <select id="selectCliente" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-50">
+                    <option value="">-- Selecciona Cliente Guardado --</option>
+                </select>
+            </div>
+            <fieldset class="border border-gray-200 p-4 rounded-md">
+                <legend class="text-lg font-semibold text-purple-800 mb-4 px-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Datos del Cliente
+                </legend>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group">
+                        <label for="clienteTratamiento" class="block text-sm font-medium text-gray-700 mb-1">Tratamiento</label>
+                        <select id="clienteTratamiento" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                            <option value="Sr.">Sr.</option>
+                            <option value="Sra.">Sra.</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="clienteNombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Cliente</label>
+                        <input type="text" id="clienteNombre" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clienteCedula" class="block text-sm font-medium text-gray-700 mb-1">N.º de Cédula</label>
+                        <input type="text" id="clienteCedula" placeholder="Ej: V-12345678" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                </div>
+                 <div class="text-right mt-4 space-x-2">
+                    <button type="button" id="deleteClienteBtn" class="btn-danger gestion-btn" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <button type="button" id="updateClienteBtn" class="btn-warning gestion-btn" title="Actualizar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <button type="button" id="saveClienteBtn" class="btn-save" title="Guardar como Nuevo">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586L7.707 10.293zM3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" /></svg>
+                    </button>
+                </div>
+            </fieldset>
+
+            <!-- Sección Informe -->
+            <fieldset class="border-t border-gray-200 pt-6">
+                <legend class="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Datos del Informe
+                </legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="entidadDirigida" class="block text-sm font-medium text-gray-700 mb-1">Entidad a la que se dirige</label>
+                        <input type="text" id="entidadDirigida" list="bancos-list" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                        <datalist id="bancos-list">
+                            <option value="Banco de Venezuela, S.A. Banco Universal"></option>
+                            <option value="Banesco Banco Universal, C.A."></option>
+                            <option value="Banco Provincial, S.A. Banco Universal"></option>
+                            <option value="Banco Mercantil, C.A. Banco Universal"></option>
+                            <option value="Bancaribe, C.A. Banco Universal"></option>
+                            <option value="Banco Nacional de Crédito, C.A. Banco Universal"></option>
+                            <option value="Banco Exterior, C.A. Banco Universal"></option>
+                            <option value="Banco del Tesoro, C.A. Banco Universal"></option>
+                            <option value="Bicentenario Banco Universal, C.A."></option>
+                            <option value="100% Banco, Banco Universal"></option>
+                            <option value="Banplus Banco Universal, C.A."></option>
+                            <option value="Banca Amiga, C.A. Banco Universal"></option>
+                            <option value="Mi Banco, C.A. Banco de Desarrollo"></option>
+                            <option value="Banco Venezolano de Crédito, S.A. Banco Universal"></option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="motivoInforme" class="block text-sm font-medium text-gray-700 mb-1">Motivo del Informe</label>
+                        <input type="text" id="motivoInforme" list="motivos-list" placeholder="Ej: Solicitud de crédito" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                        <datalist id="motivos-list">
+                            <option value="Solicitud de crédito"></option>
+                            <option value="Apertura de la Cuenta Bancaria"></option>
+                            <option value="Actualización de datos"></option>
+                            <option value="Trámite de visa"></option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="lugar" class="block text-sm font-medium text-gray-700 mb-1">Lugar</label>
+                        <input type="text" id="lugar" list="ciudades-list" placeholder="Ej: Barquisimeto" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                        <datalist id="ciudades-list">
+                            <option value="Caracas"></option>
+                            <option value="Maracaibo"></option>
+                            <option value="Valencia"></option>
+                            <option value="Barquisimeto"></option>
+                            <option value="Maracay"></option>
+                            <option value-"Ciudad Guayana"></option>
+                            <option value="San Cristóbal"></option>
+                            <option value="Mérida"></option>
+                            <option value="Barcelona"></option>
+                            <option value="Cumaná"></option>
+                            <option value="Maturín"></option>
+                            <option value="Porlamar"></option>
+                            <option value="Barinas"></option>
+                            <option value="Coro"></option>
+                            <option value="San Felipe"></option>
+                            <option value="San Juan de los Morros"></option>
+                            <option value="Quibor"></option>
+                            <option value="El Tocuyo"></option>
+                            <option value="Sanare"></option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaDocumento" class="block text-sm font-medium text-gray-700 mb-1">Fecha del Documento</label>
+                        <input type="date" id="fechaDocumento" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaDesde" class="block text-sm font-medium text-gray-700 mb-1">Período - Desde</label>
+                        <input type="date" id="fechaDesde" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaHasta" class="block text-sm font-medium text-gray-700 mb-1">Período - Hasta</label>
+                        <input type="date" id="fechaHasta" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Sección Ingresos -->
+            <fieldset class="border-t border-gray-200 pt-6">
+                <legend class="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Detalle de los Ingresos del Período
+                </legend>
+                
+                <datalist id="conceptos-list"></datalist>
+
+                <div id="income-details" class="space-y-3 mb-4">
+                    <!-- Los ingresos se agregarán aquí dinámicamente -->
+                </div>
+                <button type="button" id="addIncomeBtn" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Agregar Concepto
+                </button>
+            </fieldset>
+
+            <!-- Sección Gestionar Conceptos -->
+            <fieldset class="border-t border-gray-200 pt-6">
+                <legend class="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Gestionar Conceptos de Ingreso (Guardados en tu cuenta)
+                </legend>
+                <div class="space-y-4">
+                    <div>
+                        <label for="conceptosSelect" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select id="conceptosSelect" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-50"></select>
+                    </div>
+                    <div>
+                        <label for="conceptoEditInput" class="block text-sm font-medium text-gray-700 mb-1">Concepto (para agregar o editar)</label>
+                        <input type="text" id="conceptoEditInput" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" id="conceptoBtnAgregar" class="btn-save" title="Agregar Nuevo">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button type="button" id="conceptoBtnEditar" class="btn-warning" title="Cargar para Editar">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button type="button" id="conceptoBtnGuardarEdicion" class="btn-save" style="display:none;" title="Guardar Cambios">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586L7.707 10.293zM3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" /></svg>
+                        </button>
+                        <button type="button" id="conceptoBtnEliminar" class="btn-danger" title="Eliminar Seleccionado">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+
+
+            <!-- Botones de Acción -->
+            <div class="pt-6 border-t border-gray-200 flex justify-center">
+                 <button type="submit" id="generatePdfBtn" class="btn-primary w-full md:w-1/2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Generar PDF
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Contenedor para mensajes de éxito/error -->
+    <div id="message-container" class="fixed top-5 right-5 z-50"></div>
+
+    <!-- 
+    ================================================================
+    SCRIPT DE APLICACIÓN Y AUTENTICACIÓN (TODO EN UN MÓDULO)
+    ================================================================
+    -->
+    <script type="module">
+        // --- SDK DE FIREBASE (MODIFICADO PARA POPUP Y ANONYMOUS) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js"; // <-- AÑADIDO
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup,
+            signInAnonymously, // <-- AÑADIDO
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+        // SDK de Firestore (NUEVO)
+        import {
+            getFirestore, doc, getDoc, setDoc, addDoc, updateDoc,
+            deleteDoc, onSnapshot, collection, query, writeBatch
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        // SDK de Storage (NUEVO)
+        import {
+            getStorage, ref, uploadBytes, getDownloadURL, deleteObject
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+
+        // --- CONFIGURACIÓN DE FIREBASE (TU CONFIG) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4OAsKvRgr1Aq1lQ1mTwKtDznusPRTBKY",
+            authDomain: "contabyt-b0549.firebaseapp.com",
+            projectId: "contabyt-b0549",
+            storageBucket: "contabyt-b0549.firebasestorage.app",
+            messagingSenderId: "876182351779",
+            appId: "1:876182351779:web:225a641ab72ca62ed03416",
+            measurementId: "G-28153DWXGK"
+        };
+    
+        // --- INICIALIZAR FIREBASE ---
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app); // <-- AÑADIDO
+        const auth = getAuth(app);
+        const db = getFirestore(app); // (NUEVO)
+        const storage = getStorage(app); // (NUEVO)
+        const provider = new GoogleAuthProvider();
+
+        // --- VARIABLES GLOBALES DE ESTADO ---
+        let currentUserId = null; // ID del usuario logueado
+        let localContadores = []; // Cache local de contadores
+        let localClientes = []; // Cache local de clientes
+        let conceptosGuardados = []; // Cache local de conceptos
+        let edicionConceptoIndex = null;
+        let unsubContadores = () => {}; // Función para cancelar listener
+        let unsubClientes = () => {}; // Función para cancelar listener
+        
+        // --- REFERENCIAS AL DOM (MOVIDAS AQUÍ) ---
+        const loginContainer = document.getElementById('login-container');
+        const loginStatus = document.getElementById('login-status');
+        const loadingContainer = document.getElementById('loading-container');
+        const appContainer = document.getElementById('app-container');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userInfo = document.getElementById('user-info');
+        
+        const selectContador = document.getElementById('selectContador');
+        const selectCliente = document.getElementById('selectCliente');
+        const contadorSelloInput = document.getElementById('contadorSello');
+        const selloPreview = document.getElementById('selloPreview');
+        const reportForm = document.getElementById('report-form');
+        const clearFormBtn = document.getElementById('clearFormBtn');
+        const addIncomeBtn = document.getElementById('addIncomeBtn');
+
+        // Botones Contador
+        const saveContadorBtn = document.getElementById('saveContadorBtn');
+        const updateContadorBtn = document.getElementById('updateContadorBtn');
+        const deleteContadorBtn = document.getElementById('deleteContadorBtn');
+        
+        // Botones Cliente
+        const saveClienteBtn = document.getElementById('saveClienteBtn');
+        const updateClienteBtn = document.getElementById('updateClienteBtn');
+        const deleteClienteBtn = document.getElementById('deleteClienteBtn');
+
+        // Botones Conceptos
+        const conceptosSelect = document.getElementById('conceptosSelect');
+        const conceptoEditInput = document.getElementById('conceptoEditInput');
+        const conceptoBtnAgregar = document.getElementById('conceptoBtnAgregar');
+        const conceptoBtnEditar = document.getElementById('conceptoBtnEditar');
+        const conceptoBtnGuardarEdicion = document.getElementById('conceptoBtnGuardarEdicion');
+        const conceptoBtnEliminar = document.getElementById('conceptoBtnEliminar');
+
+
+        // --- DEFINICIÓN DE ESTILOS DE BOTONES ---
+        const btnBaseClass = "py-2 px-3 text-sm font-semibold rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 inline-flex items-center justify-center";
+        const btnIconBase = "p-2.5 font-semibold rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 inline-flex items-center justify-center";
+        const btnIconLilac = `${btnIconBase} bg-purple-200 text-purple-800 hover:bg-purple-300 focus:ring-purple-400`;
+        const btnSecondaryClass = `${btnBaseClass} bg-yellow-200 text-yellow-800 hover:bg-yellow-300 focus:ring-yellow-300`;
+        const btnPrimaryClass = "w-full py-3 px-6 bg-purple-700 text-white font-bold rounded-full shadow-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 flex items-center justify-center";
+        const btnDangerClass = btnIconLilac;
+        const btnSaveClass = btnIconLilac;
+        const btnWarningClass = btnIconLilac;
+        const btnClearClass = `${btnBaseClass} bg-yellow-200 text-yellow-800 hover:bg-yellow-300 focus:ring-yellow-300`;
+        const btnSmallDangerClass = "p-1.5 bg-red-600 text-white rounded-full shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95";
+
+        // --- ASIGNACIÓN DE ESTILOS (MOVIDO AQUÍ) ---
+        addIncomeBtn.className = btnSecondaryClass;
+        document.getElementById('generatePdfBtn').className = btnPrimaryClass;
+        saveContadorBtn.className = btnSaveClass;
+        saveClienteBtn.className = btnSaveClass;
+        clearFormBtn.className = btnClearClass;
+        deleteContadorBtn.className = btnDangerClass + " gestion-btn";
+        updateContadorBtn.className = btnWarningClass + " gestion-btn";
+        deleteClienteBtn.className = btnDangerClass + " gestion-btn";
+        updateClienteBtn.className = btnWarningClass + " gestion-btn";
+        conceptoBtnAgregar.className = btnSaveClass;
+        conceptoBtnEditar.className = btnWarningClass;
+        conceptoBtnGuardarEdicion.className = `${btnSaveClass} hidden`;
+        conceptoBtnEliminar.className = btnDangerClass;
+
+        // --- FUNCIONES HELPER (Mensajes, Formato, etc.) ---
+
+        // Función para mostrar mensajes (reemplaza alert)
+        function showMessage(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('message-container');
+            const msgDiv = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
+            
+            msgDiv.className = `p-4 ${bgColor} text-white rounded-lg shadow-lg mb-2 transition-all duration-300 ease-out transform translate-x-full`;
+            msgDiv.textContent = message;
+            
+            container.appendChild(msgDiv);
+
+            setTimeout(() => {
+                msgDiv.classList.remove('translate-x-full');
+                msgDiv.classList.add('translate-x-0');
+            }, 10);
+
+            setTimeout(() => {
+                msgDiv.classList.add('opacity-0');
+                msgDiv.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (container.contains(msgDiv)) {
+                         container.removeChild(msgDiv);
+                    }
+                }, 500);
+            }, duration);
+        }
+
+        // Helpers para manejo de imágenes (NUEVO)
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        async function urlToDataUrl(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Error al descargar imagen: ${response.statusText}`);
+                const blob = await response.blob();
+                return fileToDataUrl(blob);
+            } catch (error) {
+                console.error("Error en urlToDataUrl:", error);
+                throw error;
+            }
+        }
+
+        function getImageDimensions(dataUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve({ width: img.width, height: img.height });
+                img.onerror = (err) => {
+                    console.error("Error al cargar imagen en memoria", err);
+                    reject(new Error('No se pudo leer la imagen para obtener dimensiones.'));
+                }
+                img.src = dataUrl;
+            });
+        }
+
+        // Funciones de formato (Cédula, RIF, Moneda)
+        function formatCedula(e) {
+            let input = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+            let letter = (input.match(/^[VEve]/) || ['V'])[0].toUpperCase();
+            let numbers = input.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '');
+            if (numbers.length > 8) numbers = numbers.substring(0, 8);
+            let formattedNumbers = numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            e.target.value = `${letter}-${formattedNumbers}`;
+        }
+        
+        function formatRif(e) {
+            let input = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+            let letter = (input.match(/^[JGjgVEvePp]/) || ['V'])[0].toUpperCase();
+            let numbers = input.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '');
+            let mainNumbers = numbers;
+            let digit = '';
+            if (numbers.length > 8) {
+                digit = numbers.substring(numbers.length - 1);
+                mainNumbers = numbers.substring(0, 8);
+            }
+            let formattedMain = mainNumbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            e.target.value = `${letter}-${formattedMain}${digit ? '-' + digit : ''}`;
+        }
+
+        function formatSimpleThousands(e) {
+            let val = e.target.value.replace(/[^\d]/g, '');
+            if (!val) { e.target.value = ''; return; }
+            e.target.value = new Intl.NumberFormat('es-VE').format(parseInt(val, 10));
+        }
+
+        function formatCurrencyInput(e) {
+            let val = e.target.value.replace(/[^\d,]/g, '');
+            let parts = val.split(',');
+            let intPart = parts[0].replace(/\./g, '');
+            if (intPart) {
+                intPart = new Intl.NumberFormat('es-VE').format(parseInt(intPart, 10) || 0);
+            } else if (parts.length > 1) {
+                 intPart = '0';
+            } else {
+                intPart = '';
+            }
+            let decPart = parts[1];
+            e.target.value = decPart !== undefined ? intPart + ',' + decPart.substring(0, 2) : intPart;
+        }
+
+        function parseFormattedNumber(strVal) {
+            if (!strVal) return 0;
+            return strVal.replace(/\./g, '').replace(',', '.');
+        }
+
+        // Funciones de formato de fecha y moneda para PDF
+        function formatDate(dateString, options = {}) {
+            if (!dateString) return '';
+            const { format = 'dd/mm/yyyy' } = options;
+            const date = new Date(dateString + 'T00:00:00');
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            if (format === 'dd de M de yyyy') {
+                const monthNames = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                return `${day} de ${monthNames[date.getMonth()]} ${year}`;
+            }
+            return `${day}/${month}/${year}`;
+        }
+        
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('es-VE', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number);
+        }
+
+        function calculateMonths(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            let months = (end.getFullYear() - start.getFullYear()) * 12;
+            months -= start.getMonth();
+            months += end.getMonth();
+            if (end.getDate() < start.getDate()) months--;
+            return months <= 0 ? 1 : months + 1;
+        }
+
+        // --- FUNCIONES DE LIMPIEZA DE FORMULARIOS ---
+
+        function clearFormContador() {
+            document.getElementById('contadorNombre').value = '';
+            document.getElementById('contadorRif').value = '';
+            document.getElementById('contadorCpc').value = '';
+            contadorSelloInput.value = '';
+            selloPreview.src = '';
+            selloPreview.classList.add('hidden');
+            selectContador.value = "";
+            deleteContadorBtn.style.display = 'none';
+            updateContadorBtn.style.display = 'none';
+        }
+        
+        function clearFormCliente() {
+            document.getElementById('clienteTratamiento').value = 'Sr.';
+            document.getElementById('clienteNombre').value = '';
+            document.getElementById('clienteCedula').value = '';
+            selectCliente.value = "";
+            deleteClienteBtn.style.display = 'none';
+            updateClienteBtn.style.display = 'none';
+        }
+
+        function setFechasDefault() {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            document.getElementById('fechaDocumento').value = today;
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
+            const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0];
+            document.getElementById('fechaDesde').value = firstDay;
+            document.getElementById('fechaHasta').value = lastDay;
+        }
+
+        function clearForm() {
+            reportForm.reset();
+            document.getElementById('income-details').innerHTML = '';
+            addIncomeItem();
+            clearFormContador();
+            clearFormCliente();
+            setFechasDefault();
+            showMessage('Formulario limpiado.', 'success');
+        }
+
+        // --- FUNCIONES DE LÓGICA DE INGRESOS (Sin cambios) ---
+        function addIncomeItem() {
+            const container = document.getElementById('income-details');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex flex-col md:flex-row items-center gap-3 income-item';
+            
+            const conceptInput = document.createElement('input');
+            conceptInput.type = 'text';
+            conceptInput.placeholder = 'Concepto (Ej: Honorarios profesionales)';
+            conceptInput.className = 'w-full md:flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 income-concept';
+            conceptInput.setAttribute('list', 'conceptos-list');
+            conceptInput.required = true;
+            
+            const amountInput = document.createElement('input');
+            amountInput.type = 'text';
+            amountInput.inputMode = 'decimal';
+            amountInput.placeholder = 'Monto (Bs.)';
+            amountInput.className = 'w-full md:w-32 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 income-amount';
+            amountInput.required = true;
+            amountInput.addEventListener('input', formatCurrencyInput);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = btnSmallDangerClass + ' w-full md:w-auto';
+            removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> <span class="md:hidden ml-2">Eliminar Concepto</span>';
+            removeBtn.onclick = function() {
+                container.removeChild(itemDiv);
+            };
+            
+            itemDiv.appendChild(conceptInput);
+            itemDiv.appendChild(amountInput);
+            itemDiv.appendChild(removeBtn);
+            container.appendChild(itemDiv);
+        }
+
+        // --- FUNCIONES DE DATOS (REFACTORIZADAS PARA FIRESTORE) ---
+
+        // Carga los dropdowns desde las variables locales
+        function loadDropdownsUI() {
+            // Cargar Contadores
+            selectContador.innerHTML = '<option value="">-- Selecciona Contador Guardado --</option>';
+            localContadores.forEach((cont) => {
+                const option = document.createElement('option');
+                option.value = cont.id; // Usar Firestore Doc ID
+                option.textContent = `${cont.nombre} (CPC: ${cont.cpc})`;
+                selectContador.appendChild(option);
+            });
+
+            // Cargar Clientes
+            selectCliente.innerHTML = '<option value="">-- Selecciona Cliente Guardado --</option>';
+            localClientes.forEach((cli) => {
+                const option = document.createElement('option');
+                option.value = cli.id; // Usar Firestore Doc ID
+                option.textContent = `${cli.nombre} (CI: ${cli.cedula})`;
+                selectCliente.appendChild(option);
+            });
+        }
+        
+        // Llena el formulario al seleccionar un contador
+        function fillContadorForm(docId) {
+            clearFormContador();
+            selectContador.value = docId;
+
+            if (docId === "") {
+                return;
+            }
+            
+            const cont = localContadores.find(c => c.id === docId);
+            if (cont) {
+                document.getElementById('contadorNombre').value = cont.nombre || '';
+                document.getElementById('contadorRif').value = cont.rif || '';
+                document.getElementById('contadorCpc').value = cont.cpc || '';
+                
+                // Mostrar sello (NUEVO)
+                if (cont.selloURL) {
+                    selloPreview.src = cont.selloURL;
+                    selloPreview.classList.remove('hidden');
+                }
+                
+                deleteContadorBtn.style.display = 'inline-block';
+                updateContadorBtn.style.display = 'inline-block';
+            }
+        }
+
+        // Llena el formulario al seleccionar un cliente
+        function fillClienteForm(docId) {
+            clearFormCliente();
+            selectCliente.value = docId;
+
+            if (docId === "") {
+                return;
+            }
+            
+            const cli = localClientes.find(c => c.id === docId);
+            if (cli) {
+                document.getElementById('clienteTratamiento').value = cli.tratamiento || 'Sr.';
+                document.getElementById('clienteNombre').value = cli.nombre || '';
+                document.getElementById('clienteCedula').value = cli.cedula || '';
+                deleteClienteBtn.style.display = 'inline-block';
+                updateClienteBtn.style.display = 'inline-block';
+            }
+        }
+
+        function getContadorForm() {
+            const nombre = document.getElementById('contadorNombre').value.trim();
+            const rif = document.getElementById('contadorRif').value.trim();
+            const cpc = document.getElementById('contadorCpc').value.trim();
+            if (!nombre || !cpc) {
+                showMessage('Por favor, complete nombre y C.P.C. del contador.', 'error');
+                return null;
+            }
+            // Retorna solo datos, el sello se maneja aparte
+            return { nombre, rif, cpc };
+        }
+
+        function getClienteForm() {
+            const tratamiento = document.getElementById('clienteTratamiento').value;
+            const nombre = document.getElementById('clienteNombre').value.trim();
+            const cedula = document.getElementById('clienteCedula').value.trim();
+            if (!nombre || !cedula) {
+                showMessage('Por favor, complete nombre y cédula del cliente.', 'error');
+                return null;
+            }
+            return { tratamiento, nombre, cedula };
+        }
+
+        // --- FUNCIONES CRUD CON FIRESTORE (NUEVAS/REFACTORIZADAS) ---
+
+        // Colección de usuario (helper)
+        function userCol(collectionName) {
+            if (!currentUserId) return null;
+            return collection(db, 'users', currentUserId, collectionName);
+        }
+        // Documento de usuario (helper)
+        function userDoc(collectionName, docId) {
+            if (!currentUserId) return null;
+            return doc(db, 'users', currentUserId, collectionName, docId);
+        }
+
+        async function handleSaveContador() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para guardar.', 'error');
+            
+            const contData = getContadorForm();
+            if (!contData) return;
+            
+            // Verificar duplicado por CPC
+            const cpcExists = localContadores.some(c => c.cpc === contData.cpc);
+            if (cpcExists) {
+                return showMessage('Un contador con ese C.P.C. ya existe.', 'error');
+            }
+            
+            showMessage('Guardando contador...', 'info', 10000);
+            try {
+                // 1. Crear documento para obtener ID
+                const docRef = await addDoc(userCol('contadores'), contData);
+                
+                // 2. Subir sello si existe
+                const selloFile = contadorSelloInput.files[0];
+                if (selloFile) {
+                    const storageRef = ref(storage, `users/${currentUserId}/sellos/${docRef.id}.png`);
+                    await uploadBytes(storageRef, selloFile);
+                    const downloadURL = await getDownloadURL(storageRef);
+                    
+                    // 3. Actualizar doc con URL del sello
+                    await updateDoc(docRef, { selloURL: downloadURL });
+                }
+                
+                showMessage('Contador guardado con éxito.', 'success');
+                clearFormContador(); // Limpiar formulario
+            } catch (error) {
+                console.error("Error guardando contador:", error);
+                showMessage(`Error al guardar: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleUpdateContador() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para actualizar.', 'error');
+            
+            const selectedDocId = selectContador.value;
+            if (selectedDocId === "") return;
+
+            const contData = getContadorForm();
+            if (!contData) return;
+            
+            // Verificar duplicado
+            const cpcExists = localContadores.some(c => c.cpc === contData.cpc && c.id !== selectedDocId);
+            if (cpcExists) {
+                return showMessage('El C.P.C. actualizado ya pertenece a otro contador.', 'error');
+            }
+            
+            showMessage('Actualizando contador...', 'info', 10000);
+            try {
+                const docRef = userDoc('contadores', selectedDocId);
+                const selloFile = contadorSelloInput.files[0];
+                
+                if (selloFile) {
+                    // Subir nuevo sello (sobrescribe)
+                    const storageRef = ref(storage, `users/${currentUserId}/sellos/${selectedDocId}.png`);
+                    await uploadBytes(storageRef, selloFile);
+                    const downloadURL = await getDownloadURL(storageRef);
+                    contData.selloURL = downloadURL; // Añadir URL al objeto a actualizar
+                }
+                // Si no se sube sello, se mantiene la URL existente (o ninguna)
+                // Usar set con merge para no borrar selloURL si no se sube uno nuevo
+                
+                await setDoc(docRef, contData, { merge: true });
+                
+                showMessage('Contador actualizado con éxito.', 'success');
+                
+                // Recargar el formulario con los datos actualizados
+                // (onSnapshot lo hará, pero forzamos la recarga visual)
+                const updatedCont = { ...localContadores.find(c => c.id === selectedDocId), ...contData };
+                fillContadorForm(selectedDocId); // Llama a clearFormContador primero
+                // Re-seleccionar
+                selectContador.value = selectedDocId;
+                // Re-aplicar datos (fillContadorForm limpia)
+                document.getElementById('contadorNombre').value = updatedCont.nombre;
+                document.getElementById('contadorRif').value = updatedCont.rif;
+                document.getElementById('contadorCpc').value = updatedCont.cpc;
+                if (updatedCont.selloURL) {
+                     selloPreview.src = updatedCont.selloURL;
+                     selloPreview.classList.remove('hidden');
+                }
+
+
+            } catch (error) {
+                console.error("Error actualizando contador:", error);
+                showMessage(`Error al actualizar: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleDeleteContador() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para eliminar.', 'error');
+            
+            const selectedDocId = selectContador.value;
+            if (selectedDocId === "") return;
+
+            // Usar un modal personalizado en lugar de confirm()
+            showMessage('¿Seguro que quieres eliminar este contador? (Esta acción es permanente)', 'error', 10000);
+            // En una app real, usaríamos un modal que al confirmar llame al delete.
+            // Por simplicidad, simularemos la confirmación con un delay.
+            // O mejor, pedimos al usuario que haga clic de nuevo
+            if (!deleteContadorBtn.dataset.confirmed) {
+                 showMessage('Haz clic de nuevo en Eliminar para confirmar.', 'error', 5000);
+                 deleteContadorBtn.dataset.confirmed = "true";
+                 setTimeout(() => { deleteContadorBtn.dataset.confirmed = ""; }, 5000);
+                 return;
+            }
+            deleteContadorBtn.dataset.confirmed = ""; // reset
+            
+            showMessage('Eliminando contador...', 'info', 10000);
+            try {
+                const docRef = userDoc('contadores', selectedDocId);
+                await deleteDoc(docRef);
+                
+                // Eliminar sello de Storage
+                const storageRef = ref(storage, `users/${currentUserId}/sellos/${selectedDocId}.png`);
+                await deleteObject(storageRef).catch(err => {
+                    if (err.code !== 'storage/object-not-found') console.error("Error borrando sello:", err);
+                });
+                
+                showMessage('Contador eliminado.', 'success');
+                clearFormContador();
+            } catch (error) {
+                console.error("Error eliminando contador:", error);
+                showMessage(`Error al eliminar: ${error.message}`, 'error');
+            }
+        }
+
+        // --- CRUD Clientes (Firestore) ---
+        
+        async function handleSaveCliente() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para guardar.', 'error');
+            
+            const cliData = getClienteForm();
+            if (!cliData) return;
+            
+            const cedulaExists = localClientes.some(c => c.cedula === cliData.cedula);
+            if (cedulaExists) {
+                return showMessage('Un cliente con esa Cédula ya existe.', 'error');
+            }
+            
+            try {
+                await addDoc(userCol('clientes'), cliData);
+                showMessage('Cliente guardado con éxito.', 'success');
+                clearFormCliente();
+            } catch (error) {
+                console.error("Error guardando cliente:", error);
+                showMessage(`Error al guardar: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleUpdateCliente() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para actualizar.', 'error');
+            
+            const selectedDocId = selectCliente.value;
+            if (selectedDocId === "") return;
+
+            const cliData = getClienteForm();
+            if (!cliData) return;
+
+            const cedulaExists = localClientes.some(c => c.cedula === cliData.cedula && c.id !== selectedDocId);
+            if (cedulaExists) {
+                return showMessage('La Cédula actualizada ya pertenece a otro cliente.', 'error');
+            }
+            
+            try {
+                const docRef = userDoc('clientes', selectedDocId);
+                await updateDoc(docRef, cliData);
+                showMessage('Cliente actualizado con éxito.', 'success');
+            } catch (error) {
+                console.error("Error actualizando cliente:", error);
+                showMessage(`Error al actualizar: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleDeleteCliente() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para eliminar.', 'error');
+            
+            const selectedDocId = selectCliente.value;
+            if (selectedDocId === "") return;
+            
+            if (!deleteClienteBtn.dataset.confirmed) {
+                 showMessage('Haz clic de nuevo en Eliminar para confirmar.', 'error', 5000);
+                 deleteClienteBtn.dataset.confirmed = "true";
+                 setTimeout(() => { deleteClienteBtn.dataset.confirmed = ""; }, 5000);
+                 return;
+            }
+            deleteClienteBtn.dataset.confirmed = "";
+            
+            try {
+                const docRef = userDoc('clientes', selectedDocId);
+                await deleteDoc(docRef);
+                showMessage('Cliente eliminado.', 'success');
+                clearFormCliente();
+            } catch (error) {
+                console.error("Error eliminando cliente:", error);
+                showMessage(`Error al eliminar: ${error.message}`, 'error');
+            }
+        }
+
+        // --- CRUD Conceptos (Firestore) ---
+        
+        const conceptosDefault = [
+            "Actividades Comerciales", "Director de la entidad", "Docente contratado tiempo completo",
+            "Alquiler de inmueble", "Venta de mercancías", "Honorarios profesionales libre ejercicio",
+            "Honorarios Profesionales Médico", "Honorarios Profesionales Médico Ginecólogo Obstetra"
+        ];
+
+        async function loadConceptos(userId) {
+            const docRef = doc(db, 'users', userId, 'config', 'conceptos');
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().lista) {
+                    conceptosGuardados = docSnap.data().lista;
+                } else {
+                    // Primera vez, crear doc
+                    conceptosGuardados = [...conceptosDefault];
+                    await setDoc(docRef, { lista: conceptosGuardados });
+                }
+            } catch (error) {
+                console.error("Error cargando conceptos:", error);
+                conceptosGuardados = [...conceptosDefault]; // Fallback
+            }
+            cargarConceptosUI();
+        }
+
+        function cargarConceptosUI() {
+            conceptosSelect.innerHTML = '';
+            conceptosGuardados.forEach((concepto, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = concepto;
+                conceptosSelect.appendChild(option);
+            });
+
+            const datalist = document.getElementById('conceptos-list');
+            datalist.innerHTML = '';
+            conceptosGuardados.forEach(concepto => {
+                const option = document.createElement('option');
+                option.value = concepto;
+                datalist.appendChild(option);
+            });
+            
+            conceptoEditInput.value = '';
+            conceptoBtnAgregar.style.display = 'inline-flex';
+            conceptoBtnGuardarEdicion.style.display = 'none';
+            edicionConceptoIndex = null;
+        }
+
+        async function updateConceptosInFirestore() {
+            if (!currentUserId) return showMessage('Debe iniciar sesión para guardar conceptos.', 'error');
+            const docRef = doc(db, 'users', currentUserId, 'config', 'conceptos');
+            try {
+                await updateDoc(docRef, { lista: conceptosGuardados });
+                return true;
+            } catch (error) {
+                console.error("Error actualizando conceptos:", error);
+                showMessage(`Error al guardar conceptos: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        conceptoBtnAgregar.addEventListener('click', async () => {
+            const nuevoConcepto = conceptoEditInput.value.trim();
+            if (nuevoConcepto) {
+                if (conceptosGuardados.includes(nuevoConcepto)) {
+                    return showMessage('Ese concepto ya existe.', 'error');
+                }
+                conceptosGuardados.push(nuevoConcepto);
+                if (await updateConceptosInFirestore()) {
+                    cargarConceptosUI();
+                    showMessage('Concepto agregado.', 'success');
+                } else {
+                    conceptosGuardados.pop(); // Revertir
+                }
+            }
+        });
+
+        conceptoBtnEditar.addEventListener('click', () => {
+            const selectedIndex = conceptosSelect.value;
+            if (selectedIndex !== "") {
+                conceptoEditInput.value = conceptosGuardados[selectedIndex];
+                edicionConceptoIndex = selectedIndex;
+                conceptoBtnAgregar.style.display = 'none';
+                conceptoBtnGuardarEdicion.style.display = 'inline-flex';
+            } else {
+                showMessage('Seleccione un concepto de la lista para editar.', 'error');
+            }
+        });
+
+        conceptoBtnGuardarEdicion.addEventListener('click', async () => {
+            const conceptoEditado = conceptoEditInput.value.trim();
+            if (conceptoEditado && edicionConceptoIndex !== null) {
+                const duplicado = conceptosGuardados.some((c, i) => c === conceptoEditado && i != edicionConceptoIndex);
+                if (duplicado) {
+                    return showMessage('Ese concepto ya existe en la lista.', 'error');
+                }
+                
+                const oldValue = conceptosGuardados[edicionConceptoIndex];
+                conceptosGuardados[edicionConceptoIndex] = conceptoEditado;
+                
+                if (await updateConceptosInFirestore()) {
+                    cargarConceptosUI();
+                    showMessage('Concepto actualizado.', 'success');
+                } else {
+                    conceptosGuardados[edicionConceptoIndex] = oldValue; // Revertir
+                }
+            }
+        });
+
+        conceptoBtnEliminar.addEventListener('click', async () => {
+            const selectedIndex = conceptosSelect.value;
+            if (selectedIndex !== "") {
+                const oldValue = conceptosGuardados.splice(selectedIndex, 1)[0];
+                
+                if (await updateConceptosInFirestore()) {
+                    cargarConceptosUI();
+                    showMessage('Concepto eliminado.', 'success');
+                } else {
+                    conceptosGuardados.splice(selectedIndex, 0, oldValue); // Revertir
+                }
+            } else {
+                showMessage('Seleccione un concepto de la lista para eliminar.', 'error');
+            }
+        });
+
+        // --- LÓGICA DE PDF (REFACTORIZADA PARA SELLO ASYNC) ---
+
+        // Event listener del formulario (convertido a async)
+        reportForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // ... (Validación de ingresos)
+            const incomeItems = document.querySelectorAll('.income-item');
+            if (incomeItems.length === 0) return showMessage('Debe agregar al menos un concepto de ingreso.', 'error');
+            let valid = true;
+            incomeItems.forEach(item => { /* ... */ });
+            if (!valid) return showMessage('Revise los conceptos de ingreso.', 'error');
+            // ... (Fin validación)
+
+            let sealDataUrl = null;
+            let originalWidth = 0;
+            let originalHeight = 0;
+
+            const stagedFile = contadorSelloInput.files[0];
+            const previewSrc = selloPreview.src;
+
+            showMessage('Generando PDF...', 'info', 10000);
+            document.getElementById('generatePdfBtn').disabled = true;
+
+            try {
+                if (stagedFile) {
+                    // Caso 1: Hay un archivo nuevo en el input
+                    if (stagedFile.type !== "image/png") throw new Error('El sello debe ser un archivo PNG.');
+                    sealDataUrl = await fileToDataUrl(stagedFile);
+                
+                } else if (previewSrc && (previewSrc.startsWith('http') || previewSrc.startsWith('data:'))) {
+                    // Caso 2: Hay una imagen en la vista previa (cargada de Storage o seleccionada)
+                    if (previewSrc.startsWith('data:')) {
+                        sealDataUrl = previewSrc; // Ya es dataURL
+                    } else {
+                        // Es un URL de Firebase, hay que descargarlo y convertirlo
+                        sealDataUrl = await urlToDataUrl(previewSrc);
+                    }
+                }
+                // Caso 3: No hay stagedFile ni previewSrc, sealDataUrl sigue null (sin sello)
+
+                if (sealDataUrl) {
+                    // Si tenemos un sello, obtener sus dimensiones
+                    const dimensions = await getImageDimensions(sealDataUrl);
+                    originalWidth = dimensions.width;
+                    originalHeight = dimensions.height;
+                }
+
+                // Generar el PDF
+                buildPDF(sealDataUrl, originalWidth, originalHeight);
+                showMessage('PDF generado con éxito.', 'success');
+
+            } catch (error) {
+                console.error("Error al procesar sello o generar PDF:", error);
+                showMessage(`Error al generar PDF: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('generatePdfBtn').disabled = false;
+            }
+        });
+
+        // Función buildPDF (Idéntica a la original, excepto por el nombre)
+        function buildPDF(sealDataUrl, originalSealWidth, originalSealHeight) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'letter');
+
+            // --- 1. Recolectar Datos ---
+            const contadorNombre = document.getElementById('contadorNombre').value;
+            const contadorCpc = document.getElementById('contadorCpc').value;
+            const contadorRif = document.getElementById('contadorRif').value; 
+            const clienteTratamiento = document.getElementById('clienteTratamiento').value;
+            const clienteNombre = document.getElementById('clienteNombre').value;
+            const clienteCedula = document.getElementById('clienteCedula').value;
+            const entidadDirigida = document.getElementById('entidadDirigida').value;
+            const motivoInforme = document.getElementById('motivoInforme').value;
+            const lugar = document.getElementById('lugar').value;
+            const fechaDocumentoRaw = document.getElementById('fechaDocumento').value;
+            const fechaDesdeRaw = document.getElementById('fechaDesde').value;
+            const fechaHastaRaw = document.getElementById('fechaHasta').value;
+
+            const fechaDocumentoLarga = `${lugar}, ${formatDate(fechaDocumentoRaw, { format: 'dd de M de yyyy' })}`;
+            const fechaDesde = formatDate(fechaDesdeRaw);
+            const fechaHasta = formatDate(fechaHastaRaw);
+            const fechaDesdeLarga = formatDate(fechaDesdeRaw, { format: 'dd de M de yyyy' });
+            const fechaHastaLarga = formatDate(fechaHastaRaw, { format: 'dd de M de yyyy' });
+            
+            const incomeItems = document.querySelectorAll('.income-item');
+            let totalIngresos = 0;
+            const tableData = [];
+            incomeItems.forEach(item => {
+                const concept = item.querySelector('.income-concept').value;
+                const amountStr = item.querySelector('.income-amount').value;
+                const amount = parseFloat(parseFormattedNumber(amountStr)) || 0;
+                
+                if (concept && amount > 0) {
+                    tableData.push([concept, `Bs. ${formatCurrency(amount)}`]);
+                    totalIngresos += amount;
+                }
+            });
+
+            const numMeses = calculateMonths(fechaDesdeRaw, fechaHastaRaw);
+            const promedioMensual = totalIngresos / numMeses;
+
+            // --- 2. Definir Variables y Estilos del PDF ---
+            const marginTop = 5 * 28.35;
+            const marginBottom = 3 * 28.35;
+            const marginLeft = 60;
+            const marginRight = 60;
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const usableWidth = doc.internal.pageSize.getWidth() - marginLeft - marginRight;
+            let currentY = marginTop;
+
+            doc.setFont('helvetica', 'normal');
+
+            function addText(text, options = {}) {
+                const { fontSize = 11, fontStyle = 'normal', align = 'justify', indent = 0, spacing = 15, lineSpacing = 1.5 } = options;
+                doc.setFontSize(fontSize);
+                doc.setFont('helvetica', fontStyle);
+                let x;
+                const maxWidth = usableWidth - indent;
+                if (align === 'center') x = doc.internal.pageSize.getWidth() / 2;
+                else if (align === 'right') x = doc.internal.pageSize.getWidth() - marginRight;
+                else x = marginLeft + indent;
+
+                const lines = doc.splitTextToSize(text, maxWidth);
+                const textHeight = lines.length * fontSize * (lineSpacing * 0.58) + (lines.length -1) * (fontSize * (lineSpacing -1));
+                
+                if (currentY + textHeight > pageHeight - marginBottom) {
+                    doc.addPage();
+                    currentY = marginTop;
+                }
+                doc.text(text, x, currentY, { align: align, maxWidth: maxWidth, lineHeightFactor: lineSpacing });
+                currentY += textHeight + spacing;
+            }
+
+            // --- 3. Construir el PDF (Página 1) ---
+            addText('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', { fontSize: 11, fontStyle: 'bold', align: 'center', spacing: 30 }); 
+            addText('Alcance', { fontSize: 11, fontStyle: 'bold', align: 'left', spacing: 20 });
+            addText(`He revisado la evidencia inherente a los ingresos percibidos por el ${clienteTratamiento} ${clienteNombre}, con cedula de identidad N.º ${clienteCedula}, durante el periodo comprendido desde el ${fechaDesde} hasta el ${fechaHasta}, presentado en la relación de ingresos adjunta, correspondiente a su actividad económica según se detalla en el anexo.`, { indent: 20, spacing: 25 });
+            addText('Responsabilidad de la persona que percibe los ingresos', { fontSize: 11, fontStyle: 'bold', align: 'left', spacing: 20 });
+            addText(`El ${clienteTratamiento} ${clienteNombre}, es responsable de la preparación y presentación del importe de sus ingresos que se adjunta en este informe, incluyendo la integridad, legalidad y veracidad de los documentos suministrados. Esta responsabilidad incluye la aseveración de que todos y cada uno de los ingresos detallados en la relación, provienen de actividades legítimas y de comprobable licito ejercicio.`, { indent: 20, spacing: 25 });
+            addText('Responsabilidad del Contador Público Independiente', { fontSize: 11, fontStyle: 'bold', align: 'left', spacing: 20 });
+            addText(`Mi responsabilidad es expresar una opinión sobre la relación de ingresos obtenida por el ${clienteTratamiento} ${clienteNombre}, durante el periodo señalado de acuerdo con mis procedimientos, los cuales he realizado de conformidad con la Norma Internacional para encargos de aseguramiento, los cuales he realizado de conformidad con la Normas Internacionales de Encargos de Aseguramiento NIEA 3000, esta norma prevé que cumpla con los requerimientos éticos y que planifique y realice los procedimientos para obtener una seguridad razonable de que, en todos los aspectos materiales, la relación está presentada razonablemente.`, { indent: 20, spacing: 15 });
+            addText(`Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clienteTratamiento} ${clienteNombre}, para el periodo ${fechaDesde} hasta el ${fechaHasta}, con base al examen sobre la evidencia obtenida.`, { indent: 20, spacing: 25 });
+
+            doc.addPage();
+            currentY = marginTop;
+
+            // --- Construir el PDF (Página 2) ---
+            addText('Identificación del criterio de evaluación', { fontSize: 11, fontStyle: 'bold', align: 'left', spacing: 20 });
+            addText(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clienteTratamiento} ${clienteNombre}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25 });
+            addText('Opinión', { fontSize: 11, fontStyle: 'bold', align: 'left', spacing: 20 });
+            addText('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable y que los ingresos detallados en la relación, no provenga de actividades legítimas y de comprobable lícito ejercicio.', { indent: 20, spacing: 25 });
+            addText('Usuarios Previstos y Propósitos', { fontSize: 11, fontStyle: 'bold', align: 'left', spacing: 20 });
+            addText(`Este informe y la relación que se adjunta están dirigidos únicamente al ${entidadDirigida} el cual lo ha requerido para ${motivoInforme}.`, { indent: 20, spacing: 40 });
+
+            // --- Firma del Contador ---
+            const fontSize = 11;
+            const lineSpacing = 1.5;
+            const spacing = 12;
+            const spacingFirma = 12;
+
+            const calcHeight = (text) => {
+                const lines = doc.splitTextToSize(text, usableWidth);
+                const h = lines.length * fontSize * (lineSpacing * 0.58) + (lines.length - 1) * (fontSize * (lineSpacing - 1));
+                return h;
+            };
+
+            const h1 = calcHeight('________________________________');
+            const h2 = calcHeight(`${contadorNombre}`);
+            const h3 = calcHeight(`Rif: ${contadorRif}`);
+            const h4 = calcHeight(`Contador Público C.P.C. N ${contadorCpc}`); 
+            const h5 = calcHeight(fechaDocumentoLarga);
+
+            let signatureBlockHeight = h1 + spacingFirma + h2 + spacingFirma + h4;
+            if (contadorRif) {
+                signatureBlockHeight += spacingFirma + h3;
+            }
+            const dateHeight = h5;
+            const sigBlockY = pageHeight - marginBottom - dateHeight - (spacing * 2) - signatureBlockHeight;
+
+            // --- Agregar Sello (si existe) ---
+            if (sealDataUrl && originalSealWidth > 0 && originalSealHeight > 0) {
+                const cm = 28.35;
+                const maxSealWidth = 5.30 * cm;
+                const maxSealHeight = 2.10 * cm;
+
+                let sealWidth = originalSealWidth;
+                let sealHeight = originalSealHeight;
+                
+                const widthRatio = maxSealWidth / sealWidth;
+                const heightRatio = maxSealHeight / sealHeight;
+                const ratio = Math.min(widthRatio, heightRatio, 1); 
+                
+                sealWidth = sealWidth * ratio;
+                sealHeight = sealHeight * ratio;
+
+                const sealX = doc.internal.pageSize.getWidth() - marginRight - sealWidth;
+                const sealY = sigBlockY - sealHeight - (spacing / 2);
+
+                if (sealY + sealHeight <= pageHeight - marginBottom) {
+                    doc.addImage(sealDataUrl, 'PNG', sealX, sealY, sealWidth, sealHeight);
+                } else {
+                     doc.addImage(sealDataUrl, 'PNG', sealX, marginTop, sealWidth, sealHeight);
+                }
+            }
+            // --- Fin Sello ---
+            
+            currentY = pageHeight - marginBottom - dateHeight;
+            addText(fechaDocumentoLarga, { align: 'left', spacing: 0, fontSize: 11 });
+
+            currentY = pageHeight - marginBottom - dateHeight - (spacing * 2) - signatureBlockHeight;
+            
+            addText('________________________________', { align: 'center', spacing: spacingFirma, fontSize: 11 });
+            addText(`${contadorNombre}`, { align: 'center', spacing: spacingFirma, fontSize: 11, fontStyle: 'bold' });
+            addText(`Contador Público C.P.C. N ${contadorCpc}`, { align: 'center', spacing: spacingFirma, fontSize: 11 });
+            if (contadorRif) {
+                addText(`Rif: ${contadorRif}`, { align: 'center', spacing: spacingFirma, fontSize: 11 }); 
+            }
+            
+            // --- Página 3 (Anexo) ---
+            doc.addPage();
+            currentY = marginTop;
+            
+            addText(`${clienteNombre.toUpperCase()}`, { fontSize: 11, fontStyle: 'bold', align: 'center', spacing: 10 });
+            addText(`${clienteCedula}`, { fontSize: 11, fontStyle: 'bold', align: 'center', spacing: 30 });
+            addText(`INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)`, { fontSize: 11, fontStyle: 'bold', align: 'center', spacing: 20 });
+            addText(`Los ingresos corresponden al período desde el ${fechaDesdeLarga} hasta el ${fechaHastaLarga} y los mismos se derivan de:`, { fontSize: 11, align: 'justify', spacing: 30 });
+            
+            doc.autoTable({
+                head: [['Detalle de los ingresos del periodo:', 'Bolívares']],
+                body: tableData,
+                foot: [
+                    [
+                        { content: 'Total Ingresos', styles: { halign: 'left' } },
+                        { content: `Bs. ${formatCurrency(totalIngresos)}`, styles: { halign: 'right' } }
+                    ]
+                ],
+                startY: currentY,
+                margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom },
+                theme: 'grid',
+                headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center', fontSize: 11, font: 'helvetica', lineColor: [209, 213, 219], lineWidth: 0.5 },
+                footStyles: { fillColor: [243, 244, 246], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 11, font: 'helvetica', lineColor: [209, 213, 219], lineWidth: 0.5 },
+                bodyStyles: { font: 'helvetica', fontSize: 11, lineColor: [209, 213, 219], lineWidth: 0.5 },
+                columnStyles: { 0: { halign: 'left' }, 1: { halign: 'right' } },
+                didDrawPage: (data) => { currentY = data.cursor.y; },
+                willDrawPage: (data) => {
+                    if (data.pageNumber > 3) { currentY = marginTop; data.cursor.y = marginTop; }
+                }
+            });
+
+            currentY = doc.autoTable.previous.finalY + 30;
+
+            addText('LEGITIMACION DE CAPITALES', { fontSize: 11, fontStyle: 'bold', align: 'center', spacing: 15 });
+            addText('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { fontSize: 11, align: 'justify', spacing: 50 });
+            
+            const signatureHeightCliente = 3 * 18;
+            let finalY = pageHeight - marginBottom - signatureHeightCliente;
+            if (currentY > finalY) { doc.addPage(); currentY = marginTop; finalY = pageHeight - marginBottom - signatureHeightCliente; }
+            currentY = finalY;
+            
+            addText('_____________________________________', { align: 'center', spacing: 12, fontSize: 11 });
+            addText(`${clienteNombre}`, { align: 'center', spacing: 12, fontSize: 11, fontStyle: 'bold' });
+            addText(`C.I. ${clienteCedula}`, { align: 'center', spacing: 12, fontSize: 11 });
+
+            // --- 4. Guardar el PDF ---
+            doc.save(`Informe_Aseguramiento_${clienteNombre.replace(/\s/g, '_')}.pdf`);
+        }
+
+        // --- MANEJO DE AUTENTICACIÓN Y DATOS ---
+
+        // Función para actualizar la UI
+        function updateUI(user) {
+            if (user) {
+                loginContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                // --- MODIFICADO ---
+                // Manejar la UI para usuarios anónimos
+                if (user.isAnonymous) {
+                    userInfo.textContent = `Sesión anónima (ID: ${user.uid.substring(0, 6)}...)`;
+                } else {
+                    userInfo.textContent = `Sesión iniciada como: ${user.displayName || user.email}`;
+                }
+                // --- FIN MODIFICADO ---
+            } else {
+                loginContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                userInfo.textContent = '';
+                // Asegurarse de que el formulario de login esté visible, no el spinner
+                loginStatus.classList.remove('hidden');
+                loadingContainer.classList.add('hidden');
+            }
+        }
+
+        // Limpia la UI cuando se cierra sesión
+        function clearAllDataUI() {
+            // Detener listeners
+            unsubContadores();
+            unsubClientes();
+            
+            // Limpiar caches locales
+            localContadores = [];
+            localClientes = [];
+            conceptosGuardados = [];
+            
+            // Limpiar dropdowns
+            loadDropdownsUI();
+            cargarConceptosUI();
+            
+            // Limpiar formularios
+            clearForm();
+        }
+
+        // Configura los listeners de Firestore (NUEVO)
+        function setupRealtimeListeners(userId) {
+            // Cancelar listeners anteriores (si existen)
+            unsubContadores();
+            unsubClientes();
+
+            // Listener para Contadores
+            const qContadores = query(collection(db, 'users', userId, 'contadores'));
+            unsubContadores = onSnapshot(qContadores, (snapshot) => {
+                localContadores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Guardar selección actual
+                const currentSelection = selectContador.value;
+                loadDropdownsUI();
+                // Restaurar selección si aún existe
+                if (localContadores.some(c => c.id === currentSelection)) {
+                    selectContador.value = currentSelection;
+                } else {
+                    clearFormContador(); // Limpiar si fue eliminado
+                }
+            }, (error) => {
+                console.error("Error en listener de contadores:", error);
+                showMessage('Error al cargar contadores.', 'error');
+            });
+
+            // Listener para Clientes
+            const qClientes = query(collection(db, 'users', userId, 'clientes'));
+            unsubClientes = onSnapshot(qClientes, (snapshot) => {
+                localClientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const currentSelection = selectCliente.value;
+                loadDropdownsUI();
+                if (localClientes.some(c => c.id === currentSelection)) {
+                    selectCliente.value = currentSelection;
+                } else {
+                    clearFormCliente();
+                }
+            }, (error) => {
+                console.error("Error en listener de clientes:", error);
+                showMessage('Error al cargar clientes.', 'error');
+            });
+        }
+
+        // --- INICIALIZACIÓN Y EVENT LISTENERS ---
+
+        // Eventos de click para Auth
+        googleLoginBtn.addEventListener('click', () => {
+            loginStatus.classList.add('hidden');
+            loadingContainer.classList.remove('hidden');
+            
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // El usuario inició sesión exitosamente.
+                    const user = result.user;
+                    console.log("Usuario conectado vía popup:", user.displayName);
+                    showMessage('¡Bienvenido, ' + user.displayName + '!', 'success');
+                    // onAuthStateChanged se encargará de actualizar la UI y cargar datos.
+                })
+                .catch((error) => {
+                    // Manejar errores del popup
+                    console.error("Error al iniciar popup:", error);
+
+                    // --- INICIO DE LA MODIFICACIÓN (FALLBACK ANÓNIMO) ---
+                    if (error.code === 'auth/unauthorized-domain') {
+                        // Error de dominio: El popup falló. Intentar Iniciar Sesión Anónimamente como fallback.
+                        showMessage('Error de dominio. Iniciando sesión anónima de respaldo...', 'info', 5000);
+                        console.log("Fallback: Intentando signInAnonymously().");
+                        
+                        signInAnonymously(auth)
+                            .then(() => {
+                                // onAuthStateChanged se encargará de mostrar la app.
+                                console.log("Inicio de sesión anónimo exitoso.");
+                                showMessage('Inicio de sesión anónimo exitoso.', 'success');
+                            })
+                            .catch((anonError) => {
+                                // Error en el fallback anónimo
+                                console.error("Error en el fallback anónimo:", anonError);
+                                showMessage('Error crítico: ' + anonError.message, 'error');
+                                loginStatus.classList.remove('hidden'); // Mostrar botón de login de nuevo
+                            });
+
+                    } else {
+                        // Otro tipo de error (popup cerrado, etc.)
+                        showMessage('Error al iniciar: ' + error.message, 'error');
+                        loginStatus.classList.remove('hidden'); // Mostrar botón de login de nuevo
+                    }
+                    // --- FIN DE LA MODIFICACIÓN ---
+                })
+                .finally(() => {
+                    // Ocultar el spinner de carga en el login,
+                    // onAuthStateChanged se encargará del resto.
+                    loadingContainer.classList.add('hidden');
+                });
+        });
+    
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth)
+                .then(() => {
+                    showMessage('Has cerrado sesión.', 'success');
+                    clearAllDataUI(); // Limpiar todo
+                })
+                .catch((error) => {
+                    console.error("Error al cerrar sesión:", error);
+                    showMessage('Error al cerrar sesión: ' + error.message, 'error');
+                });
+        });
+
+        // Eventos de click para la App
+        clearFormBtn.addEventListener('click', clearForm);
+        addIncomeBtn.addEventListener('click', addIncomeItem);
+        
+        // Listeners de formularios
+        document.getElementById('clienteCedula').addEventListener('input', formatCedula);
+        document.getElementById('contadorRif').addEventListener('input', formatRif);
+        document.getElementById('contadorCpc').addEventListener('input', formatSimpleThousands);
+        
+        // Listeners de selección de Dropdowns
+        selectContador.addEventListener('change', (e) => fillContadorForm(e.target.value));
+        selectCliente.addEventListener('change', (e) => fillClienteForm(e.target.value));
+
+        // Listeners CRUD
+        saveContadorBtn.addEventListener('click', handleSaveContador);
+        updateContadorBtn.addEventListener('click', handleUpdateContador);
+        deleteContadorBtn.addEventListener('click', handleDeleteContador);
+        saveClienteBtn.addEventListener('click', handleSaveCliente);
+        updateClienteBtn.addEventListener('click', handleUpdateCliente);
+        deleteClienteBtn.addEventListener('click', handleDeleteCliente);
+        
+        // Listener para preview de sello (sin cambios)
+        contadorSelloInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.type === "image/png") {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selloPreview.src = e.target.result;
+                    selloPreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                // No limpiar src, podría haber una URL de storage
+                if (file) {
+                    showMessage('Por favor, suba un archivo en formato PNG.', 'error');
+                    contadorSelloInput.value = '';
+                }
+            }
+        });
+        
+        // --- PUNTO DE ENTRADA PRINCIPAL ---
+
+        // Mostrar spinner de carga al inicio
+        loginStatus.classList.add('hidden');
+        loadingContainer.classList.remove('hidden');
+
+        // onAuthStateChanged se llamará DESPUÉS de getRedirectResult
+        onAuthStateChanged(auth, (user) => {
+            updateUI(user); // Actualiza la UI (muestra app o login)
+            if (user) {
+                // Usuario logueado
+                if (currentUserId !== user.uid) { // Si es un usuario nuevo
+                    currentUserId = user.uid;
+                    // Iniciar la carga de datos
+                    setupRealtimeListeners(user.uid);
+                    loadConceptos(user.uid);
+                    addIncomeItem();
+                    setFechasDefault();
+                }
+            } else {
+                // Usuario no logueado
+                currentUserId = null;
+                clearAllDataUI(); // Asegurarse de que todo esté limpio
+            }
+            
+            // Ocultar el spinner de carga inicial después de que onAuthStateChanged
+            // haya hecho su primera comprobación.
+            loginStatus.classList.remove('hidden');
+            loadingContainer.classList.add('hidden');
+            // Re-actualizar la UI por si el estado cambió mientras se ocultaba el spinner
+            updateUI(auth.currentUser);
+        });
+
+        // Procesar el resultado del redirect (ELIMINADO, no se usa con Popup)
+        /*
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    // El usuario acaba de iniciar sesión
+                    const user = result.user;
+                    console.log("Usuario conectado vía redirect:", user.displayName);
+                    showMessage('¡Bienvenido, ' + user.displayName + '!', 'success');
+                }
+            })
+            .catch((error) => {
+                console.error("Error al obtener redirect result:", error);
+                showMessage('Error al iniciar sesión: ' + error.code + " " + error.message, 'error');
+            })
+            .finally(() => {
+                updateUI(auth.currentUser);
+            });
+        */
+    
+    </script>
+
+</body>
+</html>

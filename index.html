@@ -74,7 +74,7 @@
             </button>
         </div>
 
-        <!-- Estado de Carga -->
+        <!-- Estado de Carga (Oculto por defecto para que no bloquee el login en Vercel) -->
         <div id="loading-container" class="hidden">
             <p class="text-gray-600 mb-4">Verificando autenticación...</p>
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto"></div>
@@ -500,8 +500,10 @@
 
         // --- INICIALIZACIÓN "HÍBRIDA" ---
         async function init() {
-            loginStatus.classList.remove('hidden'); loadingContainer.classList.remove('hidden');
-            
+            // Por defecto (Producción): mostrar botón de login, ocultar loader
+            loginStatus.classList.remove('hidden');
+            loadingContainer.classList.add('hidden');
+
             onAuthStateChanged(auth, (user) => {
                 currentUserId = user ? user.uid : null;
                 loginContainer.classList.toggle('hidden', !!user);
@@ -515,44 +517,43 @@
                     unsubClientes = onSnapshot(getPublicCol('clientes'), (s) => { localClientes = s.docs.map(d => ({ id: d.id, ...d.data() })); loadDropdownsUI(); if (selectCliente.value && !localClientes.find(x => x.id === selectCliente.value)) clearFormCliente(); });
                     loadConceptos(); addIncomeItem(); setFechasDefault();
                 } else {
-                    // No autenticado: limpiar
+                    // No autenticado: limpiar y asegurar que se ve el botón de login
                     unsubContadores(); unsubClientes(); clearForm();
+                    loginStatus.classList.remove('hidden');
+                    loadingContainer.classList.add('hidden');
                 }
-                loginStatus.classList.add('hidden'); loadingContainer.classList.add('hidden');
             });
 
-            // Lógica de Auto-Login para Canvas vs Producción
-            try {
-                if (initialAuthToken) {
-                    // Estamos en Canvas Preview -> Usar token especial
-                    console.log("Detectado entorno Canvas Preview. Usando token.");
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // Estamos en Producción (Vercel) -> No hacer nada, esperar click en botón Google
-                    console.log("Detectado entorno Producción. Esperando inicio de sesión manual.");
-                }
-            } catch (e) {
-                console.error("Fallo auto-login:", e);
-                // Fallback solo para Canvas
-                if (initialAuthToken) {
-                     try { await signInAnonymously(auth); } catch(e2) { showMessage('Error crítico auth: ' + e2.message, 'error'); }
-                }
+            // Lógica de Auto-Login SOLO para Canvas
+            if (initialAuthToken) {
+                 // Estamos en Canvas Preview -> Ocultar login, mostrar loader
+                 console.log("Detectado entorno Canvas Preview. Usando token.");
+                 loginStatus.classList.add('hidden');
+                 loadingContainer.classList.remove('hidden');
+                 try {
+                     await signInWithCustomToken(auth, initialAuthToken);
+                 } catch (e) {
+                     console.error("Fallo auto-login Canvas:", e);
+                     // Si falla, volver a mostrar el botón de login normal
+                     loginStatus.classList.remove('hidden');
+                     loadingContainer.classList.add('hidden');
+                 }
             }
         }
 
         // Event Listeners
         googleLoginBtn.addEventListener('click', async () => {
-            loginStatus.classList.remove('hidden'); loadingContainer.classList.remove('hidden');
+            loginStatus.classList.add('hidden'); loadingContainer.classList.remove('hidden');
             try {
                 await signInWithPopup(auth, provider);
             } catch (e) {
                 console.error("Error Google Login:", e);
                 if (e.code === 'auth/unauthorized-domain') {
-                    showMessage('Este dominio no está autorizado para Google Login. Si estás en vista previa, esto es normal. En Vercel funcionará si configuraste el dominio.', 'error', 10000);
+                    showMessage('Dominio no autorizado en Firebase. Revise la consola de Firebase.', 'error', 5000);
                 } else {
                     showMessage('Error de inicio de sesión: ' + e.message, 'error');
                 }
-                loginStatus.classList.add('hidden'); loadingContainer.classList.add('hidden');
+                loginStatus.classList.remove('hidden'); loadingContainer.classList.add('hidden');
             }
         });
         logoutBtn.addEventListener('click', () => signOut(auth)); clearFormBtn.addEventListener('click', clearForm); addIncomeBtn.addEventListener('click', addIncomeItem);

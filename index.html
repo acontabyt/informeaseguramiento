@@ -65,18 +65,18 @@
         
         <!-- Contenedor de estado de Login -->
         <div id="login-status">
-            <p class="text-gray-600 mb-8">Iniciando sesión...</p>
-            <!-- El botón se mostrará solo si falla el inicio automático -->
-            <button id="google-login-btn" class="hidden bg-purple-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-purple-600 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-in-out items-center justify-center w-full">
-                 <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-                Reintentar Inicio de Sesión
+            <p class="text-gray-600 mb-8">Por favor, inicia sesión para continuar.</p>
+    
+            <!-- Botón de Login con Google (Lila) -->
+            <button id="google-login-btn" class="bg-purple-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-purple-600 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center justify-center w-full">
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFF" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FFC107" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#FF3D00" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.027C9.505,39.556,16.227,44,24,44z"></path><path fill="#4CAF50" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C39.099,34.799,44,28,44,20C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                Iniciar Sesión con Google
             </button>
         </div>
 
         <!-- Estado de Carga -->
-        <div id="loading-container">
+        <div id="loading-container" class="hidden">
+            <p class="text-gray-600 mb-4">Verificando autenticación...</p>
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto"></div>
         </div>
 
@@ -94,10 +94,8 @@
                     </svg>
                     Informe de Aseguramiento
                 </h1>
-                <!-- Info del Usuario (NUEVO) -->
                 <p id="user-info" class="text-purple-200 text-xs font-medium mt-1 ml-11"></p>
             </div>
-            <!-- Botón de Logout -->
             <button id="logout-btn" class="bg-red-500 text-white py-2 px-4 rounded-full shadow-md hover:bg-red-600 transition text-sm font-semibold">
                 Cerrar Sesión
             </button>
@@ -105,7 +103,7 @@
 
         <!-- Botón Limpiar Formulario -->
         <div class="p-6 md:p-8 pb-0 flex justify-end">
-            <button type="button" id="clearFormBtn"> <!-- La clase se aplica por JS -->
+            <button type="button" id="clearFormBtn">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75-6.75M4.5 12l6.75 6.75" />
                 </svg>
@@ -145,7 +143,6 @@
                     </div>
                 </div>
 
-                <!-- Campo Sello del Contador (MODIFICADO) -->
                 <div class="form-group mt-4">
                     <label for="contadorSello" class="block text-sm font-medium text-gray-700 mb-1">Sello del Contador (PNG)</label>
                     <input type="file" id="contadorSello" class="w-full text-sm text-gray-500
@@ -155,8 +152,6 @@
                         file:bg-purple-50 file:text-purple-700
                         hover:file:bg-purple-100" accept="image/png">
                     <small class="text-xs text-gray-500">Subir PNG. Máx: 5.30cm (ancho) x 2.10cm (alto).</small>
-                    
-                    <!-- Vista previa del sello (MODIFICADA para crossOrigin) -->
                     <img id="selloPreview" src="" alt="Vista previa del sello" class="mt-2 h-16 object-contain hidden p-2" crossorigin="anonymous" />
                 </div>
                 
@@ -304,12 +299,8 @@
                     </svg>
                     Detalle de los Ingresos del Período
                 </legend>
-                
                 <datalist id="conceptos-list"></datalist>
-
-                <div id="income-details" class="space-y-3 mb-4">
-                    <!-- Los ingresos se agregarán aquí dinámicamente -->
-                </div>
+                <div id="income-details" class="space-y-3 mb-4"></div>
                 <button type="button" id="addIncomeBtn" class="btn-secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -325,16 +316,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Gestionar Conceptos de Ingreso (Guardados en tu cuenta)
+                    Gestionar Conceptos de Ingreso
                 </legend>
                 <div class="space-y-4">
                     <div>
-                        <label for="conceptosSelect" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select id="conceptosSelect" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 bg-gray-50"></select>
                     </div>
                     <div>
-                        <label for="conceptoEditInput" class="block text-sm font-medium text-gray-700 mb-1">Concepto (para agregar o editar)</label>
-                        <input type="text" id="conceptoEditInput" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        <input type="text" id="conceptoEditInput" placeholder="Nuevo concepto o editar seleccionado" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <button type="button" id="conceptoBtnAgregar" class="btn-save" title="Agregar Nuevo">
@@ -343,7 +332,7 @@
                         <button type="button" id="conceptoBtnEditar" class="btn-warning" title="Cargar para Editar">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
                         </button>
-                        <button type="button" id="conceptoBtnGuardarEdicion" class="btn-save" style="display:none;" title="Guardar Cambios">
+                        <button type="button" id="conceptoBtnGuardarEdicion" class="btn-save hidden" title="Guardar Cambios">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586L7.707 10.293zM3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" /></svg>
                         </button>
                         <button type="button" id="conceptoBtnEliminar" class="btn-danger" title="Eliminar Seleccionado">
@@ -352,7 +341,6 @@
                     </div>
                 </div>
             </fieldset>
-
 
             <!-- Botones de Acción -->
             <div class="pt-6 border-t border-gray-200 flex justify-center">
@@ -366,541 +354,220 @@
         </form>
     </div>
 
-    <!-- Contenedor para mensajes de éxito/error -->
     <div id="message-container" class="fixed top-5 right-5 z-50"></div>
 
-    <!-- 
-    ================================================================
-    SCRIPT DE APLICACIÓN Y AUTENTICACIÓN (TODO EN UN MÓDULO)
-    ================================================================
-    -->
     <script type="module">
-        // --- SDK DE FIREBASE ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-        // SDK de Firestore
-        import {
-            getFirestore, doc, getDoc, setDoc, addDoc, updateDoc,
-            deleteDoc, onSnapshot, collection, query, writeBatch
-        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-        // SDK de Storage
-        import {
-            getStorage, ref, uploadBytes, getDownloadURL, deleteObject
-        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
         
-        // --- CONFIGURACIÓN DE FIREBASE ---
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Configuración de Firebase: Usa la del entorno (vista previa) o la tuya por defecto (producción)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyD4OAsKvRgr1Aq1lQ1mTwKtDznusPRTBKY",
+            authDomain: "contabyt-b0549.firebaseapp.com",
+            projectId: "contabyt-b0549",
+            storageBucket: "contabyt-b0549.firebasestorage.app",
+            messagingSenderId: "876182351779",
+            appId: "1:876182351779:web:225a641ab72ca62ed03416",
+            measurementId: "G-28153DWXGK"
+        };
+
+        // Variables específicas de Canvas para autenticación segura en vista previa
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-    
-        // --- INICIALIZAR FIREBASE ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+        const provider = new GoogleAuthProvider();
         
-        // --- VARIABLES GLOBALES DE ESTADO ---
-        let currentUserId = null; 
-        let localContadores = []; 
-        let localClientes = []; 
-        let conceptosGuardados = []; 
-        let edicionConceptoIndex = null;
-        let unsubContadores = () => {}; 
-        let unsubClientes = () => {}; 
+        let currentUserId = null, localContadores = [], localClientes = [], conceptosGuardados = [], edicionConceptoIndex = null;
+        let unsubContadores = () => {}, unsubClientes = () => {};
         
-        // --- REFERENCIAS AL DOM ---
-        const loginContainer = document.getElementById('login-container');
-        const loginStatus = document.getElementById('login-status');
-        const loadingContainer = document.getElementById('loading-container');
-        const appContainer = document.getElementById('app-container');
-        const googleLoginBtn = document.getElementById('google-login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const userInfo = document.getElementById('user-info');
+        // Referencias DOM
+        const loginContainer = document.getElementById('login-container'), loginStatus = document.getElementById('login-status'), loadingContainer = document.getElementById('loading-container'), appContainer = document.getElementById('app-container');
+        const googleLoginBtn = document.getElementById('google-login-btn'), logoutBtn = document.getElementById('logout-btn'), userInfo = document.getElementById('user-info');
+        const selectContador = document.getElementById('selectContador'), selectCliente = document.getElementById('selectCliente'), contadorSelloInput = document.getElementById('contadorSello'), selloPreview = document.getElementById('selloPreview');
+        const reportForm = document.getElementById('report-form'), clearFormBtn = document.getElementById('clearFormBtn'), addIncomeBtn = document.getElementById('addIncomeBtn');
         
-        const selectContador = document.getElementById('selectContador');
-        const selectCliente = document.getElementById('selectCliente');
-        const contadorSelloInput = document.getElementById('contadorSello');
-        const selloPreview = document.getElementById('selloPreview');
-        const reportForm = document.getElementById('report-form');
-        const clearFormBtn = document.getElementById('clearFormBtn');
-        const addIncomeBtn = document.getElementById('addIncomeBtn');
-        
-        // Botones y Estilos
+        // Estilos
         const btnBaseClass = "py-2 px-3 text-sm font-semibold rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 inline-flex items-center justify-center";
         const btnIconBase = "p-2.5 font-semibold rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 inline-flex items-center justify-center";
         const btnIconLilac = `${btnIconBase} bg-purple-200 text-purple-800 hover:bg-purple-300 focus:ring-purple-400`;
         const btnSecondaryClass = `${btnBaseClass} bg-yellow-200 text-yellow-800 hover:bg-yellow-300 focus:ring-yellow-300`;
         const btnPrimaryClass = "w-full py-3 px-6 bg-purple-700 text-white font-bold rounded-full shadow-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 flex items-center justify-center";
-        const btnDangerClass = btnIconLilac;
-        const btnSaveClass = btnIconLilac;
-        const btnWarningClass = btnIconLilac;
+        const btnDangerClass = btnIconLilac, btnSaveClass = btnIconLilac, btnWarningClass = btnIconLilac;
         const btnClearClass = `${btnBaseClass} bg-yellow-200 text-yellow-800 hover:bg-yellow-300 focus:ring-yellow-300`;
         const btnSmallDangerClass = "p-1.5 bg-red-600 text-white rounded-full shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95";
         
-        // Asignación de Estilos
-        addIncomeBtn.className = btnSecondaryClass;
-        document.getElementById('generatePdfBtn').className = btnPrimaryClass;
-        document.getElementById('saveContadorBtn').className = btnSaveClass;
-        document.getElementById('saveClienteBtn').className = btnSaveClass;
-        clearFormBtn.className = btnClearClass;
-        document.getElementById('deleteContadorBtn').className = btnDangerClass + " gestion-btn";
-        document.getElementById('updateContadorBtn').className = btnWarningClass + " gestion-btn";
-        document.getElementById('deleteClienteBtn').className = btnDangerClass + " gestion-btn";
-        document.getElementById('updateClienteBtn').className = btnWarningClass + " gestion-btn";
-        document.getElementById('conceptoBtnAgregar').className = btnSaveClass;
-        document.getElementById('conceptoBtnEditar').className = btnWarningClass;
-        document.getElementById('conceptoBtnGuardarEdicion').className = `${btnSaveClass} hidden`;
-        document.getElementById('conceptoBtnEliminar').className = btnDangerClass;
+        addIncomeBtn.className = btnSecondaryClass; document.getElementById('generatePdfBtn').className = btnPrimaryClass;
+        document.getElementById('saveContadorBtn').className = btnSaveClass; document.getElementById('saveClienteBtn').className = btnSaveClass; clearFormBtn.className = btnClearClass;
+        document.getElementById('deleteContadorBtn').className = btnDangerClass + " gestion-btn"; document.getElementById('updateContadorBtn').className = btnWarningClass + " gestion-btn";
+        document.getElementById('deleteClienteBtn').className = btnDangerClass + " gestion-btn"; document.getElementById('updateClienteBtn').className = btnWarningClass + " gestion-btn";
+        document.getElementById('conceptoBtnAgregar').className = btnSaveClass; document.getElementById('conceptoBtnEditar').className = btnWarningClass;
+        document.getElementById('conceptoBtnGuardarEdicion').className = `${btnSaveClass} hidden`; document.getElementById('conceptoBtnEliminar').className = btnDangerClass;
         
-        // --- FUNCIONES HELPER ---
-
-        function showMessage(message, type = 'success', duration = 3000) {
-            const container = document.getElementById('message-container');
-            const msgDiv = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
-            msgDiv.className = `p-4 ${bgColor} text-white rounded-lg shadow-lg mb-2 transition-all duration-300 ease-out transform translate-x-full`;
-            msgDiv.textContent = message;
-            container.appendChild(msgDiv);
-            setTimeout(() => { msgDiv.classList.remove('translate-x-full'); msgDiv.classList.add('translate-x-0'); }, 10);
-            setTimeout(() => {
-                msgDiv.classList.add('opacity-0', 'translate-x-full');
-                setTimeout(() => { if (container.contains(msgDiv)) container.removeChild(msgDiv); }, 500);
-            }, duration);
+        function showMessage(msg, type = 'success', duration = 3000) {
+            const c = document.getElementById('message-container'), d = document.createElement('div');
+            d.className = `p-4 ${type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500')} text-white rounded-lg shadow-lg mb-2 transition-all duration-300 ease-out transform translate-x-full`;
+            d.textContent = msg; c.appendChild(d);
+            setTimeout(() => { d.classList.remove('translate-x-full'); d.classList.add('translate-x-0'); }, 10);
+            setTimeout(() => { d.classList.add('opacity-0', 'translate-x-full'); setTimeout(() => { if (c.contains(d)) c.removeChild(d); }, 500); }, duration);
         }
 
-        function fileToDataUrl(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
+        function fileToDataUrl(file) { return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file); }); }
+        function getImageDimensions(url) { return new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve({ width: i.width, height: i.height }); i.onerror = (e) => { console.error("Img err", e); reject(new Error('Err dimensiones.')); }; i.src = url; }); }
 
-        function getImageDimensions(dataUrl) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve({ width: img.width, height: img.height });
-                img.onerror = (err) => { console.error("Error al cargar imagen", err); reject(new Error('Error al leer dimensiones.')); }
-                img.src = dataUrl;
-            });
-        }
+        function formatCedula(e) { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''), l = (v.match(/^[VEve]/) || ['V'])[0].toUpperCase(), n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '').substring(0, 8); e.target.value = `${l}-${n.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`; }
+        function formatRif(e) { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''), l = (v.match(/^[JGjgVEvePp]/) || ['V'])[0].toUpperCase(), n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, ''), m = n.length > 8 ? n.substring(0, 8) : n, d = n.length > 8 ? '-' + n.substring(n.length - 1) : ''; e.target.value = `${l}-${m.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${d}`; }
+        function formatSimpleThousands(e) { let v = e.target.value.replace(/[^\d]/g, ''); e.target.value = v ? new Intl.NumberFormat('es-VE').format(parseInt(v, 10)) : ''; }
+        function formatCurrencyInput(e) { let v = e.target.value.replace(/[^\d,]/g, ''), p = v.split(','), i = p[0].replace(/\./g, ''); i = i ? new Intl.NumberFormat('es-VE').format(parseInt(i, 10)) : ''; e.target.value = p[1] !== undefined ? `${i || '0'},${p[1].substring(0, 2)}` : i; }
+        function parseFormattedNumber(v) { return !v ? 0 : v.replace(/\./g, '').replace(',', '.'); }
+        function formatDate(dStr, opts = {}) { if (!dStr) return ''; const d = new Date(dStr + 'T00:00:00'); if (opts.format === 'dd de M de yyyy') return `${String(d.getDate()).padStart(2, '0')} de ${["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()]} ${d.getFullYear()}`; return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; }
+        function formatCurrency(n) { return new Intl.NumberFormat('es-VE', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
-        // Funciones de formato
-        function formatCedula(e) {
-            let input = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
-            let letter = (input.match(/^[VEve]/) || ['V'])[0].toUpperCase();
-            let numbers = input.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '');
-            if (numbers.length > 8) numbers = numbers.substring(0, 8);
-            e.target.value = `${letter}-${numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
-        }
-        function formatRif(e) {
-            let input = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
-            let letter = (input.match(/^[JGjgVEvePp]/) || ['V'])[0].toUpperCase();
-            let numbers = input.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '');
-            let main = numbers.length > 8 ? numbers.substring(0, 8) : numbers;
-            let digit = numbers.length > 8 ? '-' + numbers.substring(numbers.length - 1) : '';
-            e.target.value = `${letter}-${main.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${digit}`;
-        }
-        function formatSimpleThousands(e) {
-            let val = e.target.value.replace(/[^\d]/g, '');
-            if (!val) { e.target.value = ''; return; }
-            e.target.value = new Intl.NumberFormat('es-VE').format(parseInt(val, 10));
-        }
-        function formatCurrencyInput(e) {
-            let val = e.target.value.replace(/[^\d,]/g, '');
-            let parts = val.split(',');
-            let intPart = parts[0].replace(/\./g, '');
-            intPart = intPart ? new Intl.NumberFormat('es-VE').format(parseInt(intPart, 10)) : '';
-            e.target.value = parts[1] !== undefined ? `${intPart || '0'},${parts[1].substring(0, 2)}` : intPart;
-        }
-        function parseFormattedNumber(strVal) { return !strVal ? 0 : strVal.replace(/\./g, '').replace(',', '.'); }
-        function formatDate(dateString, options = {}) {
-            if (!dateString) return '';
-            const date = new Date(dateString + 'T00:00:00');
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            if (options.format === 'dd de M de yyyy') {
-                const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-                return `${day} de ${months[date.getMonth()]} ${year}`;
-            }
-            return `${day}/${month}/${year}`;
-        }
-        function formatCurrency(number) { return new Intl.NumberFormat('es-VE', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number); }
-        function calculateMonths(startDate, endDate) {
-            const start = new Date(startDate); const end = new Date(endDate);
-            let months = (end.getFullYear() - start.getFullYear()) * 12;
-            months -= start.getMonth(); months += end.getMonth();
-            if (end.getDate() < start.getDate()) months--;
-            return months <= 0 ? 1 : months + 1;
-        }
-
-        // --- FUNCIONES DE LIMPIEZA ---
-        function clearFormContador() {
-            document.getElementById('contadorNombre').value = ''; document.getElementById('contadorRif').value = '';
-            document.getElementById('contadorCpc').value = ''; contadorSelloInput.value = '';
-            selloPreview.src = ''; selloPreview.classList.add('hidden'); selectContador.value = "";
-            document.getElementById('deleteContadorBtn').style.display = 'none';
-            document.getElementById('updateContadorBtn').style.display = 'none';
-        }
-        function clearFormCliente() {
-            document.getElementById('clienteTratamiento').value = 'Sr.'; document.getElementById('clienteNombre').value = '';
-            document.getElementById('clienteCedula').value = ''; selectCliente.value = "";
-            document.getElementById('deleteClienteBtn').style.display = 'none';
-            document.getElementById('updateClienteBtn').style.display = 'none';
-        }
-        function setFechasDefault() {
-            const now = new Date(); document.getElementById('fechaDocumento').value = now.toISOString().split('T')[0];
-            document.getElementById('fechaDesde').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-            document.getElementById('fechaHasta').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-        }
-        function clearForm() {
-            reportForm.reset(); document.getElementById('income-details').innerHTML = ''; addIncomeItem();
-            clearFormContador(); clearFormCliente(); setFechasDefault(); showMessage('Formulario limpiado.');
-        }
+        function clearFormContador() { document.getElementById('contadorNombre').value = ''; document.getElementById('contadorRif').value = ''; document.getElementById('contadorCpc').value = ''; contadorSelloInput.value = ''; selloPreview.src = ''; selloPreview.classList.add('hidden'); selectContador.value = ""; document.getElementById('deleteContadorBtn').style.display = 'none'; document.getElementById('updateContadorBtn').style.display = 'none'; }
+        function clearFormCliente() { document.getElementById('clienteTratamiento').value = 'Sr.'; document.getElementById('clienteNombre').value = ''; document.getElementById('clienteCedula').value = ''; selectCliente.value = ""; document.getElementById('deleteClienteBtn').style.display = 'none'; document.getElementById('updateClienteBtn').style.display = 'none'; }
+        function setFechasDefault() { const n = new Date(); document.getElementById('fechaDocumento').value = n.toISOString().split('T')[0]; document.getElementById('fechaDesde').value = new Date(n.getFullYear(), n.getMonth(), 1).toISOString().split('T')[0]; document.getElementById('fechaHasta').value = new Date(n.getFullYear(), n.getMonth() + 1, 0).toISOString().split('T')[0]; }
+        function clearForm() { reportForm.reset(); document.getElementById('income-details').innerHTML = ''; addIncomeItem(); clearFormContador(); clearFormCliente(); setFechasDefault(); showMessage('Formulario limpiado.'); }
 
         function addIncomeItem() {
-            const container = document.getElementById('income-details');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex flex-col md:flex-row items-center gap-3 income-item';
-            itemDiv.innerHTML = `
-                <input type="text" placeholder="Concepto" class="w-full md:flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 income-concept" list="conceptos-list" required>
-                <input type="text" inputmode="decimal" placeholder="Monto (Bs.)" class="w-full md:w-32 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 income-amount" required>
-            `;
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button'; removeBtn.className = btnSmallDangerClass + ' w-full md:w-auto';
-            removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
-            removeBtn.onclick = () => container.removeChild(itemDiv);
-            itemDiv.appendChild(removeBtn); container.appendChild(itemDiv);
-            itemDiv.querySelector('.income-amount').addEventListener('input', formatCurrencyInput);
+            const c = document.getElementById('income-details'), d = document.createElement('div');
+            d.className = 'flex flex-col md:flex-row items-center gap-3 income-item';
+            d.innerHTML = `<input type="text" placeholder="Concepto" class="w-full md:flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 income-concept" list="conceptos-list" required><input type="text" inputmode="decimal" placeholder="Monto (Bs.)" class="w-full md:w-32 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 income-amount" required>`;
+            const b = document.createElement('button'); b.type = 'button'; b.className = btnSmallDangerClass + ' w-full md:w-auto'; b.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>'; b.onclick = () => c.removeChild(d);
+            d.appendChild(b); c.appendChild(d); d.querySelector('.income-amount').addEventListener('input', formatCurrencyInput);
         }
 
-        // --- FUNCIONES DE DATOS Y FIRESTORE ---
         function loadDropdownsUI() {
-            selectContador.innerHTML = '<option value="">-- Selecciona Contador Guardado --</option>';
-            localContadores.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.textContent = `${c.nombre} (CPC: ${c.cpc})`; selectContador.appendChild(opt); });
-            selectCliente.innerHTML = '<option value="">-- Selecciona Cliente Guardado --</option>';
-            localClientes.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.textContent = `${c.nombre} (CI: ${c.cedula})`; selectCliente.appendChild(opt); });
+            selectContador.innerHTML = '<option value="">-- Selecciona Contador Guardado --</option>'; localContadores.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.nombre} (CPC: ${c.cpc})`; selectContador.appendChild(o); });
+            selectCliente.innerHTML = '<option value="">-- Selecciona Cliente Guardado --</option>'; localClientes.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.nombre} (CI: ${c.cedula})`; selectCliente.appendChild(o); });
         }
-        function fillContadorForm(docId) {
-            clearFormContador(); selectContador.value = docId; if (!docId) return;
-            const cont = localContadores.find(c => c.id === docId);
-            if (cont) {
-                document.getElementById('contadorNombre').value = cont.nombre || ''; document.getElementById('contadorRif').value = cont.rif || '';
-                document.getElementById('contadorCpc').value = cont.cpc || '';
-                if (cont.selloURL) { selloPreview.src = cont.selloURL; selloPreview.classList.remove('hidden'); }
-                document.getElementById('deleteContadorBtn').style.display = 'inline-block'; document.getElementById('updateContadorBtn').style.display = 'inline-block';
-            }
-        }
-        function fillClienteForm(docId) {
-            clearFormCliente(); selectCliente.value = docId; if (!docId) return;
-            const cli = localClientes.find(c => c.id === docId);
-            if (cli) {
-                document.getElementById('clienteTratamiento').value = cli.tratamiento || 'Sr.'; document.getElementById('clienteNombre').value = cli.nombre || '';
-                document.getElementById('clienteCedula').value = cli.cedula || '';
-                document.getElementById('deleteClienteBtn').style.display = 'inline-block'; document.getElementById('updateClienteBtn').style.display = 'inline-block';
-            }
-        }
+        function fillContadorForm(id) { clearFormContador(); selectContador.value = id; if (!id) return; const c = localContadores.find(x => x.id === id); if (c) { document.getElementById('contadorNombre').value = c.nombre || ''; document.getElementById('contadorRif').value = c.rif || ''; document.getElementById('contadorCpc').value = c.cpc || ''; if (c.selloURL) { selloPreview.src = c.selloURL; selloPreview.classList.remove('hidden'); } document.getElementById('deleteContadorBtn').style.display = 'inline-block'; document.getElementById('updateContadorBtn').style.display = 'inline-block'; } }
+        function fillClienteForm(id) { clearFormCliente(); selectCliente.value = id; if (!id) return; const c = localClientes.find(x => x.id === id); if (c) { document.getElementById('clienteTratamiento').value = c.tratamiento || 'Sr.'; document.getElementById('clienteNombre').value = c.nombre || ''; document.getElementById('clienteCedula').value = c.cedula || ''; document.getElementById('deleteClienteBtn').style.display = 'inline-block'; document.getElementById('updateClienteBtn').style.display = 'inline-block'; } }
 
-        // --- HELPERS PARA RUTAS PÚBLICAS (SOLUCIÓN DE PERMISOS) ---
-        function getPublicCol(colName) { return collection(db, 'artifacts', appId, 'public', 'data', colName); }
-        function getPublicDoc(colName, docId) { return doc(db, 'artifacts', appId, 'public', 'data', colName, docId); }
+        // Usar rutas PÚBLICAS para datos compartidos (solución de permisos)
+        function getPublicCol(n) { return collection(db, 'artifacts', appId, 'public', 'data', n); }
+        function getPublicDoc(n, id) { return doc(db, 'artifacts', appId, 'public', 'data', n, id); }
 
-        async function handleSaveContador() {
-            if (!currentUserId) return showMessage('Debe iniciar sesión.', 'error');
-            const nombre = document.getElementById('contadorNombre').value.trim(), rif = document.getElementById('contadorRif').value.trim(), cpc = document.getElementById('contadorCpc').value.trim();
-            if (!nombre || !cpc) return showMessage('Complete nombre y C.P.C.', 'error');
-            if (localContadores.some(c => c.cpc === cpc)) return showMessage('C.P.C. ya existe.', 'error');
-            showMessage('Guardando...', 'info');
-            try {
-                const docRef = await addDoc(getPublicCol('contadores'), { nombre, rif, cpc, userId: currentUserId });
-                if (contadorSelloInput.files[0]) {
-                    const storageRef = ref(storage, `artifacts/${appId}/public/sellos/${docRef.id}.png`);
-                    await uploadBytes(storageRef, contadorSelloInput.files[0]);
-                    await updateDoc(docRef, { selloURL: await getDownloadURL(storageRef) });
-                }
-                showMessage('Contador guardado.', 'success'); clearFormContador();
-            } catch (e) { console.error(e); showMessage('Error al guardar: ' + e.message, 'error'); }
-        }
-        async function handleUpdateContador() {
-            const docId = selectContador.value; if (!docId || !currentUserId) return;
-            const nombre = document.getElementById('contadorNombre').value.trim(), rif = document.getElementById('contadorRif').value.trim(), cpc = document.getElementById('contadorCpc').value.trim();
-            if (localContadores.some(c => c.cpc === cpc && c.id !== docId)) return showMessage('C.P.C. pertenece a otro.', 'error');
-            showMessage('Actualizando...', 'info');
-            try {
-                const docRef = getPublicDoc('contadores', docId); const data = { nombre, rif, cpc };
-                if (contadorSelloInput.files[0]) {
-                    const storageRef = ref(storage, `artifacts/${appId}/public/sellos/${docId}.png`);
-                    await uploadBytes(storageRef, contadorSelloInput.files[0]);
-                    data.selloURL = await getDownloadURL(storageRef);
-                }
-                await setDoc(docRef, data, { merge: true });
-                showMessage('Contador actualizado.', 'success');
-                // Forzar recarga visual inmediata
-                const updated = { ...localContadores.find(c => c.id === docId), ...data };
-                fillContadorForm(docId);
-                selectContador.value = docId;
-                document.getElementById('contadorNombre').value = updated.nombre; document.getElementById('contadorRif').value = updated.rif; document.getElementById('contadorCpc').value = updated.cpc;
-                if (updated.selloURL) { selloPreview.src = updated.selloURL; selloPreview.classList.remove('hidden'); }
+        async function handleSaveContador() { if (!currentUserId) return showMessage('Inicie sesión.', 'error'); const n = document.getElementById('contadorNombre').value.trim(), r = document.getElementById('contadorRif').value.trim(), c = document.getElementById('contadorCpc').value.trim(); if (!n || !c) return showMessage('Faltan datos.', 'error'); if (localContadores.some(x => x.cpc === c)) return showMessage('CPC duplicado.', 'error'); showMessage('Guardando...', 'info'); try { const refDoc = await addDoc(getPublicCol('contadores'), { nombre: n, rif: r, cpc: c, userId: currentUserId }); if (contadorSelloInput.files[0]) { const sRef = ref(storage, `artifacts/${appId}/public/sellos/${refDoc.id}.png`); await uploadBytes(sRef, contadorSelloInput.files[0]); await updateDoc(refDoc, { selloURL: await getDownloadURL(sRef) }); } showMessage('Guardado.', 'success'); clearFormContador(); } catch (e) { console.error(e); showMessage('Error: ' + e.message, 'error'); } }
+        async function handleUpdateContador() { const id = selectContador.value; if (!id || !currentUserId) return; const n = document.getElementById('contadorNombre').value.trim(), r = document.getElementById('contadorRif').value.trim(), c = document.getElementById('contadorCpc').value.trim(); if (localContadores.some(x => x.cpc === c && x.id !== id)) return showMessage('CPC duplicado.', 'error'); showMessage('Actualizando...', 'info'); try { const dRef = getPublicDoc('contadores', id), data = { nombre: n, rif: r, cpc: c }; if (contadorSelloInput.files[0]) { const sRef = ref(storage, `artifacts/${appId}/public/sellos/${id}.png`); await uploadBytes(sRef, contadorSelloInput.files[0]); data.selloURL = await getDownloadURL(sRef); } await setDoc(dRef, data, { merge: true }); showMessage('Actualizado.', 'success'); const upd = { ...localContadores.find(x => x.id === id), ...data }; fillContadorForm(id); selectContador.value = id; document.getElementById('contadorNombre').value = upd.nombre; document.getElementById('contadorRif').value = upd.rif; document.getElementById('contadorCpc').value = upd.cpc; if (upd.selloURL) { selloPreview.src = upd.selloURL; selloPreview.classList.remove('hidden'); } } catch (e) { console.error(e); showMessage('Error: ' + e.message, 'error'); } }
+        async function handleDeleteContador() { const id = selectContador.value; if (!id || !currentUserId || !confirm('¿Eliminar?')) return; try { await deleteDoc(getPublicDoc('contadores', id)); try { await deleteObject(ref(storage, `artifacts/${appId}/public/sellos/${id}.png`)); } catch (e) {} showMessage('Eliminado.', 'success'); clearFormContador(); } catch (e) { console.error(e); showMessage('Error: ' + e.message, 'error'); } }
+        async function handleSaveCliente() { if (!currentUserId) return showMessage('Inicie sesión.', 'error'); const t = document.getElementById('clienteTratamiento').value, n = document.getElementById('clienteNombre').value.trim(), c = document.getElementById('clienteCedula').value.trim(); if (!n || !c) return showMessage('Faltan datos.', 'error'); if (localClientes.some(x => x.cedula === c)) return showMessage('Cédula duplicada.', 'error'); try { await addDoc(getPublicCol('clientes'), { tratamiento: t, nombre: n, cedula: c, userId: currentUserId }); showMessage('Guardado.', 'success'); clearFormCliente(); } catch (e) { console.error(e); showMessage('Error.', 'error'); } }
+        async function handleUpdateCliente() { const id = selectCliente.value; if (!id || !currentUserId) return; const t = document.getElementById('clienteTratamiento').value, n = document.getElementById('clienteNombre').value.trim(), c = document.getElementById('clienteCedula').value.trim(); if (localClientes.some(x => x.cedula === c && x.id !== id)) return showMessage('Cédula duplicada.', 'error'); try { await updateDoc(getPublicDoc('clientes', id), { tratamiento: t, nombre: n, cedula: c }); showMessage('Actualizado.', 'success'); } catch (e) { console.error(e); showMessage('Error.', 'error'); } }
+        async function handleDeleteCliente() { const id = selectCliente.value; if (!id || !currentUserId || !confirm('¿Eliminar?')) return; try { await deleteDoc(getPublicDoc('clientes', id)); showMessage('Eliminado.', 'success'); clearFormCliente(); } catch (e) { console.error(e); showMessage('Error.', 'error'); } }
 
-            } catch (e) { console.error(e); showMessage('Error al actualizar: ' + e.message, 'error'); }
-        }
-        async function handleDeleteContador() {
-            const docId = selectContador.value; if (!docId || !currentUserId) return;
-            if (!confirm('¿Eliminar contador?')) return;
-            try { await deleteDoc(getPublicDoc('contadores', docId)); showMessage('Eliminado.', 'success'); clearFormContador(); }
-            catch (e) { console.error(e); showMessage('Error al eliminar.', 'error'); }
-        }
-
-        async function handleSaveCliente() {
-            if (!currentUserId) return showMessage('Debe iniciar sesión.', 'error');
-            const tratamiento = document.getElementById('clienteTratamiento').value, nombre = document.getElementById('clienteNombre').value.trim(), cedula = document.getElementById('clienteCedula').value.trim();
-            if (!nombre || !cedula) return showMessage('Complete nombre y cédula.', 'error');
-            if (localClientes.some(c => c.cedula === cedula)) return showMessage('Cédula ya existe.', 'error');
-            try { await addDoc(getPublicCol('clientes'), { tratamiento, nombre, cedula, userId: currentUserId }); showMessage('Cliente guardado.', 'success'); clearFormCliente(); }
-            catch (e) { console.error(e); showMessage('Error al guardar.', 'error'); }
-        }
-        async function handleUpdateCliente() {
-            const docId = selectCliente.value; if (!docId || !currentUserId) return;
-            const tratamiento = document.getElementById('clienteTratamiento').value, nombre = document.getElementById('clienteNombre').value.trim(), cedula = document.getElementById('clienteCedula').value.trim();
-            if (localClientes.some(c => c.cedula === cedula && c.id !== docId)) return showMessage('Cédula pertenece a otro.', 'error');
-            try { await updateDoc(getPublicDoc('clientes', docId), { tratamiento, nombre, cedula }); showMessage('Cliente actualizado.', 'success'); }
-            catch (e) { console.error(e); showMessage('Error al actualizar.', 'error'); }
-        }
-        async function handleDeleteCliente() {
-            const docId = selectCliente.value; if (!docId || !currentUserId) return;
-            if (!confirm('¿Eliminar cliente?')) return;
-            try { await deleteDoc(getPublicDoc('clientes', docId)); showMessage('Eliminado.', 'success'); clearFormCliente(); }
-            catch (e) { console.error(e); showMessage('Error al eliminar.', 'error'); }
-        }
-
-        // Conceptos (Ruta Pública para compartir)
         const conceptosDefault = ["Actividades Comerciales", "Honorarios profesionales libre ejercicio", "Alquiler de inmueble"];
-        async function loadConceptos() {
-            try {
-                const docSnap = await getDoc(getPublicDoc('config', 'conceptos_main'));
-                conceptosGuardados = (docSnap.exists() && docSnap.data().lista) ? docSnap.data().lista : [...conceptosDefault];
-                if (!docSnap.exists()) await setDoc(getPublicDoc('config', 'conceptos_main'), { lista: conceptosGuardados });
-                updateConceptosUI();
-            } catch (e) { console.error("Err conceptos", e); conceptosGuardados = [...conceptosDefault]; updateConceptosUI(); }
-        }
-        function updateConceptosUI() {
-            const select = document.getElementById('conceptosSelect'), datalist = document.getElementById('conceptos-list');
-            select.innerHTML = ''; datalist.innerHTML = '';
-            conceptosGuardados.forEach((c, i) => {
-                const opt = document.createElement('option'); opt.value = i; opt.textContent = c; select.appendChild(opt);
-                const dlOpt = document.createElement('option'); dlOpt.value = c; datalist.appendChild(dlOpt);
-            });
-            document.getElementById('conceptoEditInput').value = '';
-            document.getElementById('conceptoBtnAgregar').style.display = 'inline-flex';
-            document.getElementById('conceptoBtnGuardarEdicion').style.display = 'none'; edicionConceptoIndex = null;
-        }
-        async function saveConceptos() {
-            if (!currentUserId) return showMessage('Inicie sesión.', 'error');
-            try { await updateDoc(getPublicDoc('config', 'conceptos_main'), { lista: conceptosGuardados }); updateConceptosUI(); return true; }
-            catch (e) { console.error(e); showMessage('Error al guardar conceptos.', 'error'); return false; }
-        }
+        async function loadConceptos() { try { const s = await getDoc(getPublicDoc('config', 'conceptos_main')); conceptosGuardados = (s.exists() && s.data().lista) ? s.data().lista : [...conceptosDefault]; if (!s.exists()) await setDoc(getPublicDoc('config', 'conceptos_main'), { lista: conceptosGuardados }); updateConceptosUI(); } catch (e) { console.error(e); conceptosGuardados = [...conceptosDefault]; updateConceptosUI(); } }
+        function updateConceptosUI() { const s = document.getElementById('conceptosSelect'), l = document.getElementById('conceptos-list'); s.innerHTML = ''; l.innerHTML = ''; conceptosGuardados.forEach((c, i) => { const o = document.createElement('option'); o.value = i; o.textContent = c; s.appendChild(o); const lo = document.createElement('option'); lo.value = c; l.appendChild(lo); }); document.getElementById('conceptoEditInput').value = ''; document.getElementById('conceptoBtnAgregar').style.display = 'inline-flex'; document.getElementById('conceptoBtnGuardarEdicion').style.display = 'none'; edicionConceptoIndex = null; }
+        async function saveConceptos() { if (!currentUserId) return showMessage('Inicie sesión.', 'error'); try { await updateDoc(getPublicDoc('config', 'conceptos_main'), { lista: conceptosGuardados }); updateConceptosUI(); return true; } catch (e) { console.error(e); showMessage('Error al guardar conceptos.', 'error'); return false; } }
 
-        // --- GENERACIÓN DE PDF ---
         reportForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const incomeItems = document.querySelectorAll('.income-item');
-            if (incomeItems.length === 0) return showMessage('Agregue al menos un ingreso.', 'error');
-            let valid = true; incomeItems.forEach(i => { if (!i.querySelector('.income-concept').value || parseFloat(parseFormattedNumber(i.querySelector('.income-amount').value)) <= 0) valid = false; });
-            if (!valid) return showMessage('Revise los montos de ingreso.', 'error');
-
-            showMessage('Generando PDF...', 'info'); document.getElementById('generatePdfBtn').disabled = true;
+            e.preventDefault(); const items = document.querySelectorAll('.income-item'); if (items.length === 0) return showMessage('Agregue ingresos.', 'error');
+            let v = true; items.forEach(i => { if (!i.querySelector('.income-concept').value || parseFloat(parseFormattedNumber(i.querySelector('.income-amount').value)) <= 0) v = false; });
+            if (!v) return showMessage('Revise montos.', 'error'); showMessage('Generando PDF...', 'info', 10000); document.getElementById('generatePdfBtn').disabled = true;
             try {
-                let sealDataUrl = null, w = 0, h = 0;
-                const file = contadorSelloInput.files[0], img = document.getElementById('selloPreview');
-                if (file) {
-                    sealDataUrl = await fileToDataUrl(file); const dim = await getImageDimensions(sealDataUrl); w = dim.width; h = dim.height;
-                } else if (img.src && img.complete && img.naturalWidth > 0 && !img.src.startsWith('http')) {
-                     // Si es dataURL ya cargado
-                     sealDataUrl = img.src; const dim = await getImageDimensions(sealDataUrl); w = dim.width; h = dim.height;
-                } else if (img.src && img.complete && img.naturalWidth > 0) {
-                    // Si es URL remota (Firebase), usar canvas para evitar CORS al generar PDF
-                    const canvas = document.createElement('canvas'); canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-                    canvas.getContext('2d').drawImage(img, 0, 0); sealDataUrl = canvas.toDataURL('image/png'); w = img.naturalWidth; h = img.naturalHeight;
+                let sUrl = null, w = 0, h = 0, file = contadorSelloInput.files[0], img = document.getElementById('selloPreview');
+                if (file) { sUrl = await fileToDataUrl(file); const d = await getImageDimensions(sUrl); w = d.width; h = d.height; }
+                else if (img.src && img.complete && img.naturalWidth > 0) {
+                    if (img.src.startsWith('data:')) { sUrl = img.src; const d = await getImageDimensions(sUrl); w = d.width; h = d.height; }
+                    else { const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0); sUrl = c.toDataURL('image/png'); w = img.naturalWidth; h = img.naturalHeight; }
                 }
-                buildPDF(sealDataUrl, w, h); showMessage('PDF generado.', 'success');
-            } catch (e) { console.error(e); showMessage('Error al generar PDF: ' + e.message, 'error'); }
-            finally { document.getElementById('generatePdfBtn').disabled = false; }
+                buildPDF(sUrl, w, h); showMessage('PDF generado.', 'success');
+            } catch (e) { console.error(e); showMessage('Error PDF: ' + e.message, 'error'); } finally { document.getElementById('generatePdfBtn').disabled = false; }
         });
 
-        function buildPDF(sealUrl, sW, sH) {
-            const doc = new window.jspdf.jsPDF('p', 'pt', 'letter');
-            const getData = id => document.getElementById(id).value;
-            const [cNom, cCpc, cRif, cliTrat, cliNom, cliCed] = ['contadorNombre','contadorCpc','contadorRif','clienteTratamiento','clienteNombre','clienteCedula'].map(getData);
-            const [entidad, motivo, lugar, fDoc, fDes, fHas] = ['entidadDirigida','motivoInforme','lugar','fechaDocumento','fechaDesde','fechaHasta'].map(getData);
-            const fDocL = `${lugar}, ${formatDate(fDoc, {format:'dd de M de yyyy'})}`, fDesL = formatDate(fDes, {format:'dd de M de yyyy'}), fHasL = formatDate(fHas, {format:'dd de M de yyyy'});
-            
-            let total = 0; const rows = [];
-            document.querySelectorAll('.income-item').forEach(i => {
-                const m = parseFloat(parseFormattedNumber(i.querySelector('.income-amount').value)) || 0;
-                if (m > 0) { rows.push([i.querySelector('.income-concept').value, `Bs. ${formatCurrency(m)}`]); total += m; }
-            });
-
-            const margin = 60, pW = doc.internal.pageSize.getWidth(), usableW = pW - margin * 2; let y = 140;
+        function buildPDF(sUrl, sW, sH) {
+            const doc = new window.jspdf.jsPDF('p', 'pt', 'letter'), val = id => document.getElementById(id).value;
+            const [cNom, cCpc, cRif, cliTrat, cliNom, cliCed, ent, mot, lug, fDoc, fDes, fHas] = ['contadorNombre', 'contadorCpc', 'contadorRif', 'clienteTratamiento', 'clienteNombre', 'clienteCedula', 'entidadDirigida', 'motivoInforme', 'lugar', 'fechaDocumento', 'fechaDesde', 'fechaHasta'].map(val);
+            const fDocL = `${lug}, ${formatDate(fDoc, { format: 'dd de M de yyyy' })}`, fDesL = formatDate(fDes, { format: 'dd de M de yyyy' }), fHasL = formatDate(fHas, { format: 'dd de M de yyyy' });
+            let tot = 0, rows = []; document.querySelectorAll('.income-item').forEach(i => { const m = parseFloat(parseFormattedNumber(i.querySelector('.income-amount').value)) || 0; if (m > 0) { rows.push([i.querySelector('.income-concept').value, `Bs. ${formatCurrency(m)}`]); tot += m; } });
+            const m = 60, pW = doc.internal.pageSize.getWidth(), uW = pW - m * 2; let y = 140;
             doc.setFont('helvetica', 'normal');
-            const addTxt = (txt, opt={}) => {
-                doc.setFontSize(opt.sz || 11); doc.setFont('helvetica', opt.st || 'normal');
-                const lines = doc.splitTextToSize(txt, usableW - (opt.ind || 0));
-                const h = lines.length * (opt.sz || 11) * 1.15;
-                if (y + h > doc.internal.pageSize.getHeight() - 85) { doc.addPage(); y = 140; }
-                doc.text(txt, opt.al === 'center' ? pW/2 : (opt.al === 'right' ? pW - margin : margin + (opt.ind || 0)), y, { align: opt.al || 'justify', maxWidth: usableW - (opt.ind || 0) });
-                y += h + (opt.sp || 15);
-            };
-
-            addTxt('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', {st:'bold', al:'center', sp:30});
-            addTxt('Alcance', {st:'bold', al:'left', sp:15});
-            addTxt(`He revisado la evidencia inherente a los ingresos percibidos por el ${cliTrat} ${cliNom}, con cedula de identidad N.º ${cliCed}, durante el periodo comprendido desde el ${formatDate(fDes)} hasta el ${formatDate(fHas)}, presentado en la relación de ingresos adjunta.`, {ind:20, sp:20});
-            addTxt('Responsabilidad de la persona que percibe los ingresos', {st:'bold', al:'left', sp:15});
-            addTxt(`El ${cliTrat} ${cliNom}, es responsable de la preparación y presentación del importe de sus ingresos, incluyendo la integridad, legalidad y veracidad de los documentos suministrados.`, {ind:20, sp:20});
-            addTxt('Responsabilidad del Contador Público Independiente', {st:'bold', al:'left', sp:15});
-            addTxt(`Mi responsabilidad es expresar una opinión sobre la relación de ingresos obtenida por el ${cliTrat} ${cliNom}, durante el periodo señalado de acuerdo con mis procedimientos, realizados de conformidad con la Norma Internacional de Encargos de Aseguramiento NIEA 3000.`, {ind:20, sp:15});
-            
-            doc.addPage(); y = 140;
-            addTxt('Opinión', {st:'bold', al:'left', sp:15});
-            addTxt('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable.', {ind:20, sp:25});
-            addTxt('Usuarios Previstos y Propósitos', {st:'bold', al:'left', sp:15});
-            addTxt(`Este informe está dirigido únicamente al ${entidad} el cual lo ha requerido para ${motivo}.`, {ind:20, sp:40});
-
-            // Firma
-            let sigH = 60; if (cRif) sigH += 15;
-            if (y + sigH + 40 > doc.internal.pageSize.getHeight() - 85) { doc.addPage(); y = 140; }
-            
-            const sigY = doc.internal.pageSize.getHeight() - 85 - sigH - 30;
-            if (sealUrl && sW > 0 && sH > 0) {
-                const ratio = Math.min((5.3 * 28.35) / sW, (2.1 * 28.35) / sH, 1);
-                doc.addImage(sealUrl, 'PNG', pW - margin - (sW * ratio), sigY - (sH * ratio), sW * ratio, sH * ratio);
-            }
-            
-            y = doc.internal.pageSize.getHeight() - 85 - sigH - 15;
-            addTxt(fDocL, {al:'left', sp:30});
-            addTxt('________________________________', {al:'center', sp:12});
-            addTxt(cNom, {st:'bold', al:'center', sp:12});
-            addTxt(`Contador Público C.P.C. N ${cCpc}`, {al:'center', sp:12});
-            if (cRif) addTxt(`Rif: ${cRif}`, {al:'center', sp:12});
-
-            // Anexo
-            doc.addPage(); y = 140;
-            addTxt(cliNom.toUpperCase(), {st:'bold', al:'center', sp:10});
-            addTxt(cliCed, {st:'bold', al:'center', sp:30});
-            addTxt('RELACIÓN DE INGRESOS (BS)', {st:'bold', al:'center', sp:20});
-            addTxt(`Correspondientes al período desde el ${fDesL} hasta el ${fHasL}:`, {sp:20});
-            
-            doc.autoTable({
-                head: [['Concepto', 'Monto (Bs.)']], body: rows,
-                foot: [['Total Ingresos', `Bs. ${formatCurrency(total)}`]],
-                startY: y, margin: {left:margin, right:margin}, theme: 'grid',
-                headStyles: {fillColor:[220,220,255], textColor:20, halign:'center', fontStyle:'bold'},
-                columnStyles: {0:{halign:'left'}, 1:{halign:'right'}},
-                didDrawPage: (d) => y = d.cursor.y
-            });
-            y = doc.lastAutoTable.finalY + 40;
-            
-            addTxt('_____________________________________', {al:'center', sp:12});
-            addTxt(cliNom, {st:'bold', al:'center', sp:12});
-            addTxt(`C.I. ${cliCed}`, {al:'center', sp:12});
-            
+            const txt = (t, o = {}) => { doc.setFontSize(o.sz || 11); doc.setFont('helvetica', o.st || 'normal'); const h = doc.splitTextToSize(t, uW - (o.ind || 0)).length * (o.sz || 11) * 1.15; if (y + h > doc.internal.pageSize.getHeight() - 85) { doc.addPage(); y = 140; } doc.text(t, o.al === 'center' ? pW / 2 : (o.al === 'right' ? pW - m : m + (o.ind || 0)), y, { align: o.al || 'justify', maxWidth: uW - (o.ind || 0) }); y += h + (o.sp || 15); };
+            txt('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', { st: 'bold', al: 'center', sp: 30 }); txt('Alcance', { st: 'bold', al: 'left', sp: 15 }); txt(`He revisado la evidencia inherente a los ingresos percibidos por el ${cliTrat} ${cliNom}, con cedula de identidad N.º ${cliCed}, durante el periodo comprendido desde el ${formatDate(fDes)} hasta el ${formatDate(fHas)}, presentado en la relación de ingresos adjunta.`, { ind: 20, sp: 20 }); txt('Responsabilidad de la persona que percibe los ingresos', { st: 'bold', al: 'left', sp: 15 }); txt(`El ${cliTrat} ${cliNom}, es responsable de la preparación y presentación del importe de sus ingresos, incluyendo la integridad, legalidad y veracidad de los documentos suministrados.`, { ind: 20, sp: 20 }); txt('Responsabilidad del Contador Público Independiente', { st: 'bold', al: 'left', sp: 15 }); txt(`Mi responsabilidad es expresar una opinión sobre la relación de ingresos obtenida por el ${cliTrat} ${cliNom}, durante el periodo señalado de acuerdo con mis procedimientos, realizados de conformidad con la Norma Internacional de Encargos de Aseguramiento NIEA 3000.`, { ind: 20, sp: 15 });
+            doc.addPage(); y = 140; txt('Opinión', { st: 'bold', al: 'left', sp: 15 }); txt('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable.', { ind: 20, sp: 25 }); txt('Usuarios Previstos y Propósitos', { st: 'bold', al: 'left', sp: 15 }); txt(`Este informe está dirigido únicamente al ${ent} el cual lo ha requerido para ${mot}.`, { ind: 20, sp: 40 });
+            let sigH = 60; if (cRif) sigH += 15; if (y + sigH + 40 > doc.internal.pageSize.getHeight() - 85) { doc.addPage(); y = 140; }
+            const sigY = doc.internal.pageSize.getHeight() - 85 - sigH - 30; if (sUrl && sW > 0 && sH > 0) { const r = Math.min((5.3 * 28.35) / sW, (2.1 * 28.35) / sH, 1); doc.addImage(sUrl, 'PNG', pW - m - (sW * r), sigY - (sH * r), sW * r, sH * r); }
+            y = doc.internal.pageSize.getHeight() - 85 - sigH - 15; txt(fDocL, { al: 'left', sp: 30 }); txt('________________________________', { al: 'center', sp: 12 }); txt(cNom, { st: 'bold', al: 'center', sp: 12 }); txt(`Contador Público C.P.C. N ${cCpc}`, { al: 'center', sp: 12 }); if (cRif) txt(`Rif: ${cRif}`, { al: 'center', sp: 12 });
+            doc.addPage(); y = 140; txt(cliNom.toUpperCase(), { st: 'bold', al: 'center', sp: 10 }); txt(cliCed, { st: 'bold', al: 'center', sp: 30 }); txt('RELACIÓN DE INGRESOS (BS)', { st: 'bold', al: 'center', sp: 20 }); txt(`Correspondientes al período desde el ${fDesL} hasta el ${fHasL}:`, { sp: 20 });
+            doc.autoTable({ head: [['Concepto', 'Monto (Bs.)']], body: rows, foot: [['Total Ingresos', `Bs. ${formatCurrency(tot)}`]], startY: y, margin: { left: m, right: m }, theme: 'grid', headStyles: { fillColor: [220, 220, 255], textColor: 20, halign: 'center', fontStyle: 'bold' }, columnStyles: { 0: { halign: 'left' }, 1: { halign: 'right' } }, didDrawPage: (d) => y = d.cursor.y }); y = doc.lastAutoTable.finalY + 40;
+            txt('_____________________________________', { al: 'center', sp: 12 }); txt(cliNom, { st: 'bold', al: 'center', sp: 12 }); txt(`C.I. ${cliCed}`, { al: 'center', sp: 12 });
             doc.save(`Informe_${cliNom.replace(/\s+/g, '_')}.pdf`);
         }
 
-        // --- INICIALIZACIÓN ---
+        // --- INICIALIZACIÓN "HÍBRIDA" ---
         async function init() {
             loginStatus.classList.remove('hidden'); loadingContainer.classList.remove('hidden');
+            
             onAuthStateChanged(auth, (user) => {
                 currentUserId = user ? user.uid : null;
                 loginContainer.classList.toggle('hidden', !!user);
                 appContainer.classList.toggle('hidden', !user);
-                userInfo.textContent = user ? (user.isAnonymous ? 'Sesión Anónima' : 'Conectado') : '';
+                userInfo.textContent = user ? (user.isAnonymous ? 'Sesión Anónima (Preview)' : (user.displayName || user.email)) : '';
+                
                 if (user) {
+                    // Usuario autenticado: cargar datos desde rutas PÚBLICAS
                     unsubContadores(); unsubClientes();
-                    unsubContadores = onSnapshot(getPublicCol('contadores'), (snap) => {
-                        localContadores = snap.docs.map(d => ({id: d.id, ...d.data()})); loadDropdownsUI();
-                        if (selectContador.value && !localContadores.find(c => c.id === selectContador.value)) clearFormContador();
-                    });
-                    unsubClientes = onSnapshot(getPublicCol('clientes'), (snap) => {
-                        localClientes = snap.docs.map(d => ({id: d.id, ...d.data()})); loadDropdownsUI();
-                        if (selectCliente.value && !localClientes.find(c => c.id === selectCliente.value)) clearFormCliente();
-                    });
+                    unsubContadores = onSnapshot(getPublicCol('contadores'), (s) => { localContadores = s.docs.map(d => ({ id: d.id, ...d.data() })); loadDropdownsUI(); if (selectContador.value && !localContadores.find(x => x.id === selectContador.value)) clearFormContador(); });
+                    unsubClientes = onSnapshot(getPublicCol('clientes'), (s) => { localClientes = s.docs.map(d => ({ id: d.id, ...d.data() })); loadDropdownsUI(); if (selectCliente.value && !localClientes.find(x => x.id === selectCliente.value)) clearFormCliente(); });
                     loadConceptos(); addIncomeItem(); setFechasDefault();
                 } else {
+                    // No autenticado: limpiar
                     unsubContadores(); unsubClientes(); clearForm();
                 }
                 loginStatus.classList.add('hidden'); loadingContainer.classList.add('hidden');
             });
 
+            // Lógica de Auto-Login para Canvas vs Producción
             try {
-                if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken);
-                else await signInAnonymously(auth);
+                if (initialAuthToken) {
+                    // Estamos en Canvas Preview -> Usar token especial
+                    console.log("Detectado entorno Canvas Preview. Usando token.");
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    // Estamos en Producción (Vercel) -> No hacer nada, esperar click en botón Google
+                    console.log("Detectado entorno Producción. Esperando inicio de sesión manual.");
+                }
             } catch (e) {
-                console.error("Auth failed", e); showMessage('Error de inicio de sesión. Intente nuevamente.', 'error');
-                loadingContainer.classList.add('hidden'); loginStatus.classList.remove('hidden');
-                document.getElementById('google-login-btn').classList.remove('hidden');
+                console.error("Fallo auto-login:", e);
+                // Fallback solo para Canvas
+                if (initialAuthToken) {
+                     try { await signInAnonymously(auth); } catch(e2) { showMessage('Error crítico auth: ' + e2.message, 'error'); }
+                }
             }
         }
 
         // Event Listeners
         googleLoginBtn.addEventListener('click', async () => {
-            loginStatus.classList.add('hidden'); loadingContainer.classList.remove('hidden');
-            try { await signInAnonymously(auth); } 
-            catch (e) { showMessage(e.message, 'error'); loadingContainer.classList.add('hidden'); loginStatus.classList.remove('hidden'); }
-        });
-        logoutBtn.addEventListener('click', () => signOut(auth));
-        clearFormBtn.addEventListener('click', clearForm);
-        addIncomeBtn.addEventListener('click', addIncomeItem);
-        document.getElementById('clienteCedula').addEventListener('input', formatCedula);
-        document.getElementById('contadorRif').addEventListener('input', formatRif);
-        document.getElementById('contadorCpc').addEventListener('input', formatSimpleThousands);
-        selectContador.addEventListener('change', (e) => fillContadorForm(e.target.value));
-        selectCliente.addEventListener('change', (e) => fillClienteForm(e.target.value));
-        document.getElementById('saveContadorBtn').addEventListener('click', handleSaveContador);
-        document.getElementById('updateContadorBtn').addEventListener('click', handleUpdateContador);
-        document.getElementById('deleteContadorBtn').addEventListener('click', handleDeleteContador);
-        document.getElementById('saveClienteBtn').addEventListener('click', handleSaveCliente);
-        document.getElementById('updateClienteBtn').addEventListener('click', handleUpdateCliente);
-        document.getElementById('deleteClienteBtn').addEventListener('click', handleDeleteCliente);
-        contadorSelloInput.addEventListener('change', function() {
-            if (this.files[0]) {
-                const r = new FileReader(); r.onload = (e) => { selloPreview.src = e.target.result; selloPreview.classList.remove('hidden'); };
-                r.readAsDataURL(this.files[0]);
+            loginStatus.classList.remove('hidden'); loadingContainer.classList.remove('hidden');
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (e) {
+                console.error("Error Google Login:", e);
+                if (e.code === 'auth/unauthorized-domain') {
+                    showMessage('Este dominio no está autorizado para Google Login. Si estás en vista previa, esto es normal. En Vercel funcionará si configuraste el dominio.', 'error', 10000);
+                } else {
+                    showMessage('Error de inicio de sesión: ' + e.message, 'error');
+                }
+                loginStatus.classList.add('hidden'); loadingContainer.classList.add('hidden');
             }
         });
-        
-        // Listeners Conceptos
-        document.getElementById('conceptoBtnAgregar').addEventListener('click', () => {
-            const val = document.getElementById('conceptoEditInput').value.trim();
-            if (val && !conceptosGuardados.includes(val)) { conceptosGuardados.push(val); saveConceptos(); }
-        });
-        document.getElementById('conceptoBtnEditar').addEventListener('click', () => {
-            const idx = document.getElementById('conceptosSelect').value;
-            if (idx !== "") {
-                document.getElementById('conceptoEditInput').value = conceptosGuardados[idx]; edicionConceptoIndex = idx;
-                document.getElementById('conceptoBtnAgregar').style.display = 'none'; document.getElementById('conceptoBtnGuardarEdicion').style.display = 'inline-flex';
-            }
-        });
-        document.getElementById('conceptoBtnGuardarEdicion').addEventListener('click', () => {
-            const val = document.getElementById('conceptoEditInput').value.trim();
-            if (val && edicionConceptoIndex !== null) { conceptosGuardados[edicionConceptoIndex] = val; saveConceptos(); }
-        });
-        document.getElementById('conceptoBtnEliminar').addEventListener('click', () => {
-            const idx = document.getElementById('conceptosSelect').value;
-            if (idx !== "") { conceptosGuardados.splice(idx, 1); saveConceptos(); }
-        });
+        logoutBtn.addEventListener('click', () => signOut(auth)); clearFormBtn.addEventListener('click', clearForm); addIncomeBtn.addEventListener('click', addIncomeItem);
+        document.getElementById('clienteCedula').addEventListener('input', formatCedula); document.getElementById('contadorRif').addEventListener('input', formatRif); document.getElementById('contadorCpc').addEventListener('input', formatSimpleThousands);
+        selectContador.addEventListener('change', (e) => fillContadorForm(e.target.value)); selectCliente.addEventListener('change', (e) => fillClienteForm(e.target.value));
+        document.getElementById('saveContadorBtn').addEventListener('click', handleSaveContador); document.getElementById('updateContadorBtn').addEventListener('click', handleUpdateContador); document.getElementById('deleteContadorBtn').addEventListener('click', handleDeleteContador);
+        document.getElementById('saveClienteBtn').addEventListener('click', handleSaveCliente); document.getElementById('updateClienteBtn').addEventListener('click', handleUpdateCliente); document.getElementById('deleteClienteBtn').addEventListener('click', handleDeleteCliente);
+        contadorSelloInput.addEventListener('change', function() { if (this.files[0]) { const r = new FileReader(); r.onload = (e) => { selloPreview.src = e.target.result; selloPreview.classList.remove('hidden'); }; r.readAsDataURL(this.files[0]); } });
+        document.getElementById('conceptoBtnAgregar').addEventListener('click', () => { const v = document.getElementById('conceptoEditInput').value.trim(); if (v && !conceptosGuardados.includes(v)) { conceptosGuardados.push(v); saveConceptos(); } });
+        document.getElementById('conceptoBtnEditar').addEventListener('click', () => { const i = document.getElementById('conceptosSelect').value; if (i !== "") { document.getElementById('conceptoEditInput').value = conceptosGuardados[i]; edicionConceptoIndex = i; document.getElementById('conceptoBtnAgregar').style.display = 'none'; document.getElementById('conceptoBtnGuardarEdicion').style.display = 'inline-flex'; } });
+        document.getElementById('conceptoBtnGuardarEdicion').addEventListener('click', () => { const v = document.getElementById('conceptoEditInput').value.trim(); if (v && edicionConceptoIndex !== null) { conceptosGuardados[edicionConceptoIndex] = v; saveConceptos(); } });
+        document.getElementById('conceptoBtnEliminar').addEventListener('click', () => { const i = document.getElementById('conceptosSelect').value; if (i !== "") { conceptosGuardados.splice(i, 1); saveConceptos(); } });
 
+        // Iniciar
         init();
     </script>
-
 </body>
 </html>

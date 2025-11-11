@@ -10,8 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     
     <!-- SDK de PayPal -->
-    <!-- Reemplaza 'YOUR_PAYPAL_CLIENT_ID' con tu Client ID real de PayPal -->
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+    <!-- CORRECCIÓN: Se actualizó el Client ID real proporcionado por el usuario -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexx BKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,7 +102,6 @@
     
     <!-- Contenedor de Autenticación -->
     <div id="auth-container" class="container max-w-md mx-auto bg-white shadow-xl rounded-lg overflow-hidden p-8 hidden">
-        <!-- CAMBIO: Título actualizado -->
         <h2 class="text-2xl font-bold text-center text-purple-700 mb-6 font-dancing-script">Genera Informe de Aseguramiento</h2>
         <div class="space-y-4">
             <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-white border border-gray-300 text-gray-700 font-semibold rounded-full shadow-md hover:bg-gray-50 focus:outline-none transition-transform duration-150 ease-in-out active:scale-95 flex items-center justify-center">
@@ -126,16 +125,13 @@
 
     <!-- Contenedor Principal de la Aplicación -->
     <div id="app-container" class="container max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden hidden">
-        <!-- CAMBIO: Padding 'p-6' a 'p-4 md:p-6' para mejor vista móvil -->
         <div class="bg-purple-700 p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <h1 class="text-3xl md:text-4xl font-bold text-white flex items-center font-dancing-script">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 Informe de Aseguramiento
             </h1>
             <div class="text-center md:text-right">
-                <!-- CAMBIO: Añadida clase 'break-all' para evitar desbordamiento en móviles -->
                 <p class="text-sm text-purple-200 break-all" id="userEmailDisplay"></p>
-                <!-- Info del Plan del Usuario -->
                 <div id="userPlanInfo" class="text-xs text-yellow-200 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1"></div>
                 <button id="logoutBtn" class="text-sm text-yellow-200 hover:text-yellow-100 font-semibold mt-1">Cerrar Sesión</button>
             </div>
@@ -289,11 +285,9 @@
     <div id="premium-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 class="text-2xl font-bold text-purple-800 mb-4 font-dancing-script">¡Has alcanzado tu límite!</h3>
-            <!-- CAMBIO: Límite de 3 a 2 informes -->
             <p class="mb-4 text-gray-600">Has usado tus 2 informes gratuitos. Para generar informes ilimitados, actualiza a Premium.</p>
             
             <div class="p-4 bg-purple-50 rounded-lg mb-4">
-                <!-- CAMBIO: Precio y duración (ya estaba correcto, se mantiene) -->
                 <h4 class="font-semibold text-purple-700">Plan Premium - $15.00 USD</h4>
                 <p class="text-sm text-purple-600">Acceso ilimitado a la generación de informes durante 1 año.</p>
             </div>
@@ -308,9 +302,6 @@
                 <button id="showPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95">
                     Pagar con Pago Móvil
                 </button>
-                
-                <!-- CAMBIO: Sección de anuncio recompensado eliminada -->
-
             </div>
 
             <button onclick="hideModals()" class="mt-6 text-sm text-gray-500 hover:text-gray-700 w-full text-center">Cancelar</button>
@@ -327,7 +318,6 @@
                 <p><strong>Banco:</strong> [Nombre de tu Banco]</p>
                 <p><strong>CI:</strong> [Tu Cédula]</p>
                 <p><strong>Teléfono:</strong> [Tu Teléfono]</p>
-                <!-- CAMBIO: Precio (ya estaba correcto, se mantiene) -->
                 <p><strong>Monto:</strong> 15 USD (o su equivalente en Bs. a la tasa BCV del día)</p>
             </div>
 
@@ -336,7 +326,7 @@
                     <label for="pagoMovilProof" class="block text-sm font-medium text-gray-700 mb-1">Subir Comprobante (Imagen)</label>
                     <input type="file" id="pagoMovilProof" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*">
                 </div>
-                <button id="submitPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95 disabled:opacity-50" disabled>
+                <button id="submitPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-7G00 transition-transform duration-150 ease-in-out active:scale-95 disabled:opacity-50" disabled>
                     Subir y Notificar Pago
                 </button>
             </div>
@@ -345,9 +335,6 @@
         </div>
     </div>
     
-    <!-- CAMBIO: Modal de anuncio eliminado -->
-
-
     <!-- ========= FIN MODALES ========= -->
 
     <script type="module">
@@ -379,7 +366,6 @@
         // --- Selectores de DOM (Modales) ---
         const premiumModal = document.getElementById('premium-modal');
         const pagomovilModal = document.getElementById('pagomovil-modal');
-        // CAMBIO: selector de modal de anuncio eliminado
         const pagoMovilProofInput = document.getElementById('pagoMovilProof');
         const submitPagoMovilBtn = document.getElementById('submitPagoMovilBtn');
 
@@ -416,15 +402,13 @@
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            db = getFirestore(app);
-            storage = getStorage(app); // Inicializar Storage
-            setLogLevel('Debug'); // Para depuración
+            db = getFirestore(app); 
+            storage = getStorage(app); 
+            setLogLevel('Debug'); 
 
-            // Listeners de Autenticación
             setupAuthListeners();
             
-            // Listener de estado de autenticación
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async (user) => { // <-- Se añade 'async'
                 loadingOverlay.classList.add('hidden');
                 if (user) {
                     currentUserId = user.uid;
@@ -432,17 +416,22 @@
                     appContainer.classList.remove('hidden');
                     authContainer.classList.add('hidden');
                     
-                    // Configurar perfil de usuario y cargar datos
-                    setupUserProfile(user.uid); 
-                    loadDropdowns();
-                    inicializarConceptos();
+                    try {
+                        // Esperamos a que el perfil se configure antes de continuar
+                        // AHORA: setupUserProfile también llamará a las funciones de carga de datos
+                        await setupUserProfile(user.uid); 
+
+                    } catch (error) {
+                        console.error("Error crítico al configurar perfil:", error);
+                        showMessage("No se pudo cargar tu perfil. Intenta recargar la página.", "error");
+                    }
+
                 } else {
                     currentUserId = null;
                     userPlanStatus = null;
                     appContainer.classList.add('hidden');
                     authContainer.classList.remove('hidden');
                     
-                    // Limpiar listeners de snapshots
                     if (contadoresUnsubscribe) contadoresUnsubscribe();
                     if (clientesUnsubscribe) clientesUnsubscribe();
                     if (conceptosUnsubscribe) conceptosUnsubscribe();
@@ -455,33 +444,68 @@
             loadingOverlay.classList.add('hidden'); authContainer.classList.remove('hidden'); appContainer.classList.add('hidden'); authMessage.textContent = error.message || "Error al conectar.";
         }
 
-        // --- Lógica de Autenticación ---
-        // (Las funciones se movieron arriba, antes del bloque 'try')
-
         // --- Gestión de Perfil y Planes de Usuario ---
-
         function getCollectionPath(collectionName) { return currentUserId ? `artifacts/${appId}/users/${currentUserId}/${collectionName}` : null; }
         function getUserProfileRef() { return currentUserId ? doc(db, `artifacts/${appId}/users/${currentUserId}/profile`, 'status') : null; }
 
         async function setupUserProfile(userId) {
-            if (userProfileUnsubscribe) userProfileUnsubscribe(); // Limpiar listener anterior
+            if (userProfileUnsubscribe) userProfileUnsubscribe(); 
             
             const profileRef = getUserProfileRef();
-            if (!profileRef) return;
+            if (!profileRef) return Promise.reject("No hay referencia de perfil"); // <-- Salida si no hay ref
 
-            userProfileUnsubscribe = onSnapshot(profileRef, async (docSnap) => {
-                if (!docSnap.exists()) {
-                    // El usuario es nuevo, crear perfil free
-                    await createFreeUserProfile(profileRef);
-                } else {
-                    userPlanStatus = docSnap.data();
-                    // Verificar si el plan premium ha expirado
-                    await checkPremiumExpiry(profileRef, userPlanStatus);
-                }
-                updatePlanUI(); // Actualizar la UI con la info del plan
-            }, (error) => {
-                console.error("Error al escuchar perfil de usuario:", error);
-                showMessage("Error al cargar tu plan.", "error");
+            // Devolvemos una promesa que se resuelve en la primera carga
+            return new Promise((resolve, reject) => {
+                let initialLoadComplete = false; // <-- Flag para evitar ejecuciones múltiples
+
+                userProfileUnsubscribe = onSnapshot(profileRef, async (docSnap) => {
+                    try {
+                        if (!docSnap.exists()) {
+                            await createFreeUserProfile(profileRef);
+                        } else {
+                            userPlanStatus = docSnap.data();
+                            await checkPremiumExpiry(profileRef, userPlanStatus);
+                        }
+                        updatePlanUI(); 
+                        
+                        // --- INICIO DE LA CORRECCIÓN ---
+                        // Solo ejecutamos esto en la PRIMERA carga del snapshot
+                        // para evitar recargar todo si el plan del usuario cambia.
+                        if (!initialLoadComplete) {
+                            initialLoadComplete = true; 
+                            
+                            // Movemos las funciones de carga de datos aquí.
+                            // Ahora se ejecutan DESPUÉS de que el primer snapshot (perfil)
+                            // se ha completado con éxito.
+                            loadDropdowns();
+
+                            // --- INICIO DE LA CORRECCIÓN (Error "offline") ---
+                            // Añadimos un pequeño retraso (e.g., 1 segundo) antes de inicializar los conceptos.
+                            // Esto le da al cliente de Firestore una oportunidad adicional para conectarse
+                            // completamente después de que la autenticación y el perfil se hayan cargado.
+                            const delay = ms => new Promise(res => setTimeout(res, ms));
+                            await delay(1000); // 1 segundo de retraso
+                            // --- FIN DE LA CORRECCIÓN (Error "offline") ---
+                            
+                            await inicializarConceptos(); // <-- Hacemos await aquí
+                            
+                            resolve(); // <-- Resolvemos la promesa DESPUÉS de que todo cargue
+                        }
+                        // --- FIN DE LA CORRECCIÓN ---
+
+                    } catch (error) {
+                        console.error("Error en el snapshot del perfil:", error);
+                        if (!initialLoadComplete) {
+                            reject(error); // <-- Rechazamos si hay error interno ANTES de la carga inicial
+                        }
+                    }
+                }, (error) => {
+                    console.error("Error al escuchar perfil de usuario:", error);
+                    showMessage("Error al cargar tu plan.", "error");
+                    if (!initialLoadComplete) {
+                        reject(error); // <-- Rechazamos si el listener falla ANTES de la carga inicial
+                    }
+                });
             });
         }
 
@@ -491,7 +515,6 @@
                     plan: 'free',
                     reportsGenerated: 0,
                     premiumUntil: null,
-                    // CAMBIO: campo de anuncios eliminado
                     createdAt: serverTimestamp()
                 };
                 await setDoc(profileRef, freePlan);
@@ -503,12 +526,11 @@
 
         async function checkPremiumExpiry(profileRef, status) {
             if (status.plan === 'premium' && status.premiumUntil && status.premiumUntil.toDate() < new Date()) {
-                // El plan premium ha expirado
                 try {
                     await updateDoc(profileRef, {
                         plan: 'free',
                         premiumUntil: null,
-                        reportsGenerated: 0 // Reiniciar conteo
+                        reportsGenerated: 0 
                     });
                     showMessage("Tu plan Premium ha expirado. Has vuelto al plan Free.", "info");
                 } catch (e) {
@@ -526,33 +548,21 @@
                 userPlanInfo.textContent = `⭐ Usuario Premium (Vence: ${fmtDate(userPlanStatus.premiumUntil.toDate().toISOString().split('T')[0])})`;
                 userPlanInfo.className = 'text-xs text-yellow-300 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
             } else {
-                // CAMBIO: Límite de 3 a 2
                 const reportsLeft = 2 - userPlanStatus.reportsGenerated;
-                // CAMBIO: Mensaje de anuncios eliminado
                 userPlanInfo.textContent = `Plan Free (${reportsLeft < 0 ? 0 : reportsLeft} informes gratis)`;
                 userPlanInfo.className = 'text-xs text-gray-200 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
             }
         }
 
         // --- Lógica de Generación de Informes (Validación) ---
-
         function canGenerateReport() {
             if (!userPlanStatus) return { allow: false, reason: 'no_auth' };
-
-            // 1. Usuario Premium
             if (userPlanStatus.plan === 'premium') {
                 return { allow: true, type: 'premium' };
             }
-
-            // CAMBIO: Lógica de anuncios eliminada
-
-            // 3. Usuario Free con Informes Gratuitos
-            // CAMBIO: Límite de 3 a 2
             if (userPlanStatus.reportsGenerated < 2) {
                 return { allow: true, type: 'free' };
             }
-
-            // 4. Límite alcanzado
             return { allow: false, reason: 'limit_reached' };
         }
 
@@ -563,9 +573,7 @@
             try {
                 if (type === 'free') {
                     await updateDoc(profileRef, { reportsGenerated: increment(1) });
-                // CAMBIO: Lógica de anuncios eliminada
                 }
-                // 'premium' no necesita contador
                 console.log(`Informe de tipo ${type} registrado.`);
             } catch (e) {
                 console.error("Error al incrementar contador de informes:", e);
@@ -574,21 +582,17 @@
         }
         
         // --- Lógica de Modales (Planes y Pagos) ---
-
         function hideModals() {
             premiumModal.classList.add('hidden');
             premiumModal.classList.remove('visible');
             pagomovilModal.classList.add('hidden');
             pagomovilModal.classList.remove('visible');
-            // CAMBIO: Lógica de modal de anuncio eliminada
         }
 
         function showPremiumModal() {
             hideModals();
             premiumModal.classList.remove('hidden');
             setTimeout(() => premiumModal.classList.add('visible'), 10);
-            
-            // Renderizar botones de PayPal
             renderPayPalButtons();
         }
 
@@ -598,42 +602,62 @@
             setTimeout(() => pagomovilModal.classList.add('visible'), 10);
         }
 
-        // CAMBIO: Lógica de modal de anuncio eliminada
-
         // --- Lógica de PayPal ---
         function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
-            if (!container || container.children.length > 0) return; // No renderizar si ya existen
+            if (!container || container.children.length > 0) return; 
 
-            paypal.Buttons({
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        purchase_units: [{
-                            description: "Plan Premium 1 Año - Informe de Aseguramiento",
-                            amount: {
-                                value: "15.00", // Monto en USD (ya estaba correcto)
-                                currency_code: "USD"
-                            }
-                        }]
-                    });
-                },
-                onApprove: async (data, actions) => {
-                    try {
-                        const details = await actions.order.capture();
-                        console.log("Pago completado:", details);
-                        await grantPremiumAccess();
-                        showMessage("¡Pago completado! Ahora eres Premium.", "success");
-                        hideModals();
-                    } catch (err) {
-                        console.error("Error en la aprobación de PayPal:", err);
-                        showMessage("Error al procesar el pago.", "error");
+            // --- INICIO DE LA CORRECCIÓN (Error PayPal) ---
+            // 1. Comprobar si 'paypal' está definido
+            if (typeof paypal === 'undefined') {
+                console.error("SDK de PayPal no se ha cargado. 'paypal' no está definido.");
+                showMessage("Error al cargar la opción de pago. Refresca la página.", "error");
+                // Mostrar un mensaje de error en lugar del botón
+                container.innerHTML = '<p class="text-center text-red-600">Error al cargar el botón de pago. Por favor, refresca la página.</p>';
+                return;
+            }
+            
+            // 2. Envolver el renderizado en un try...catch
+            try {
+            // --- FIN DE LA CORRECCIÓN (Error PayPal) ---
+
+                paypal.Buttons({
+                    createOrder: (data, actions) => {
+                        return actions.order.create({
+                            purchase_units: [{
+                                description: "Plan Premium 1 Año - Informe de Aseguramiento",
+                                amount: {
+                                    value: "15.00", 
+                                    currency_code: "USD"
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: async (data, actions) => {
+                        try {
+                            const details = await actions.order.capture();
+                            console.log("Pago completado:", details);
+                            await grantPremiumAccess();
+                            showMessage("¡Pago completado! Ahora eres Premium.", "success");
+                            hideModals();
+                        } catch (err) {
+                            console.error("Error en la aprobación de PayPal:", err);
+                            showMessage("Error al procesar el pago.", "error");
+                        }
+                    },
+                    onError: (err) => {
+                        console.error("Error de PayPal:", err);
+                        showMessage("Ocurrió un error con PayPal.", "error");
                     }
-                },
-                onError: (err) => {
-                    console.error("Error de PayPal:", err);
-                    showMessage("Ocurrió un error con PayPal.", "error");
-                }
-            }).render('#paypal-button-container');
+                }).render('#paypal-button-container');
+
+            // --- INICIO DE LA CORRECCIÓN (Error PayPal) ---
+            } catch (error) {
+                console.error("Error al renderizar botones de PayPal:", error);
+                showMessage("Error al mostrar el botón de pago.", "error");
+                container.innerHTML = '<p class="text-center text-red-600">Error al mostrar el botón de pago.</p>';
+            }
+            // --- FIN DE LA CORRECCIÓN (Error PayPal) ---
         }
 
         async function grantPremiumAccess() {
@@ -641,13 +665,13 @@
             if (!profileRef) return;
             
             const expiryDate = new Date();
-            expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 año desde hoy (ya estaba correcto)
+            expiryDate.setFullYear(expiryDate.getFullYear() + 1); 
             
             try {
                 await updateDoc(profileRef, {
                     plan: 'premium',
                     premiumUntil: Timestamp.fromDate(expiryDate),
-                    reportsGenerated: 0 // Opcional: reiniciar contador
+                    reportsGenerated: 0 
                 });
             } catch (e) {
                 console.error("Error al actualizar a premium:", e);
@@ -657,11 +681,7 @@
 
         // --- Lógica de Pago Móvil ---
         pagoMovilProofInput.addEventListener('change', () => {
-            if (pagoMovilProofInput.files.length > 0) {
-                submitPagoMovilBtn.disabled = false;
-            } else {
-                submitPagoMovilBtn.disabled = true;
-            }
+            submitPagoMovilBtn.disabled = pagoMovilProofInput.files.length === 0;
         });
 
         submitPagoMovilBtn.addEventListener('click', async () => {
@@ -672,23 +692,20 @@
             submitPagoMovilBtn.textContent = 'Subiendo...';
 
             try {
-                // 1. Subir imagen a Storage
                 const storagePath = `artifacts/${appId}/pagoMovilUploads/${currentUserId}/${Date.now()}-${file.name}`;
                 const storageRef = ref(storage, storagePath);
                 const snapshot = await uploadBytes(storageRef, file);
                 const downloadURL = await getDownloadURL(snapshot.ref);
 
-                // 2. Crear registro de validación en Firestore (para el admin)
                 const validationData = {
                     userId: currentUserId,
                     userEmail: auth.currentUser.email,
                     fileURL: downloadURL,
                     storagePath: storagePath,
-                    status: 'pending', // El admin lo cambiará a 'approved' o 'rejected'
+                    status: 'pending', 
                     createdAt: serverTimestamp()
                 };
                 
-                // Esta colección debe ser securizada para que solo admins puedan leer/escribir (excepto la creación)
                 await addDoc(collection(db, `artifacts/${appId}/admin/pagoValidations`), validationData);
 
                 showMessage("Comprobante enviado. Estará en revisión y se activará en 24h.", "success");
@@ -704,30 +721,21 @@
             }
         });
 
-        // CAMBIO: Lógica de anuncio recompensado eliminada
-
         // --- Aplicar Estilos de Botones ---
         function applyButtonStyles() {
             document.getElementById('addIncomeItemBtn').className = btnYellow; 
             document.querySelector('.btn-primary').className = btnPrimary;
             document.getElementById('saveContadorBtn').className = btnLilac; document.getElementById('saveClienteBtn').className = btnLilac;
-            document.getElementById('clearFormBtn').className = `${btnYellow} flex items-center`; // Añadido flex
+            document.getElementById('clearFormBtn').className = `${btnYellow} flex items-center`; 
             document.getElementById('deleteContadorBtn').className = btnLilac + " gestion-btn"; document.getElementById('updateContadorBtn').className = btnLilac + " gestion-btn";
             document.getElementById('deleteClienteBtn').className = btnLilac + " gestion-btn"; document.getElementById('updateClienteBtn').className = btnLilac + " gestion-btn";
             document.getElementById('conceptoBtnAgregar').className = btnLilac; document.getElementById('conceptoBtnEditar').className = btnLilac;
             document.getElementById('conceptoBtnGuardarEdicion').className = `${btnLilac} hidden`; document.getElementById('conceptoBtnEliminar').className = btnLilac;
             document.getElementById('showPagoMovilBtn').className = "w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95";
-            // CAMBIO: Botón de anuncio eliminado
         }
         applyButtonStyles();
         
         // --- Lógica de Formulario (Contadores, Clientes, Conceptos) ---
-        // (El código de contadores, clientes y conceptos se mantiene igual que el original)
-        // ... (código de gestión de contadores) ...
-        // ... (código de gestión de clientes) ...
-        // ... (código de gestión de conceptos) ...
-        
-        // (Listeners de la UI del formulario)
         contadorSelloInput.addEventListener('change', function() { const file = this.files[0]; if (file && file.type === "image/png") { const reader = new FileReader(); reader.onload = (e) => { selloPreview.src = e.target.result; selloPreview.classList.remove('hidden'); }; reader.readAsDataURL(file); } else { selloPreview.src = ''; selloPreview.classList.add('hidden'); if (file) { showMessage('Solo se permiten archivos PNG.', 'error'); this.value = ''; } } });
 
         function loadDropdowns() {
@@ -764,31 +772,83 @@
         async function deleteCliente() { const id = document.getElementById('selectCliente').value; if (id) showConfirmationModal('¿Eliminar cliente?', async () => { try { await deleteDoc(doc(db, getCollectionPath('clientes'), id)); showMessage('Eliminado.', 'success'); clearFormCliente(); } catch (e) { showMessage('Error al eliminar.', 'error'); } }); }
 
         const DEFAULT_CONCEPTOS = ["Actividades Comerciales", "Alquiler de Inmueble", "Director de la Entidad", "Docente contratado tiempo completo", "Honorarios Profesionales de libre ejercicio", "Intereses generados por inversiones", "Servicios de Consultoría", "Servicios Técnicos", "Sueldos y Salarios"];
+        
+        // --- INICIO DE LA CORRECCIÓN 1 (Poblar Datalist por defecto) ---
+        function populateDefaultConceptosDatalist() {
+            const datalist = document.getElementById('conceptos-list');
+            if (!datalist || datalist.options.length > 0) return; // Salir si no existe o ya tiene opciones
+            DEFAULT_CONCEPTOS.forEach(c => {
+                const optD = document.createElement('option');
+                optD.value = c;
+                datalist.appendChild(optD);
+            });
+        }
+        // Llamar inmediatamente para poblar los conceptos por defecto en la UI
+        populateDefaultConceptosDatalist();
+        // --- FIN DE LA CORRECCIÓN 1 ---
+
+        // --- INICIO DE LA CORRECCIÓN (Error "offline") ---
         async function inicializarConceptos() {
             if (!currentUserId) return;
             const path = getCollectionPath('conceptos'); if (!path) return;
             const defRef = doc(db, path, 'defaults_v6');
-            try {
-                const snap = await getDoc(defRef);
-                if (!snap.exists()) {
-                    const q = query(collection(db, path));
-                    const existingSnap = await getDocs(q);
-                    const existingNames = new Set();
-                    existingSnap.forEach(doc => { if (doc.data().nombre) existingNames.add(doc.data().nombre.toLowerCase()); });
-                    const batch = writeBatch(db); let addedCount = 0;
-                    DEFAULT_CONCEPTOS.forEach(n => { if (!existingNames.has(n.toLowerCase())) { batch.set(doc(collection(db, path)), { nombre: n, createdAt: serverTimestamp(), isDefault: true }); addedCount++; } });
-                    batch.set(defRef, { inicializado: true }); await batch.commit(); console.log(`Conceptos inicializados (v6). Agregados: ${addedCount}`);
+
+            // Función interna para reintentar
+            const attemptInitialization = async (retryCount = 0) => {
+                try {
+                    const snap = await getDoc(defRef); // <-- La llamada que puede fallar
+                    
+                    if (!snap.exists()) {
+                        const q = query(collection(db, path));
+                        const existingSnap = await getDocs(q);
+                        const existingNames = new Set();
+                        existingSnap.forEach(doc => { if (doc.data().nombre) existingNames.add(doc.data().nombre.toLowerCase()); });
+                        const batch = writeBatch(db); let addedCount = 0;
+                        DEFAULT_CONCEPTOS.forEach(n => { if (!existingNames.has(n.toLowerCase())) { batch.set(doc(collection(db, path)), { nombre: n, createdAt: serverTimestamp(), isDefault: true }); addedCount++; } });
+                        batch.set(defRef, { inicializado: true }); await batch.commit(); console.log(`Conceptos inicializados (v6). Agregados: ${addedCount}`);
+                    }
+                    
+                    // Si todo va bien (o ya existía), cargamos la UI
+                    cargarConceptosUI();
+
+                } catch (e) {
+                    // Verificamos si es el error "offline"
+                    // AUMENTAMOS LOS REINTENTOS Y EL TIEMPO
+                    if ( (e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 5 ) { // <-- CAMBIO: 4 a 5
+                        // Es un error de conexión, reintentamos
+                        console.warn(`Firestore offline, reintentando init... (Intento ${retryCount + 1})`);
+                        
+                        // --- CAMBIO CLAVE ---
+                        // 1. Creamos una promesa de 'delay'
+                        const delay = ms => new Promise(res => setTimeout(res, ms));
+                        // 2. Esperamos (await) el tiempo necesario
+                        await delay(2500 * (retryCount + 1)); // <-- CAMBIO: 2000 a 2500 (2.5s, 5s, 7.5s, 10s, 12.5s)
+                        // 3. Llamamos y retornamos (return) el siguiente intento.
+                        //    Esto mantiene la cadena de promesas.
+                        return attemptInitialization(retryCount + 1);
+                        // --- FIN CAMBIO CLAVE ---
+
+                    } else {
+                        // Es un error diferente o ya reintentamos
+                        console.error("Error init conceptos: Falló después de reintentos.", e);
+                        showMessage("No se pudieron cargar los conceptos. Revisa tu conexión.", "error");
+                        // Aún así intentamos cargar la UI, puede que solo falle la inicialización
+                        cargarConceptosUI();
+                    }
                 }
-            } catch (e) { console.error("Error init conceptos:", e); }
-            cargarConceptosUI();
+            };
+
+            // Iniciamos el primer intento
+            await attemptInitialization();
         }
+        // --- FIN DE LA CORRECCIÓN ---
+
         function cargarConceptosUI() {
             const path = getCollectionPath('conceptos'); if (!path) return;
             if (conceptosUnsubscribe) conceptosUnsubscribe();
             conceptosUnsubscribe = onSnapshot(query(collection(db, path)), (snapshot) => {
                 localConceptos = [];
                 const select = document.getElementById('conceptosSelect'), datalist = document.getElementById('conceptos-list');
-                // CAMBIO: Texto del 'option' por defecto
                 select.innerHTML = '<option value="">-- Seleccionar Concepto --</option>'; datalist.innerHTML = ''; 
                 snapshot.forEach(doc => { if (doc.id !== 'defaults_v6') { localConceptos.push({ id: doc.id, ...doc.data() }); } });
                 localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
@@ -821,22 +881,20 @@
         document.getElementById('showPagoMovilBtn').addEventListener('click', showPagoMovilModal);
         
         // --- Lógica de Ingresos (Items) ---
-        // CAMBIO: Botón de eliminar ingreso modificado
         window.addIncomeItem = function() {
             const c = document.getElementById('income-details');
             const d = document.createElement('div'); d.className = 'flex flex-col md:flex-row items-center gap-3 income-item';
             
-            // Definir los estilos del botón de eliminar
             const btnRemoveClasses = `${btnBase} bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-300 flex-shrink-0`;
             
             d.innerHTML = `
                 <input type="text" placeholder="Concepto" class="w-full md:flex-grow p-2 border border-gray-300 rounded-md income-concept" list="conceptos-list" required>
                 <input type="text" inputmode="decimal" placeholder="Monto (Bs.)" class="w-full md:w-32 p-2 border border-gray-300 rounded-md income-amount" required>
                 <button type="button" class="${btnRemoveClasses} btn-remove-income">
-                    Eliminar Ingreso
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
+                    <span class="ml-1.5 md:hidden">Eliminar Ingreso</span>
                 </button>`;
             
             d.querySelector('.income-amount').addEventListener('input', formatCurrencyInput);
@@ -851,12 +909,12 @@
         function fmtDate(s, long = false) { if (!s) return ''; const d = s instanceof Date ? s : new Date(s + 'T00:00:00'); if (long) return `${d.getDate()} de ${["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()]} ${d.getFullYear()}`; return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; }
         function fmtCur(n) { return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
-        // Mover buildPDF fuera del listener
         function buildPDF(sealData, sealW, sealH) {
             try {
-                const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'pt', 'letter');
+                const { jsPDF } = window.jspdf; 
+                const doc = new jsPDF('p', 'pt', 'letter');
                 const margin = 60, pageH = doc.internal.pageSize.getHeight(), usableW = doc.internal.pageSize.getWidth() - 120;
-                let y = 141.75; // 5cm top margin
+                let y = 141.75; 
 
                 const getVal = (id) => document.getElementById(id).value;
                 const cNom = getVal('contadorNombre'), cCpc = getVal('contadorCpc'), cRif = getVal('contadorRif');
@@ -875,7 +933,7 @@
                     y += h + (opts.spacing || 15);
                 };
 
-                // --- PÁGINAS PDF (Idéntico al original) ---
+                // --- PÁGINAS PDF ---
                 addTxt('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', { fontStyle: 'bold', align: 'center', spacing: 30 });
                 addTxt('Alcance', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`He revisado la evidencia inherente a los ingresos percibidos por el ${clTrat} ${clNom}, con cedula de identidad N.º ${clCed}, durante el periodo comprendido desde el ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, presentado en la relación de ingresos adjunta, correspondiente a su actividad económica según se detalla en el anexo.`, { indent: 20, spacing: 25 });
@@ -902,13 +960,27 @@
                 if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 y = pageH - 50; 
                 addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 0, lineSpacing: 1.5 });
+                
                 doc.addPage(); y = 141.75;
                 addTxt(clNom.toUpperCase(), { fontStyle: 'bold', align: 'center', spacing: 10 });
                 addTxt(clCed, { fontStyle: 'bold', align: 'center', spacing: 30 });
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
                 addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
-                doc.autoTable({ head: [['Detalle de los ingresos del periodo:', 'Bolívares']], body: data, foot: [[{ content: 'Total Ingresos', styles: { halign: 'left' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right' } }]], startY: y, margin: { left: 60, right: 60, top: 141.75, bottom: 70.86 }, theme: 'grid', headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center' }, footStyles: { fillColor: [243, 244, 246], textColor: [0, 0, 0], fontStyle: 'bold' }, columnStyles: { 1: { halign: 'right' } }, didDrawPage: (d) => y = d.cursor.y > 141.75 ? d.cursor.y : 141.75 });
-                y = doc.autoTable.previous.finalY + 30;
+                
+                doc.autoTable({ 
+                    head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
+                    body: data, 
+                    foot: [[{ content: 'Total Ingresos', styles: { halign: 'left' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right' } }]], 
+                    startY: y, 
+                    margin: { left: 60, right: 60, top: 141.75, bottom: 70.86 }, 
+                    theme: 'grid', 
+                    headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center' }, 
+                    footStyles: { fillColor: [243, 244, 246], textColor: [0, 0, 0], fontStyle: 'bold' }, 
+                    columnStyles: { 1: { halign: 'right' } } 
+                });
+                
+                y = doc.autoTable.previous.finalY + 30; 
+                
                 const clSigH = 100; if (y + clSigH > pageH - 70.86) { doc.addPage(); y = 141.75; }
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
                 addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
@@ -917,7 +989,6 @@
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
-                // CAMBIO: Nombre de archivo (ya estaba implementado, se mantiene)
                 const safeClientName = clNom.replace(/[^a-zA-Z0-9]/g, '_');
                 doc.save(`Informe_Aseguramiento_${safeClientName}.pdf`);
 
@@ -927,24 +998,20 @@
             }
         }
         
-        // --- Listener del Formulario Principal (MODIFICADO) ---
+        // --- Listener del Formulario Principal ---
         document.getElementById('report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // 1. Validar campos de ingresos
             const items = document.querySelectorAll('.income-item');
             if ([...items].some(i => !i.querySelector('.income-concept').value || parseVal(i.querySelector('.income-amount').value) <= 0)) {
                 return showMessage('Revise conceptos y montos. Deben tener un valor válido.', 'error');
             }
 
-            // 2. Verificar permiso de generación
             const check = canGenerateReport();
             
             if (check.allow) {
-                // 3. Si se permite, registrar el informe
                 await incrementReportCount(check.type);
                 
-                // 4. Proceder a generar el PDF
                 const file = contadorSelloInput.files[0];
                 if (file && file.type === "image/png") {
                     const r = new FileReader(); 
@@ -958,21 +1025,16 @@
                     buildPDF(null, 0, 0);
                 }
                 
-                // Mostrar un mensaje de éxito
                 if (check.type === 'free') {
-                    // CAMBIO: Mensaje actualizado para 2 informes ( 1 - 0 = 1, 1 - 1 = 0 )
                     const reportsRemaining = 1 - userPlanStatus.reportsGenerated;
                     showMessage(`Informe generado. Te quedan ${reportsRemaining} informes gratuitos.`, 'success');
-                // CAMBIO: Lógica de anuncios eliminada
                 } else {
                     showMessage("Informe Premium generado.", "success");
                 }
 
             } else if (check.reason === 'limit_reached') {
-                // 5. Si no se permite, mostrar modal de pago
                 showPremiumModal();
             } else {
-                // Otro error (ej. no autenticado)
                 showMessage('Debes iniciar sesión para generar informes.', 'error');
             }
         });

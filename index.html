@@ -1163,17 +1163,17 @@
                         doc.addPage();
                         y = margin;
                     }
+                    // --- CORRECCIÓN: Alineado a la derecha, fluyendo con 'y' ---
                     doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); // Dibujar imagen
                 }
 
-                // Firma (centrada, como en el código original, pero fluyendo)
-                // --- CORRECCIÓN: Alineación de firma a la izquierda ---
-                addTxt('________________________________', { align: 'left', spacing: 12, lineSpacing: 1 });
-                addTxt(cNom, { align: 'left', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'left', spacing: 12, lineSpacing: 1 });
-                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'left', spacing: 12, lineSpacing: 1 });
+                // --- CORRECCIÓN: Alineación de firma al CENTRO ---
+                addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
+                addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
+                addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 
-                // --- CORRECCIÓN: Añadir espacio y fecha debajo de la firma ---
+                // --- CORRECCIÓN: Añadir espacio y fecha A LA IZQUIERDA ---
                 y += 12; // Espacio en blanco
                 addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
 

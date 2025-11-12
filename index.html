@@ -1077,8 +1077,14 @@
             try {
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF('p', 'pt', 'letter');
-                const margin = 60, pageH = doc.internal.pageSize.getHeight(), usableW = doc.internal.pageSize.getWidth() - 120;
-                let y = 141.75; // Posición Y inicial (5cm)
+                
+                // --- INICIO DE LA CORRECCIÓN DE FORMATO ---
+                const margin = 85.03; // 3cm
+                const marginBottom = 70.86; // 2.5cm
+                const pageH = doc.internal.pageSize.getHeight();
+                const usableW = doc.internal.pageSize.getWidth() - (margin * 2);
+                let y = margin; // Posición Y inicial (3cm)
+                // --- FIN DE LA CORRECCIÓN ---
 
                 // Recolectar datos del formulario
                 const getVal = (id) => document.getElementById(id).value;
@@ -1094,10 +1100,22 @@
                 const addTxt = (txt, opts = {}) => {
                     doc.setFontSize(opts.fontSize || 11); doc.setFont('helvetica', opts.fontStyle || 'normal');
                     const lines = doc.splitTextToSize(txt, usableW - (opts.indent || 0));
+                    // Calcular altura de las líneas
                     const h = (lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5)) - ((opts.fontSize || 11) * ((opts.lineSpacing || 1.5) - 1));
-                    if (y + h > pageH - 70.86) { doc.addPage(); y = 141.75; } // Salto de página
-                    doc.text(txt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - 60 : 60 + (opts.indent || 0)), y, { align: opts.align || 'justify', maxWidth: usableW - (opts.indent || 0), lineHeightFactor: opts.lineSpacing || 1.5 });
-                    y += h + (opts.spacing || 15);
+                    
+                    // --- CORRECCIÓN: Lógica de Salto de Página ---
+                    if (y + h > pageH - marginBottom) { 
+                        doc.addPage(); 
+                        y = margin; // Resetear Y al margen superior
+                    }
+                    
+                    // --- CORRECCIÓN: Posicionamiento X ---
+                    doc.text(txt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - margin : margin + (opts.indent || 0)), y, { 
+                        align: opts.align || 'justify', 
+                        maxWidth: usableW - (opts.indent || 0), 
+                        lineHeightFactor: opts.lineSpacing || 1.5 
+                    });
+                    y += h + (opts.spacing || 15); // Avanzar Y
                 };
 
                 // --- PÁGINAS PDF ---
@@ -1115,7 +1133,7 @@
                 const respP2 = `Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clTrat} ${clNom}, para el periodo ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, con base al examen sobre la evidencia obtenida.`;
                 addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25 });
                 
-                doc.addPage(); y = 141.75;
+                // --- CORRECCIÓN: Movido a flujo normal ---
                 // Criterio
                 addTxt('Identificación del criterio de evaluación', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clTrat} ${clNom}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25 });
@@ -1126,30 +1144,44 @@
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${getVal('entidadDirigida')} el cual lo ha requerido para ${getVal('motivoInforme')}.`, { indent: 20, spacing: 40 });
                 
-                // Firma y Sello
-                const sigH = (4 * 11 * 1) + (cRif ? 12 : 0); // Altura de las líneas de firma
-                let sigY = pageH - 85 - sigH; // Posición Y de la firma
-                // Añadir sello si existe
+                // --- CORRECCIÓN: Firma y Sello fluyen naturalmente ---
+                
+                // Fecha (como en el PDF modelo)
+                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 40, lineSpacing: 1.5 });
+                
+                const sealStartY = y; // Posición Y para el bloque de firma/sello
+                let sealH_pt = 0, sealW_pt = 0;
+
+                // Añadir sello si existe (colocado a la derecha)
                 if (sealData) { 
                     const ratio = Math.min((5.3 * 28.35) / sealW, (2.1 * 28.35) / sealH); // Calcular ratio de aspecto
-                    const sW = Math.min(sealW * ratio, sealW * 0.75), sH = Math.min(sealH * ratio, sealH * 0.75); // Dimensiones finales
-                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - 60 - sW, sigY - sH - 6, sW, sH); // Dibujar imagen
+                    sealW_pt = Math.min(sealW * ratio, sealW * 0.75);
+                    sealH_pt = Math.min(sealH * ratio, sealH * 0.75); // Dimensiones finales
+                    
+                    // Comprobar si el sello cabe antes de dibujarlo
+                    if (y + sealH_pt > pageH - marginBottom) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); // Dibujar imagen
                 }
-                y = sigY; // Mover Y a la posición de la firma
+
+                // Firma (centrada, como en el código original, pero fluyendo)
+                // Usamos 'align: 'center'' que se alinea al centro de la PÁGINA
                 addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 
-                // Fecha al final
-                y = pageH - 50; 
-                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 0, lineSpacing: 1.5 });
-                
                 // --- PÁGINA 2: ANEXO ---
-                doc.addPage(); y = 141.75;
+                doc.addPage(); 
+                y = margin; // Resetear Y al margen superior
+                
                 addTxt(clNom.toUpperCase(), { fontStyle: 'bold', align: 'center', spacing: 10 });
                 addTxt(clCed, { fontStyle: 'bold', align: 'center', spacing: 30 });
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
+                
+                // --- CORRECCIÓN: Formato de fecha largo para el anexo ---
                 addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
                 
                 // Tabla de Ingresos
@@ -1158,7 +1190,8 @@
                     body: data, 
                     foot: [[{ content: 'Total Ingresos', styles: { halign: 'left' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right' } }]], 
                     startY: y, 
-                    margin: { left: 60, right: 60, top: 141.75, bottom: 70.86 }, 
+                    // --- CORRECCIÓN: Márgenes de la tabla ---
+                    margin: { left: margin, right: margin, top: margin, bottom: marginBottom }, 
                     theme: 'grid', 
                     headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center' }, 
                     footStyles: { fillColor: [243, 244, 246], textColor: [0, 0, 0], fontStyle: 'bold' }, 
@@ -1168,16 +1201,22 @@
                 y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
                 
                 // Legitimación de Capitales y Firma del Cliente
-                const clSigH = 100; if (y + clSigH > pageH - 70.86) { doc.addPage(); y = 141.75; }
+                const clSigH = 100; // Espacio estimado para firma
+                if (y + clSigH > pageH - marginBottom) { doc.addPage(); y = margin; }
+                
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
                 addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
-                y = Math.max(y, pageH - 70.86 - 60); // Asegurar espacio para la firma
+                
+                // --- CORRECCIÓN: Anclar firma del cliente al pie de página ---
+                y = Math.max(y, pageH - marginBottom - 60); // Asegurar espacio para la firma
+                
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
                 // --- LÓGICA DE DESCARGA (CORREGIDA) ---
-                const safeClientName = clNom.replace(/[^a-zA-Z0-9]/g, '_');
+                // --- CORRECCIÓN: Limpiar nombre del cliente para el archivo ---
+                const safeClientName = clNom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, '_');
                 const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
                 
                 try {
@@ -1190,16 +1229,13 @@
                     document.body.appendChild(a); // Añadir al DOM
                     a.click(); // Simular clic
                     
-                    // --- INICIO DE LA CORRECCIÓN ---
                     // Añadir un retraso antes de revocar la URL y eliminar el enlace.
-                    // Esto le da tiempo al navegador para iniciar la descarga.
                     setTimeout(() => {
                         URL.revokeObjectURL(downloadUrl);
                         if (document.body.contains(a)) {
                             document.body.removeChild(a);
                         }
                     }, 100); // 100 milisegundos de retraso
-                    // --- FIN DE LA CORRECCIÓN ---
                     
                     return true; // Indicar éxito
 

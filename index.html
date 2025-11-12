@@ -431,12 +431,18 @@
             
             // Observador principal del estado de autenticación
             onAuthStateChanged(auth, async (user) => {
+                // loadingOverlay.classList.add('hidden'); // <-- MOVIMOS ESTO
                 if (user) {
+                    // --- INICIO DE LA CORRECCIÓN ---
                     // 1. Mostrar "Cargando..." MIENTRAS se verifica el perfil.
                     loadingOverlay.classList.remove('hidden');
                     
+                    // --- (CORRECCIÓN: Se eliminó la llamada a enableNetwork(db)) ---
+                    
                     currentUserId = user.uid;
                     userEmailDisplay.textContent = user.email;
+                    // appContainer.classList.remove('hidden'); // <-- NO MOSTRAR AÚN
+                    // authContainer.classList.add('hidden'); // <-- NO OCULTAR AÚN
                     
                     try {
                         // 2. Esperar a que el perfil se cargue (esta función ahora tiene reintentos)
@@ -457,6 +463,7 @@
                     
                     // 5. Ocultar "Cargando..." al final del proceso
                     loadingOverlay.classList.add('hidden');
+                    // --- FIN DE LA CORRECCIÓN ---
 
                 } else {
                     // Usuario ha cerrado sesión
@@ -528,6 +535,7 @@
                     await inicializarConceptos();
 
                     // 4. AHORA, adjuntar el listener `onSnapshot` para futuras actualizaciones
+                    // (por ejemplo, si el plan cambia mientras está en la página)
                     userProfileUnsubscribe = onSnapshot(profileRef, async (snap) => {
                         if (snap.exists()) {
                             userPlanStatus = snap.data();
@@ -541,11 +549,13 @@
                     });
 
                     // 5. Resolver la promesa principal. ¡La carga inicial está completa!
-                    return Promise.resolve(); 
+                    return Promise.resolve(); // <-- Usar 'return' ya que estamos en una func async
 
                 } catch (e) {
                     // --- MANEJO DE ERROR ---
+                    // --- CORRECCIÓN: Aumentar reintentos y tiempo ---
                     if ((e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 7) {
+                        // Es un error de conexión, reintentamos
                         console.warn(`Firestore offline, reintentando perfil... (Intento ${retryCount + 1})`);
                         const delay = ms => new Promise(res => setTimeout(res, ms));
                         await delay(2000 * (retryCount + 1)); // 2s, 4s, 6s...
@@ -632,6 +642,7 @@
                     // Solo incrementar si es 'free'
                     await updateDoc(profileRef, { reportsGenerated: increment(1) });
                 }
+                // No necesitamos hacer nada para 'premium'
                 console.log(`Informe de tipo ${type} registrado.`);
             } catch (e) {
                 console.error("Error al incrementar contador de informes:", e);
@@ -663,6 +674,7 @@
         // --- Lógica de PayPal ---
         function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
+            // No renderizar si ya hay botones o si PayPal SDK no se cargó
             if (!container || container.children.length > 0) return; 
 
             if (typeof paypal === 'undefined') {
@@ -721,7 +733,7 @@
                 await updateDoc(profileRef, {
                     plan: 'premium',
                     premiumUntil: Timestamp.fromDate(expiryDate),
-                    reportsGenerated: 0 
+                    reportsGenerated: 0 // Resetear contador por si acaso
                 });
             } catch (e) {
                 console.error("Error al actualizar a premium:", e);
@@ -731,6 +743,7 @@
 
         // --- Lógica de Pago Móvil ---
         pagoMovilProofInput.addEventListener('change', () => {
+            // Habilitar botón solo si hay un archivo
             submitPagoMovilBtn.disabled = pagoMovilProofInput.files.length === 0;
         });
 
@@ -742,20 +755,23 @@
             submitPagoMovilBtn.textContent = 'Subiendo...';
 
             try {
+                // Subir comprobante a Storage
                 const storagePath = `artifacts/${appId}/pagoMovilUploads/${currentUserId}/${Date.now()}-${file.name}`;
                 const storageRef = ref(storage, storagePath);
                 const snapshot = await uploadBytes(storageRef, file);
                 const downloadURL = await getDownloadURL(snapshot.ref);
 
+                // Crear documento de validación para el admin
                 const validationData = {
                     userId: currentUserId,
                     userEmail: auth.currentUser.email,
                     fileURL: downloadURL,
                     storagePath: storagePath,
-                    status: 'pending', 
+                    status: 'pending', // Pendiente de revisión
                     createdAt: serverTimestamp()
                 };
                 
+                // Guardar en una colección de "admin"
                 await addDoc(collection(db, `artifacts/${appId}/admin/pagoValidations`), validationData);
 
                 showMessage("Comprobante enviado. Estará en revisión y se activará en 24h.", "success");
@@ -850,6 +866,7 @@
         // --- CRUD Conceptos ---
         const DEFAULT_CONCEPTOS = ["Actividades Comerciales", "Alquiler de Inmueble", "Director de la Entidad", "Docente contratado tiempo completo", "Honorarios Profesionales de libre ejercicio", "Intereses generados por inversiones", "Servicios de Consultoría", "Servicios Técnicos", "Sueldos y Salarios"];
         
+        // Poblar el datalist estático por si Firestore falla
         function populateDefaultConceptosDatalist() {
             const datalist = document.getElementById('conceptos-list');
             if (!datalist || datalist.options.length > 0) return; 
@@ -861,9 +878,11 @@
         }
         populateDefaultConceptosDatalist();
 
+        // Inicializar conceptos por defecto en Firestore si no existen
         async function inicializarConceptos() {
             if (!currentUserId) return;
             const path = getCollectionPath('conceptos'); if (!path) return;
+            // Usamos un ID de documento único para marcar la inicialización
             const defRef = doc(db, path, 'defaults_v6'); 
 
             const attemptInitialization = async (retryCount = 0) => {
@@ -871,6 +890,7 @@
                     const snap = await getDoc(defRef); // La llamada que puede fallar
                     
                     if (!snap.exists()) {
+                        // Primera vez: verificar conceptos existentes y añadir los que falten
                         const q = query(collection(db, path));
                         const existingSnap = await getDocs(q);
                         const existingNames = new Set();
@@ -888,24 +908,29 @@
                         console.log(`Conceptos inicializados (v6). Agregados: ${addedCount}`);
                     }
                     
+                    // Cargar la UI (siempre)
                     cargarConceptosUI();
 
                 } catch (e) {
+                    // Manejo de error "offline" con reintentos
+                    // --- CORRECCIÓN: Aumentar reintentos y tiempo ---
                     if ( (e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 7 ) {
                         console.warn(`Firestore offline, reintentando init... (Intento ${retryCount + 1})`);
                         const delay = ms => new Promise(res => setTimeout(res, ms));
-                        await delay(2000 * (retryCount + 1)); 
-                        return attemptInitialization(retryCount + 1); 
+                        await delay(2000 * (retryCount + 1)); // Backoff exponencial (2s, 4s, 6s...)
+                        return attemptInitialization(retryCount + 1); // Reintentar
                     } else {
+                        // Error final
                         console.error("Error init conceptos: Falló después de reintentos.", e);
                         showMessage("No se pudieron cargar los conceptos. Revisa tu conexión.", "error");
-                        cargarConceptosUI(); 
+                        cargarConceptosUI(); // Intentar cargar de todos modos (puede que funcione el listener)
                     }
                 }
             };
             await attemptInitialization();
         }
 
+        // Cargar conceptos en Select y Datalist desde Firestore
         function cargarConceptosUI() {
             const path = getCollectionPath('conceptos'); if (!path) return;
             if (conceptosUnsubscribe) conceptosUnsubscribe();
@@ -914,7 +939,7 @@
                 const select = document.getElementById('conceptosSelect'), datalist = document.getElementById('conceptos-list');
                 select.innerHTML = '<option value="">-- Seleccionar Concepto --</option>'; datalist.innerHTML = ''; 
                 snapshot.forEach(doc => { if (doc.id !== 'defaults_v6') { localConceptos.push({ id: doc.id, ...doc.data() }); } });
-                localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); 
+                localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); // Ordenar alfabéticamente
                 localConceptos.forEach(c => { const optS = document.createElement('option'); optS.value = c.id; optS.textContent = c.nombre; select.appendChild(optS); const optD = document.createElement('option'); optD.value = c.nombre; datalist.appendChild(optD); });
                 resetConceptoForm();
             }, (error) => { console.error("Error loading concepts:", error); showMessage('Error al cargar conceptos.', 'error'); });
@@ -922,6 +947,7 @@
         
         function resetConceptoForm() { document.getElementById('conceptoEditInput').value = ''; edicionConceptoId = null; document.getElementById('conceptoBtnAgregar').classList.remove('hidden'); document.getElementById('conceptoBtnGuardarEdicion').classList.add('hidden'); document.getElementById('conceptoBtnCancelarEdicion').classList.add('hidden'); document.getElementById('conceptosSelect').value = ""; }
         
+        // Listeners del CRUD de Conceptos
         document.getElementById('conceptoBtnAgregar').addEventListener('click', async () => { const val = document.getElementById('conceptoEditInput').value.trim(); if (val) { if (localConceptos.some(c => c.nombre.toLowerCase() === val.toLowerCase())) return showMessage('Concepto ya existe.', 'error'); try { await addDoc(collection(db, getCollectionPath('conceptos')), { nombre: val, createdAt: serverTimestamp(), isDefault: false }); showMessage('Concepto agregado.', 'success'); document.getElementById('conceptoEditInput').value = ''; } catch (e) { showMessage('Error al agregar.', 'error'); } } });
         document.getElementById('conceptoBtnEditar').addEventListener('click', () => { const id = document.getElementById('conceptosSelect').value; const c = localConceptos.find(x => x.id === id); if (c) { document.getElementById('conceptoEditInput').value = c.nombre; edicionConceptoId = id; document.getElementById('conceptoBtnAgregar').classList.add('hidden'); document.getElementById('conceptoBtnGuardarEdicion').classList.remove('hidden'); document.getElementById('conceptoBtnCancelarEdicion').classList.remove('hidden'); } else { showMessage('Seleccione un concepto para editar.', 'error'); } });
         document.getElementById('conceptoBtnCancelarEdicion').addEventListener('click', resetConceptoForm);
@@ -935,6 +961,7 @@
         
         document.getElementById('clearFormBtn').addEventListener('click', (e) => { e.preventDefault(); clearForm(); showMessage('Formulario limpiado.', 'success'); });
         
+        // Modal de confirmación genérico
         function showConfirmationModal(msg, onConfirm) { 
             const ov = document.createElement('div'); 
             ov.className = 'fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[101]'; 
@@ -944,14 +971,18 @@
             document.getElementById('cfmOk').onclick = () => { onConfirm(); document.body.removeChild(ov); }; 
         }
         
+        // Auto-formato de Cédula y RIF
         document.getElementById('clienteCedula').addEventListener('input', (e) => { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); let l = (v.match(/^[VEve]/) || ['V'])[0].toUpperCase(); let n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '').substring(0, 8); e.target.value = `${l}-${n.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`; });
         document.getElementById('contadorRif').addEventListener('input', (e) => { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); let l = (v.match(/^[JGjgVEvePp]/) || ['V'])[0].toUpperCase(); let n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, ''); let m = n.substring(0, 8), d = n.length > 8 ? n.substring(8, 9) : ''; e.target.value = `${l}-${m.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${d ? '-' + d : ''}`; });
         document.getElementById('contadorCpc').addEventListener('input', (e) => { let v = e.target.value.replace(/[^\d]/g, ''); e.target.value = v ? new Intl.NumberFormat('es-VE').format(parseInt(v, 10)) : ''; });
         
+        // Establecer fechas por defecto
         function setFechasDefault() { const now = new Date(); document.getElementById('fechaDocumento').value = now.toISOString().split('T')[0]; document.getElementById('fechaDesde').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; document.getElementById('fechaHasta').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]; }
         
+        // Cargar defaults al cargar la página (si no hay usuario)
         document.addEventListener('DOMContentLoaded', () => { if (!auth.currentUser) { addIncomeItem(); setFechasDefault(); } });
         
+        // Listeners de los selects y botones de guardado
         document.getElementById('selectContador').addEventListener('change', (e) => fillContadorForm(e.target.value));
         document.getElementById('selectCliente').addEventListener('change', (e) => fillClienteForm(e.target.value));
         document.getElementById('saveContadorBtn').addEventListener('click', saveContador); 
@@ -979,7 +1010,9 @@
                     <span class="ml-1.5 md:hidden">Eliminar Ingreso</span>
                 </button>`;
             
+            // Formato de moneda al escribir
             d.querySelector('.income-amount').addEventListener('input', formatCurrencyInput);
+            // Botón de eliminar (solo si hay más de 1)
             d.querySelector('.btn-remove-income').onclick = () => c.querySelectorAll('.income-item').length > 1 ? c.removeChild(d) : showMessage('Debe haber al menos un concepto.', 'error');
             c.appendChild(d);
         };
@@ -994,6 +1027,7 @@
         
         // --- Lógica de Generación de PDF ---
         
+        // Funciones Helper para el PDF
         function parseVal(s) { return parseFloat((s || '0').replace(/\./g, '').replace(',', '.')) || 0; }
         function fmtDate(s, long = false) { 
             if (!s) return ''; 
@@ -1003,6 +1037,7 @@
         }
         function fmtCur(n) { return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
+        // Cargar datos del sello (asíncrono)
         function getSealData() {
             return new Promise((resolve, reject) => {
                 const file = contadorSelloInput.files[0];
@@ -1010,10 +1045,12 @@
                     resolve({ data: null, width: 0, height: 0 }); // Resolver sin sello
                     return;
                 }
+
                 const r = new FileReader();
                 r.onload = (e) => {
                     const img = new Image();
                     img.onload = function() {
+                        // Resolver con los datos y dimensiones de la imagen
                         resolve({ data: e.target.result, width: this.width, height: this.height });
                     };
                     img.onerror = (err) => {
@@ -1034,53 +1071,45 @@
 
         /**
          * Construye el PDF y devuelve true/false si tuvo éxito.
+         * Esta función es síncrona y bloquea el hilo principal.
          */
         function buildPDF(sealData, sealW, sealH) {
             try {
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF('p', 'pt', 'letter');
                 
-                // --- AJUSTE DE FORMATO ---
+                // --- INICIO DE LA CORRECCIÓN DE FORMATO ---
                 const margin = 56.69; // 2cm (Laterales)
                 const marginBottom = 70.86; // 2.5cm (Inferior)
                 const pageH = doc.internal.pageSize.getHeight();
                 const usableW = doc.internal.pageSize.getWidth() - (margin * 2);
                 let y = 85.03; // 3cm (Superior)
-                // --- FIN AJUSTE ---
+                // --- FIN DE LA CORRECCIÓN ---
 
                 // Recolectar datos del formulario
                 const getVal = (id) => document.getElementById(id).value;
-                const cNom = getVal('contadorNombre'), cCpc = getVal('contadorCpc').replace(/[^\d]/g, ''), cRif = getVal('contadorRif'); // Limpiar CPC
+                const cNom = getVal('contadorNombre'), cCpc = getVal('contadorCpc'), cRif = getVal('contadorRif');
                 const clTrat = getVal('clienteTratamiento'), clNom = getVal('clienteNombre'), clCed = getVal('clienteCedula');
                 const fDoc = getVal('fechaDocumento'), fDes = getVal('fechaDesde'), fHas = getVal('fechaHasta');
 
                 // Recolectar datos de ingresos
                 let total = 0, data = [];
-                document.querySelectorAll('.income-item').forEach(i => { 
-                    const m = parseVal(i.querySelector('.income-amount').value); 
-                    if (m > 0) { 
-                        data.push([
-                            i.querySelector('.income-concept').value, 
-                            `Bs. ${fmtCur(m)}`
-                        ]); 
-                        total += m; 
-                    } 
-                });
+                document.querySelectorAll('.income-item').forEach(i => { const m = parseVal(i.querySelector('.income-amount').value); if (m > 0) { data.push([i.querySelector('.income-concept').value, `Bs. ${fmtCur(m)}`]); total += m; } });
 
                 // Función helper para añadir texto con saltos de página
                 const addTxt = (txt, opts = {}) => {
-                    // *** CAMBIO DE FUENTE ***
-                    doc.setFontSize(opts.fontSize || 11); 
-                    doc.setFont('times', opts.fontStyle || 'normal'); // Usar 'times'
-                    
+                    doc.setFontSize(opts.fontSize || 11); doc.setFont('helvetica', opts.fontStyle || 'normal');
                     const lines = doc.splitTextToSize(txt, usableW - (opts.indent || 0));
+                    // Calcular altura de las líneas
                     const h = (lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5)) - ((opts.fontSize || 11) * ((opts.lineSpacing || 1.5) - 1));
                     
+                    // --- CORRECCIÓN: Lógica de Salto de Página ---
                     if (y + h > pageH - marginBottom) { 
                         doc.addPage(); 
                         y = 85.03; // Resetear Y al margen superior
                     }
                     
+                    // --- CORRECCIÓN: Posicionamiento X ---
                     doc.text(txt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - margin : margin + (opts.indent || 0)), y, { 
                         align: opts.align || 'justify', 
                         maxWidth: usableW - (opts.indent || 0), 
@@ -1104,6 +1133,7 @@
                 const respP2 = `Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clTrat} ${clNom}, para el periodo ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, con base al examen sobre la evidencia obtenida.`;
                 addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25 });
                 
+                // --- CORRECCIÓN: Movido a flujo normal ---
                 // Criterio
                 addTxt('Identificación del criterio de evaluación', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clTrat} ${clNom}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25 });
@@ -1114,49 +1144,38 @@
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${getVal('entidadDirigida')} el cual lo ha requerido para ${getVal('motivoInforme')}.`, { indent: 20, spacing: 40 });
                 
-                // --- *** INICIO DEL BLOQUE DE FIRMA CORREGIDO *** ---
+                // --- CORRECCIÓN: Firma y Sello fluyen naturalmente ---
                 
-                // 1. Añadir Fecha (como en el modelo)
-                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 40 }); // Aumentar espacio después
-
-                // 2. Calcular Sello
+                // Fecha (como en el PDF modelo)
+                // --- CORRECCIÓN: Se elimina la fecha de aquí y se mueve debajo de la firma ---
+                
+                const sealStartY = y; // Posición Y para el bloque de firma/sello
                 let sealH_pt = 0, sealW_pt = 0;
-                if (sealData) {
-                    // Convertir cm a puntos (1 cm = 28.35 pt) y limitar
-                    const maxW_pt = 5.3 * 28.35; // 5.3cm
-                    const maxH_pt = 2.1 * 28.35; // 2.1cm
+
+                // Añadir sello si existe (colocado a la derecha)
+                if (sealData) { 
+                    const ratio = Math.min((5.3 * 28.35) / sealW, (2.1 * 28.35) / sealH); // Calcular ratio de aspecto
+                    sealW_pt = Math.min(sealW * ratio, sealW * 0.75);
+                    sealH_pt = Math.min(sealH * ratio, sealH * 0.75); // Dimensiones finales
                     
-                    // Calcular ratio respetando el aspect ratio
-                    const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1); // No escalar más grande
-                    sealW_pt = sealW * ratio;
-                    sealH_pt = sealH * ratio;
+                    // Comprobar si el sello cabe antes de dibujarlo
+                    if (y + sealH_pt > pageH - marginBottom) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    // --- CORRECCIÓN: Alineado a la derecha, fluyendo con 'y' ---
+                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); // Dibujar imagen
                 }
 
-                // 3. Estimar altura total del bloque de firma para salto de página
-                // Altura de texto: 1 línea (12) + nombre (12) + cpc (12) + rif (12) + sello (sealH_pt + 15)
-                const signatureBlockHeight = 12 + 12 + 12 + (cRif ? 12 : 0) + 15 + (sealData ? sealH_pt + 15 : 0);
-                if (y + signatureBlockHeight > pageH - marginBottom) {
-                    doc.addPage();
-                    y = 85.03; // Resetear Y al margen superior
-                }
-                
-                // 4. Añadir Firma (Centrada)
+                // --- CORRECCIÓN: Alineación de firma al CENTRO ---
                 addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                // Formatear CPC con puntos
-                const cpcFmt = cCpc ? new Intl.NumberFormat('es-VE').format(parseInt(cCpc, 10)) : '';
-                addTxt(`Contador Público C.P.C. N ${cpcFmt}`, { align: 'center', spacing: 12, lineSpacing: 1 });
-                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 15, lineSpacing: 1 }); // Espacio antes del sello
-
-                // 5. Añadir Sello (Centrado, DEBAJO de la firma)
-                if (sealData) {
-                    const sealX = (doc.internal.pageSize.getWidth() / 2) - (sealW_pt / 2); // Posición X centrada
-                    doc.addImage(sealData, 'PNG', sealX, y, sealW_pt, sealH_pt);
-                    y += sealH_pt + 15; // Avanzar Y después del sello
-                }
+                addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 
-                // --- *** FIN DEL BLOQUE DE FIRMA CORREGIDO *** ---
-
+                // --- CORRECCIÓN: Añadir espacio y fecha A LA IZQUIERDA ---
+                y += 12; // Espacio en blanco
+                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
 
                 // --- PÁGINA 2: ANEXO ---
                 doc.addPage(); 
@@ -1166,84 +1185,69 @@
                 addTxt(clCed, { fontStyle: 'bold', align: 'center', spacing: 30 });
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
                 
+                // --- CORRECCIÓN: Formato de fecha largo para el anexo ---
                 addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
                 
-                // --- *** INICIO DE TABLA CORREGIDA *** ---
-                
-                // Añadir fila de Total al cuerpo de datos
-                data.push([
-                    { content: 'Total Ingresos', styles: { fontStyle: 'bold' } },
-                    { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right', fontStyle: 'bold' } }
-                ]);
-                
+                // Tabla de Ingresos
                 doc.autoTable({ 
                     head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
                     body: data, 
-                    // foot: (Eliminado)
+                    foot: [[{ content: 'Total Ingresos', styles: { halign: 'left' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right' } }]], 
                     startY: y, 
+                    // --- CORRECCIÓN: Márgenes de la tabla ---
                     margin: { left: margin, right: margin, top: 85.03, bottom: marginBottom }, 
-                    theme: 'plain', // CAMBIO: Sin rejillas
-                    styles: {
-                        font: 'times', // CAMBIO: Usar 'times' en la tabla
-                        fontSize: 11
-                    },
-                    headStyles: { 
-                        textColor: [31, 41, 55], 
-                        fontStyle: 'bold',
-                        halign: 'left', // Alineación por defecto para cabecera
-                        // Aplicar estilos por columna en cabecera
-                        cellStyles: {
-                            0: { halign: 'left' },  // Cabecera col 0
-                            1: { halign: 'right' } // Cabecera col 1
-                        }
-                    }, 
-                    columnStyles: { 
-                        1: { halign: 'right' } // Alinear toda la columna 1 (Bolívares) a la derecha
-                    } 
+                    theme: 'grid', 
+                    headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center' }, 
+                    footStyles: { fillColor: [243, 244, 246], textColor: [0, 0, 0], fontStyle: 'bold' }, 
+                    columnStyles: { 1: { halign: 'right' } } 
                 });
-                
-                // --- *** FIN DE TABLA CORREGIDA *** ---
                 
                 y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
                 
-                const clSigH = 100; // Espacio estimado
+                // Legitimación de Capitales y Firma del Cliente
+                const clSigH = 100; // Espacio estimado para firma
                 if (y + clSigH > pageH - marginBottom) { doc.addPage(); y = 85.03; }
                 
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
                 addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
                 
-                // --- ELIMINADA LA LÍNEA DE ANCLAJE AL FONDO ---
-                // y = Math.max(y, pageH - marginBottom - 60); (Eliminado)
+                // --- CORRECCIÓN: Anclar firma del cliente al pie de página ---
+                y = Math.max(y, pageH - marginBottom - 60); // Asegurar espacio para la firma
                 
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
+                // --- LÓGICA DE DESCARGA (CORREGIDA) ---
+                // --- CORRECCIÓN: Limpiar nombre del cliente para el archivo ---
                 const safeClientName = clNom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, '_');
                 const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
                 
                 try {
-                    const pdfBlob = doc.output('blob');
-                    const downloadUrl = URL.createObjectURL(pdfBlob);
+                    const pdfBlob = doc.output('blob'); // Generar PDF como Blob
+                    const downloadUrl = URL.createObjectURL(pdfBlob); // Crear URL
+                    
                     const a = document.createElement('a');
                     a.href = downloadUrl;
                     a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
+                    document.body.appendChild(a); // Añadir al DOM
+                    a.click(); // Simular clic
                     
+                    // Añadir un retraso antes de revocar la URL y eliminar el enlace.
                     setTimeout(() => {
                         URL.revokeObjectURL(downloadUrl);
                         if (document.body.contains(a)) {
                             document.body.removeChild(a);
                         }
-                    }, 100);
+                    }, 100); // 100 milisegundos de retraso
                     
                     return true; // Indicar éxito
 
                 } catch(e) {
+                    // Fallback (menos probable que funcione en iFrame)
                     console.warn("Fallo el método de descarga Blob, intentando doc.save()", e);
                     doc.save(fileName);
-                    return true; 
+                    return true; // Asumir que funcionó si no lanzó error
                 }
 
             } catch (error) {
@@ -1257,14 +1261,17 @@
         document.getElementById('report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Validar que los items de ingreso estén completos
             const items = document.querySelectorAll('.income-item');
             if ([...items].some(i => !i.querySelector('.income-concept').value || parseVal(i.querySelector('.income-amount').value) <= 0)) {
                 return showMessage('Revise conceptos y montos. Deben tener un valor válido.', 'error');
             }
 
+            // Verificar si el usuario puede generar el informe
             const check = canGenerateReport();
             
             if (check.allow) {
+                // Deshabilitar botón y mostrar spinner
                 const submitBtn = e.target.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
@@ -1276,11 +1283,22 @@
                     Generando...`;
 
                 try {
+                    // 1. Incrementar el contador en Firestore (asíncrono)
                     await incrementReportCount(check.type);
+
+                    // 2. Preparar los datos del sello (asíncrono)
                     const seal = await getSealData();
+
+                    // 3. Añadir un pequeño retardo (yield)
+                    // Esto permite que el DOM se actualice y muestre "Generando..."
+                    // ANTES de que buildPDF (síncrono) bloquee el hilo.
                     await new Promise(resolve => setTimeout(resolve, 50)); 
+
+                    // 4. Generar el PDF (síncrono)
+                    // Esta función ahora contiene la lógica de descarga.
                     const pdfSuccess = buildPDF(seal.data, seal.width, seal.height);
 
+                    // 5. Mostrar mensaje SÓLO si el PDF se generó
                     if (pdfSuccess) {
                         if (check.type === 'free') {
                             showMessage(`Informe generado. Has usado tu informe gratuito.`, 'success');
@@ -1288,17 +1306,24 @@
                             showMessage("Informe Premium generado.", "success");
                         }
                     }
+                    // Si pdfSuccess es false, buildPDF ya mostró el mensaje de error.
+
                 } catch (error) {
+                    // Capturar errores (ej. de getSealData)
                     console.error("Error en el proceso de envío:", error);
                     showMessage('Se produjo un error al procesar el sello. Inténtelo de nuevo.', 'error');
+                
                 } finally {
+                    // 5. Reactivar el botón
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnText;
                 }
 
             } else if (check.reason === 'limit_reached') {
+                // Si se alcanzó el límite, mostrar modal premium
                 showPremiumModal();
             } else {
+                // Si no está autenticado
                 showMessage('Debes iniciar sesión para generar informes.', 'error');
             }
         });

@@ -11,7 +11,8 @@
     
     <!-- SDK de PayPal -->
     <!-- CORRECCIÓN: Se actualizó el Client ID real proporcionado por el usuario -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexx BKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD"></script>
+    <!-- CORRECCIÓN 2: Se eliminó el espacio en el client-id que rompía la URL -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexxBKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -783,7 +784,7 @@
                 datalist.appendChild(optD);
             });
         }
-        // Llamar inmediatamente para poblar los conceptos por defecto en la UI
+        // Llamar inmigiatamente para poblar los conceptos por defecto en la UI
         populateDefaultConceptosDatalist();
         // --- FIN DE LA CORRECCIÓN 1 ---
 
@@ -909,6 +910,39 @@
         function fmtDate(s, long = false) { if (!s) return ''; const d = s instanceof Date ? s : new Date(s + 'T00:00:00'); if (long) return `${d.getDate()} de ${["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()]} ${d.getFullYear()}`; return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; }
         function fmtCur(n) { return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
+        // --- INICIO DE LA CORRECCIÓN 3 ---
+        // Nueva función para manejar la carga asíncrona del sello
+        function getSealData() {
+            return new Promise((resolve, reject) => {
+                const file = contadorSelloInput.files[0];
+                if (!file || file.type !== "image/png") {
+                    resolve({ data: null, width: 0, height: 0 });
+                    return;
+                }
+
+                const r = new FileReader();
+                r.onload = (e) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        resolve({ data: e.target.result, width: this.width, height: this.height });
+                    };
+                    img.onerror = (err) => {
+                        console.error("Error al cargar la imagen del sello.", err);
+                        showMessage('Error al procesar la imagen del sello.', 'error');
+                        reject(new Error('Error al cargar la imagen del sello.'));
+                    };
+                    img.src = e.target.result;
+                };
+                r.onerror = (err) => {
+                    console.error("Error al leer el archivo del sello.", err);
+                    showMessage('Error al leer el archivo del sello.', 'error');
+                    reject(new Error('Error al leer el archivo del sello.'));
+                };
+                r.readAsDataURL(file);
+            });
+        }
+
+        // Modificar buildPDF para que devuelva true/false indicando el éxito
         function buildPDF(sealData, sealW, sealH) {
             try {
                 const { jsPDF } = window.jspdf; 
@@ -989,16 +1023,42 @@
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
+
                 const safeClientName = clNom.replace(/[^a-zA-Z0-9]/g, '_');
-                doc.save(`Informe_Aseguramiento_${safeClientName}.pdf`);
+                const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
+                
+                try {
+                    const pdfBlob = doc.output('blob');
+                    const downloadUrl = URL.createObjectURL(pdfBlob);
+                    
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = fileName;
+                    document.body.appendChild(a); // Necesario para que funcione en Firefox
+                    a.click();
+                    
+                    // Limpiar
+                    URL.revokeObjectURL(downloadUrl);
+                    if (document.body.contains(a)) {
+                        document.body.removeChild(a);
+                    }
+                    return true; // <-- Indicar éxito
+
+                } catch(e) {
+                    // Si todo lo demás falla, intentar el método original como último recurso
+                    console.warn("Fallo el método de descarga Blob, intentando doc.save()", e);
+                    doc.save(fileName);
+                    return true; // Asumir que funcionó si no lanzó error
+                }
 
             } catch (error) {
                 console.error('Error al generar el PDF:', error);
                 showMessage('Error al generar el PDF: ' + error.message, 'error');
+                return false; // <-- Indicar fallo
             }
         }
         
-        // --- Listener del Formulario Principal ---
+        // --- Listener del Formulario Principal (MODIFICADO) ---
         document.getElementById('report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1010,26 +1070,48 @@
             const check = canGenerateReport();
             
             if (check.allow) {
-                await incrementReportCount(check.type);
+                // Deshabilitar botón para evitar doble click
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generando...`;
+
+                try {
+                    // 1. Incrementar el contador PRIMERO
+                    await incrementReportCount(check.type);
+
+                    // 2. Preparar los datos del sello (asíncrono)
+                    const seal = await getSealData();
+
+                    // 3. Generar el PDF y esperar a que termine
+                    const pdfSuccess = buildPDF(seal.data, seal.width, seal.height);
+
+                    // 4. Mostrar mensaje SÓLO si el PDF se generó
+                    if (pdfSuccess) {
+                        if (check.type === 'free') {
+                            // Calcular informes restantes DESPUÉS de incrementar
+                            const reportsRemaining = (2 - userPlanStatus.reportsGenerated) - 1; // 2 - (0) - 1 = 1; 2 - (1) - 1 = 0
+                            showMessage(`Informe generado. Te quedan ${reportsRemaining < 0 ? 0 : reportsRemaining} informes gratuitos.`, 'success');
+                        } else {
+                            showMessage("Informe Premium generado.", "success");
+                        }
+                    }
+                    // Si pdfSuccess es false, buildPDF ya mostró el mensaje de error.
+
+                } catch (error) {
+                    // Capturar errores de getSealData
+                    console.error("Error en el proceso de envío:", error);
+                    showMessage('Se produjo un error al procesar el sello. Inténtelo de nuevo.', 'error');
                 
-                const file = contadorSelloInput.files[0];
-                if (file && file.type === "image/png") {
-                    const r = new FileReader(); 
-                    r.onload = (e) => { 
-                        const img = new Image(); 
-                        img.onload = function() { buildPDF(e.target.result, this.width, this.height); }; 
-                        img.src = e.target.result; 
-                    }; 
-                    r.readAsDataURL(file);
-                } else {
-                    buildPDF(null, 0, 0);
-                }
-                
-                if (check.type === 'free') {
-                    const reportsRemaining = 1 - userPlanStatus.reportsGenerated;
-                    showMessage(`Informe generado. Te quedan ${reportsRemaining} informes gratuitos.`, 'success');
-                } else {
-                    showMessage("Informe Premium generado.", "success");
+                } finally {
+                    // 5. Reactivar el botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
                 }
 
             } else if (check.reason === 'limit_reached') {
@@ -1038,6 +1120,7 @@
                 showMessage('Debes iniciar sesión para generar informes.', 'error');
             }
         });
+        // --- FIN DE LA CORRECCIÓN 3 ---
 
     </script>
 </body>

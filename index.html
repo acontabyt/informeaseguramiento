@@ -10,8 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     
     <!-- SDK de PayPal -->
-    <!-- CORRECCIÓN: Se actualizó el Client ID real proporcionado por el usuario -->
-    <!-- CORRECCIÓN 2: Se eliminó el espacio en el client-id que rompía la URL -->
     <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexxBKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,16 +40,19 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-dancing-script { font-family: 'Dancing Script', cursive; }
+        /* Ocultar flechas en campos de número */
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
+        /* Estilo personalizado para Select */
         select {
             appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%2D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013l128%20128c3.6%203.6%207.8%205.4%2013%205.4s9.4-1.8%2013-5.4l128-128c3.6-3.6%205.4-7.8%205.4-13%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013l128%20128c3.6%203.6%207.8%205.4%2013%205.4s9.4-1.8%2013-5.4l128-128c3.6-3.6%205.4-7.8%205.4-13%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
             background-size: 0.65em auto;
             padding-right: 2.5rem;
         }
+        /* Oculta botones de gestión por defecto */
         .gestion-btn { display: none; }
         .hidden { display: none !important; }
         
@@ -286,7 +287,7 @@
     <div id="premium-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 class="text-2xl font-bold text-purple-800 mb-4 font-dancing-script">¡Has alcanzado tu límite!</h3>
-            <p class="mb-4 text-gray-600">Has usado tus 2 informes gratuitos. Para generar informes ilimitados, actualiza a Premium.</p>
+            <p class="mb-4 text-gray-600">Has usado tu informe gratuito. Para generar informes ilimitados, actualiza a Premium.</p>
             
             <div class="p-4 bg-purple-50 rounded-lg mb-4">
                 <h4 class="font-semibold text-purple-700">Plan Premium - $15.00 USD</h4>
@@ -313,9 +314,10 @@
     <div id="pagomovil-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 class="text-2xl font-bold text-blue-700 mb-4 font-dancing-script">Pago Móvil</h3>
-            <p class="mb-4 text-gray-600">Realiza el pago a los siguientes datos y sube el comprobante. Tu cuenta se activará manually en un plazo de 24h.</p>
+            <p class="mb-4 text-gray-600">Realiza el pago a los siguientes datos y sube el comprobante. Tu cuenta se activará manualmente en un plazo de 24h.</p>
             
             <div class="p-4 bg-blue-50 rounded-lg mb-4 text-gray-700 space-y-2">
+                <!-- Reemplaza con tus datos reales -->
                 <p><strong>Banco:</strong> [Nombre de tu Banco]</p>
                 <p><strong>CI:</strong> [Tu Cédula]</p>
                 <p><strong>Teléfono:</strong> [Tu Teléfono]</p>
@@ -327,7 +329,7 @@
                     <label for="pagoMovilProof" class="block text-sm font-medium text-gray-700 mb-1">Subir Comprobante (Imagen)</label>
                     <input type="file" id="pagoMovilProof" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*">
                 </div>
-                <button id="submitPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-7G00 transition-transform duration-150 ease-in-out active:scale-95 disabled:opacity-50" disabled>
+                <button id="submitPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95 disabled:opacity-50" disabled>
                     Subir y Notificar Pago
                 </button>
             </div>
@@ -340,18 +342,31 @@
 
     <script type="module">
         // --- Imports de Firebase ---
+        // Se usa la versión 12.5.0 para asegurar compatibilidad
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, writeBatch, serverTimestamp, setLogLevel, getDocs, increment, Timestamp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, writeBatch, serverTimestamp, setLogLevel, getDocs, increment, Timestamp, enableNetwork } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
         // --- Configuración y Variables Globales ---
-        const firebaseConfig = { apiKey: "AIzaSyAJiKG4Q0foMbkmBLPk8kYU31FlE3dIfEQ", authDomain: "formatoaseguramiento.firebaseapp.com", projectId: "formatoaseguramiento", storageBucket: "formatoaseguramiento.firebasestorage.app", messagingSenderId: "781371601755", appId: "1:781371601755:web:4013d52de8196c47c3e07e" };
+        // IMPORTANTE: Reemplaza con tu propia configuración de Firebase
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAJiKG4Q0foMbkmBLPk8kYU31FlE3dIfEQ", 
+            authDomain: "formatoaseguramiento.firebaseapp.com", 
+            projectId: "formatoaseguramiento", 
+            storageBucket: "formatoaseguramiento.firebasestorage.app", 
+            messagingSenderId: "781371601755", 
+            appId: "1:781371601755:web:4013d52de8196c47c3e07e" 
+        };
+        
+        // Usamos el appId para las rutas de Firestore, como en el original
         const appId = firebaseConfig.appId; 
         let app, auth, db, storage, currentUserId = null;
+        
+        // Descriptores de suscripciones de Firestore
         let contadoresUnsubscribe = () => {}, clientesUnsubscribe = () => {}, conceptosUnsubscribe = () => {}, userProfileUnsubscribe = () => {};
         
-        let userPlanStatus = null; // Almacena el estado del plan del usuario
+        let userPlanStatus = null; // Almacena el estado del plan del usuario ('free', 'premium', etc.)
         let localContadores = [], localClientes = [], localConceptos = [], edicionConceptoId = null;
 
         // --- Selectores de DOM (UI Principal) ---
@@ -370,24 +385,29 @@
         const pagoMovilProofInput = document.getElementById('pagoMovilProof');
         const submitPagoMovilBtn = document.getElementById('submitPagoMovilBtn');
 
-        // --- Constantes de Estilo Botones ---
+        // --- Constantes de Estilo Botones (para DRY) ---
         const btnBase = "py-2 px-3 text-sm font-semibold rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 inline-flex items-center justify-center";
         const btnLilac = `${btnBase} bg-purple-200 text-purple-800 hover:bg-purple-300 focus:ring-purple-400 p-2.5`;
         const btnYellow = `${btnBase} bg-yellow-200 text-yellow-800 hover:bg-yellow-300 focus:ring-yellow-300`;
         const btnPrimary = "w-full py-3 px-6 bg-purple-700 text-white font-bold rounded-full shadow-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 flex items-center justify-center";
         
-        // --- Lógica de Autenticación (MOVIDA ARRIBA) ---
+        // --- Lógica de Autenticación ---
         function setupAuthListeners() {
             const loginEmail = document.getElementById('loginEmail'), loginPassword = document.getElementById('loginPassword');
             const loginBtn = document.getElementById('loginBtn'), registerBtn = document.getElementById('registerBtn'), googleLoginBtn = document.getElementById('googleLoginBtn'), logoutBtn = document.getElementById('logoutBtn');
 
+            // Registrarse
             if (registerBtn) registerBtn.addEventListener('click', async (e) => { e.preventDefault(); authMessage.textContent = ''; try { await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value); } catch (error) { authMessage.textContent = `Error: ${traducirErrorAuth(error.code)}`; } });
+            // Iniciar con Google
             if (googleLoginBtn) googleLoginBtn.addEventListener('click', async (e) => { e.preventDefault(); authMessage.textContent = ''; try { await setPersistence(auth, browserLocalPersistence); await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { authMessage.textContent = `Error: ${traducirErrorAuth(error.code)}`; } });
+            // Iniciar con Email
             if (loginBtn) loginBtn.addEventListener('click', async (e) => { e.preventDefault(); authMessage.textContent = ''; try { await setPersistence(auth, browserLocalPersistence); await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value); } catch (error) { authMessage.textContent = `Error: ${traducirErrorAuth(error.code)}`; } });
+            // Cerrar Sesión
             if (logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth).catch((error) => showMessage("Error al cerrar sesión.", "error")));
         }
 
-        function traducirErrorAuth(code) { const errors = { 
+        function traducirErrorAuth(code) { 
+            const errors = { 
                 'auth/invalid-email': 'Email inválido.', 
                 'auth/user-not-found': 'Usuario no encontrado.', 
                 'auth/wrong-password': 'Contraseña incorrecta.', 
@@ -405,109 +425,152 @@
             auth = getAuth(app);
             db = getFirestore(app); 
             storage = getStorage(app); 
-            setLogLevel('Debug'); 
+            setLogLevel('Debug'); // Descomentar para ver logs detallados de Firestore
 
             setupAuthListeners();
             
-            onAuthStateChanged(auth, async (user) => { // <-- Se añade 'async'
-                loadingOverlay.classList.add('hidden');
+            // Observador principal del estado de autenticación
+            onAuthStateChanged(auth, async (user) => {
+                // loadingOverlay.classList.add('hidden'); // <-- MOVIMOS ESTO
                 if (user) {
+                    // --- INICIO DE LA CORRECCIÓN ---
+                    // 1. Mostrar "Cargando..." MIENTRAS se verifica el perfil.
+                    loadingOverlay.classList.remove('hidden');
+                    
+                    // --- (CORRECCIÓN: Se eliminó la llamada a enableNetwork(db)) ---
+                    
                     currentUserId = user.uid;
                     userEmailDisplay.textContent = user.email;
-                    appContainer.classList.remove('hidden');
-                    authContainer.classList.add('hidden');
+                    // appContainer.classList.remove('hidden'); // <-- NO MOSTRAR AÚN
+                    // authContainer.classList.add('hidden'); // <-- NO OCULTAR AÚN
                     
                     try {
-                        // Esperamos a que el perfil se configure antes de continuar
-                        // AHORA: setupUserProfile también llamará a las funciones de carga de datos
+                        // 2. Esperar a que el perfil se cargue (esta función ahora tiene reintentos)
                         await setupUserProfile(user.uid); 
+                        
+                        // 3. SOLO SI TIENE ÉXITO, mostrar la app
+                        appContainer.classList.remove('hidden');
+                        authContainer.classList.add('hidden');
 
                     } catch (error) {
+                        // 4. Si el perfil falla al cargar, cerrar sesión y mostrar error
                         console.error("Error crítico al configurar perfil:", error);
                         showMessage("No se pudo cargar tu perfil. Intenta recargar la página.", "error");
+                        signOut(auth); // Forzar cierre de sesión si el perfil no carga
+                        authContainer.classList.remove('hidden');
+                        appContainer.classList.add('hidden');
                     }
+                    
+                    // 5. Ocultar "Cargando..." al final del proceso
+                    loadingOverlay.classList.add('hidden');
+                    // --- FIN DE LA CORRECCIÓN ---
 
                 } else {
+                    // Usuario ha cerrado sesión
                     currentUserId = null;
                     userPlanStatus = null;
                     appContainer.classList.add('hidden');
                     authContainer.classList.remove('hidden');
                     
+                    // Detener todas las suscripciones de Firestore
                     if (contadoresUnsubscribe) contadoresUnsubscribe();
                     if (clientesUnsubscribe) clientesUnsubscribe();
                     if (conceptosUnsubscribe) conceptosUnsubscribe();
                     if (userProfileUnsubscribe) userProfileUnsubscribe();
                     
-                    clearForm();
+                    clearForm(); // Limpiar el formulario
+
+                    // Asegurarse de que la pantalla de carga esté oculta y se muestre el login
+                    loadingOverlay.classList.add('hidden');
+                    authContainer.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
                 }
             });
         } catch (error) {
-            loadingOverlay.classList.add('hidden'); authContainer.classList.remove('hidden'); appContainer.classList.add('hidden'); authMessage.textContent = error.message || "Error al conectar.";
+            // Error catastrófico al inicializar Firebase
+            loadingOverlay.classList.add('hidden'); 
+            authContainer.classList.remove('hidden'); 
+            appContainer.classList.add('hidden'); 
+            authMessage.textContent = error.message || "Error al conectar con la base de datos.";
         }
 
         // --- Gestión de Perfil y Planes de Usuario ---
+        
+        // Funciones helper para obtener rutas de Firestore
         function getCollectionPath(collectionName) { return currentUserId ? `artifacts/${appId}/users/${currentUserId}/${collectionName}` : null; }
         function getUserProfileRef() { return currentUserId ? doc(db, `artifacts/${appId}/users/${currentUserId}/profile`, 'status') : null; }
 
+        /**
+         * Configura el perfil del usuario.
+         * Escucha cambios en el perfil (onSnapshot).
+         * Si no existe, crea un perfil 'free'.
+         * Si existe, comprueba si el plan 'premium' ha expirado.
+         * Devuelve una Promesa que se resuelve en la carga inicial.
+         */
         async function setupUserProfile(userId) {
-            if (userProfileUnsubscribe) userProfileUnsubscribe(); 
-            
+            if (userProfileUnsubscribe) userProfileUnsubscribe();
             const profileRef = getUserProfileRef();
-            if (!profileRef) return Promise.reject("No hay referencia de perfil"); // <-- Salida si no hay ref
+            if (!profileRef) return Promise.reject("No hay referencia de perfil");
 
-            // Devolvemos una promesa que se resuelve en la primera carga
-            return new Promise((resolve, reject) => {
-                let initialLoadComplete = false; // <-- Flag para evitar ejecuciones múltiples
+            // 1. Función de reintento para la *primera lectura*
+            const attemptGetProfile = async (retryCount = 0) => {
+                try {
+                    // Intenta OBTENER el documento
+                    const docSnap = await getDoc(profileRef); // <-- La llamada clave
 
-                userProfileUnsubscribe = onSnapshot(profileRef, async (docSnap) => {
-                    try {
-                        if (!docSnap.exists()) {
-                            await createFreeUserProfile(profileRef);
-                        } else {
-                            userPlanStatus = docSnap.data();
+                    // --- ÉXITO ---
+                    // Una vez que getDoc tiene éxito, sabemos que estamos conectados.
+
+                    // 2. Procesar la primera lectura
+                    if (!docSnap.exists()) {
+                        await createFreeUserProfile(profileRef);
+                    } else {
+                        userPlanStatus = docSnap.data();
+                        await checkPremiumExpiry(profileRef, userPlanStatus);
+                    }
+                    updatePlanUI();
+
+                    // 3. Cargar el resto de los datos (dependencias)
+                    loadDropdowns();
+                    await inicializarConceptos();
+
+                    // 4. AHORA, adjuntar el listener `onSnapshot` para futuras actualizaciones
+                    // (por ejemplo, si el plan cambia mientras está en la página)
+                    userProfileUnsubscribe = onSnapshot(profileRef, async (snap) => {
+                        if (snap.exists()) {
+                            userPlanStatus = snap.data();
                             await checkPremiumExpiry(profileRef, userPlanStatus);
+                            updatePlanUI();
                         }
-                        updatePlanUI(); 
-                        
-                        // --- INICIO DE LA CORRECCIÓN ---
-                        // Solo ejecutamos esto en la PRIMERA carga del snapshot
-                        // para evitar recargar todo si el plan del usuario cambia.
-                        if (!initialLoadComplete) {
-                            initialLoadComplete = true; 
-                            
-                            // Movemos las funciones de carga de datos aquí.
-                            // Ahora se ejecutan DESPUÉS de que el primer snapshot (perfil)
-                            // se ha completado con éxito.
-                            loadDropdowns();
+                    }, (error) => {
+                        // Si el *listener* falla después, es menos crítico
+                        console.error("Error en el listener (onSnapshot) del perfil:", error);
+                        showMessage("Se perdió la conexión en tiempo real con tu perfil.", "error");
+                    });
 
-                            // --- INICIO DE LA CORRECCIÓN (Error "offline") ---
-                            // Añadimos un pequeño retraso (e.g., 1 segundo) antes de inicializar los conceptos.
-                            // Esto le da al cliente de Firestore una oportunidad adicional para conectarse
-                            // completamente después de que la autenticación y el perfil se hayan cargado.
-                            const delay = ms => new Promise(res => setTimeout(res, ms));
-                            await delay(1000); // 1 segundo de retraso
-                            // --- FIN DE LA CORRECCIÓN (Error "offline") ---
-                            
-                            await inicializarConceptos(); // <-- Hacemos await aquí
-                            
-                            resolve(); // <-- Resolvemos la promesa DESPUÉS de que todo cargue
-                        }
-                        // --- FIN DE LA CORRECCIÓN ---
+                    // 5. Resolver la promesa principal. ¡La carga inicial está completa!
+                    return Promise.resolve(); // <-- Usar 'return' ya que estamos en una func async
 
-                    } catch (error) {
-                        console.error("Error en el snapshot del perfil:", error);
-                        if (!initialLoadComplete) {
-                            reject(error); // <-- Rechazamos si hay error interno ANTES de la carga inicial
-                        }
+                } catch (e) {
+                    // --- MANEJO DE ERROR ---
+                    // --- CORRECCIÓN: Aumentar reintentos y tiempo ---
+                    if ((e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 7) {
+                        // Es un error de conexión, reintentamos
+                        console.warn(`Firestore offline, reintentando perfil... (Intento ${retryCount + 1})`);
+                        const delay = ms => new Promise(res => setTimeout(res, ms));
+                        await delay(2000 * (retryCount + 1)); // 2s, 4s, 6s...
+                        return attemptGetProfile(retryCount + 1); // ¡Importante retornar la llamada recursiva!
+                    } else {
+                        // Es un error diferente o ya reintentamos
+                        console.error("Error setupUserProfile: Falló después de reintentos.", e);
+                        showMessage("No se pudo cargar tu perfil. Revisa tu conexión.", "error");
+                        return Promise.reject(e); // Rechazar la promesa principal
                     }
-                }, (error) => {
-                    console.error("Error al escuchar perfil de usuario:", error);
-                    showMessage("Error al cargar tu plan.", "error");
-                    if (!initialLoadComplete) {
-                        reject(error); // <-- Rechazamos si el listener falla ANTES de la carga inicial
-                    }
-                });
-            });
+                }
+            };
+
+            // Iniciar el primer intento
+            return attemptGetProfile();
         }
 
         async function createFreeUserProfile(profileRef) {
@@ -519,15 +582,17 @@
                     createdAt: serverTimestamp()
                 };
                 await setDoc(profileRef, freePlan);
-                userPlanStatus = freePlan;
+                userPlanStatus = freePlan; // Establecer estado local
             } catch (e) {
                 console.error("Error creando perfil de usuario:", e);
             }
         }
 
         async function checkPremiumExpiry(profileRef, status) {
+            // Si es premium, tiene fecha de expiración, y esa fecha es pasada
             if (status.plan === 'premium' && status.premiumUntil && status.premiumUntil.toDate() < new Date()) {
                 try {
+                    // Revertir a 'free'
                     await updateDoc(profileRef, {
                         plan: 'free',
                         premiumUntil: null,
@@ -549,8 +614,8 @@
                 userPlanInfo.textContent = `⭐ Usuario Premium (Vence: ${fmtDate(userPlanStatus.premiumUntil.toDate().toISOString().split('T')[0])})`;
                 userPlanInfo.className = 'text-xs text-yellow-300 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
             } else {
-                const reportsLeft = 2 - userPlanStatus.reportsGenerated;
-                userPlanInfo.textContent = `Plan Free (${reportsLeft < 0 ? 0 : reportsLeft} informes gratis)`;
+                const reportsLeft = 1 - userPlanStatus.reportsGenerated; // Límite de 1 informe gratis
+                userPlanInfo.textContent = `Plan Free (${reportsLeft < 0 ? 0 : reportsLeft} informe gratis)`;
                 userPlanInfo.className = 'text-xs text-gray-200 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
             }
         }
@@ -561,7 +626,8 @@
             if (userPlanStatus.plan === 'premium') {
                 return { allow: true, type: 'premium' };
             }
-            if (userPlanStatus.reportsGenerated < 2) {
+            // Límite de 1 informe gratis
+            if (userPlanStatus.reportsGenerated < 1) { 
                 return { allow: true, type: 'free' };
             }
             return { allow: false, reason: 'limit_reached' };
@@ -573,8 +639,10 @@
 
             try {
                 if (type === 'free') {
+                    // Solo incrementar si es 'free'
                     await updateDoc(profileRef, { reportsGenerated: increment(1) });
                 }
+                // No necesitamos hacer nada para 'premium'
                 console.log(`Informe de tipo ${type} registrado.`);
             } catch (e) {
                 console.error("Error al incrementar contador de informes:", e);
@@ -606,29 +674,24 @@
         // --- Lógica de PayPal ---
         function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
+            // No renderizar si ya hay botones o si PayPal SDK no se cargó
             if (!container || container.children.length > 0) return; 
 
-            // --- INICIO DE LA CORRECCIÓN (Error PayPal) ---
-            // 1. Comprobar si 'paypal' está definido
             if (typeof paypal === 'undefined') {
                 console.error("SDK de PayPal no se ha cargado. 'paypal' no está definido.");
                 showMessage("Error al cargar la opción de pago. Refresca la página.", "error");
-                // Mostrar un mensaje de error en lugar del botón
                 container.innerHTML = '<p class="text-center text-red-600">Error al cargar el botón de pago. Por favor, refresca la página.</p>';
                 return;
             }
             
-            // 2. Envolver el renderizado en un try...catch
             try {
-            // --- FIN DE LA CORRECCIÓN (Error PayPal) ---
-
                 paypal.Buttons({
                     createOrder: (data, actions) => {
                         return actions.order.create({
                             purchase_units: [{
                                 description: "Plan Premium 1 Año - Informe de Aseguramiento",
                                 amount: {
-                                    value: "15.00", 
+                                    value: "15.00", // Precio
                                     currency_code: "USD"
                                 }
                             }]
@@ -638,7 +701,7 @@
                         try {
                             const details = await actions.order.capture();
                             console.log("Pago completado:", details);
-                            await grantPremiumAccess();
+                            await grantPremiumAccess(); // Activar premium en Firestore
                             showMessage("¡Pago completado! Ahora eres Premium.", "success");
                             hideModals();
                         } catch (err) {
@@ -652,13 +715,11 @@
                     }
                 }).render('#paypal-button-container');
 
-            // --- INICIO DE LA CORRECCIÓN (Error PayPal) ---
             } catch (error) {
                 console.error("Error al renderizar botones de PayPal:", error);
                 showMessage("Error al mostrar el botón de pago.", "error");
                 container.innerHTML = '<p class="text-center text-red-600">Error al mostrar el botón de pago.</p>';
             }
-            // --- FIN DE LA CORRECCIÓN (Error PayPal) ---
         }
 
         async function grantPremiumAccess() {
@@ -666,13 +727,13 @@
             if (!profileRef) return;
             
             const expiryDate = new Date();
-            expiryDate.setFullYear(expiryDate.getFullYear() + 1); 
+            expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Premium por 1 año
             
             try {
                 await updateDoc(profileRef, {
                     plan: 'premium',
                     premiumUntil: Timestamp.fromDate(expiryDate),
-                    reportsGenerated: 0 
+                    reportsGenerated: 0 // Resetear contador por si acaso
                 });
             } catch (e) {
                 console.error("Error al actualizar a premium:", e);
@@ -682,6 +743,7 @@
 
         // --- Lógica de Pago Móvil ---
         pagoMovilProofInput.addEventListener('change', () => {
+            // Habilitar botón solo si hay un archivo
             submitPagoMovilBtn.disabled = pagoMovilProofInput.files.length === 0;
         });
 
@@ -693,20 +755,23 @@
             submitPagoMovilBtn.textContent = 'Subiendo...';
 
             try {
+                // Subir comprobante a Storage
                 const storagePath = `artifacts/${appId}/pagoMovilUploads/${currentUserId}/${Date.now()}-${file.name}`;
                 const storageRef = ref(storage, storagePath);
                 const snapshot = await uploadBytes(storageRef, file);
                 const downloadURL = await getDownloadURL(snapshot.ref);
 
+                // Crear documento de validación para el admin
                 const validationData = {
                     userId: currentUserId,
                     userEmail: auth.currentUser.email,
                     fileURL: downloadURL,
                     storagePath: storagePath,
-                    status: 'pending', 
+                    status: 'pending', // Pendiente de revisión
                     createdAt: serverTimestamp()
                 };
                 
+                // Guardar en una colección de "admin"
                 await addDoc(collection(db, `artifacts/${appId}/admin/pagoValidations`), validationData);
 
                 showMessage("Comprobante enviado. Estará en revisión y se activará en 24h.", "success");
@@ -722,23 +787,46 @@
             }
         });
 
-        // --- Aplicar Estilos de Botones ---
+        // --- Aplicar Estilos de Botones (Centralizado) ---
         function applyButtonStyles() {
-            document.getElementById('addIncomeItemBtn').className = btnYellow; 
-            document.querySelector('.btn-primary').className = btnPrimary;
-            document.getElementById('saveContadorBtn').className = btnLilac; document.getElementById('saveClienteBtn').className = btnLilac;
-            document.getElementById('clearFormBtn').className = `${btnYellow} flex items-center`; 
-            document.getElementById('deleteContadorBtn').className = btnLilac + " gestion-btn"; document.getElementById('updateContadorBtn').className = btnLilac + " gestion-btn";
-            document.getElementById('deleteClienteBtn').className = btnLilac + " gestion-btn"; document.getElementById('updateClienteBtn').className = btnLilac + " gestion-btn";
-            document.getElementById('conceptoBtnAgregar').className = btnLilac; document.getElementById('conceptoBtnEditar').className = btnLilac;
-            document.getElementById('conceptoBtnGuardarEdicion').className = `${btnLilac} hidden`; document.getElementById('conceptoBtnEliminar').className = btnLilac;
-            document.getElementById('showPagoMovilBtn').className = "w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95";
+            try {
+                document.getElementById('addIncomeItemBtn').className = btnYellow; 
+                document.querySelector('button[type="submit"].btn-primary').className = btnPrimary;
+                document.getElementById('saveContadorBtn').className = btnLilac; 
+                document.getElementById('saveClienteBtn').className = btnLilac;
+                document.getElementById('clearFormBtn').className = `${btnYellow} flex items-center`; 
+                document.getElementById('deleteContadorBtn').className = btnLilac + " gestion-btn"; 
+                document.getElementById('updateContadorBtn').className = btnLilac + " gestion-btn";
+                document.getElementById('deleteClienteBtn').className = btnLilac + " gestion-btn"; 
+                document.getElementById('updateClienteBtn').className = btnLilac + " gestion-btn";
+                document.getElementById('conceptoBtnAgregar').className = btnLilac; 
+                document.getElementById('conceptoBtnEditar').className = btnLilac;
+                document.getElementById('conceptoBtnGuardarEdicion').className = `${btnLilac} hidden`; 
+                document.getElementById('conceptoBtnEliminar').className = btnLilac;
+                document.getElementById('showPagoMovilBtn').className = "w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95";
+            } catch (e) {
+                console.warn("Error aplicando estilos a botones (puede ocurrir en carga inicial):", e);
+            }
         }
         applyButtonStyles();
         
         // --- Lógica de Formulario (Contadores, Clientes, Conceptos) ---
-        contadorSelloInput.addEventListener('change', function() { const file = this.files[0]; if (file && file.type === "image/png") { const reader = new FileReader(); reader.onload = (e) => { selloPreview.src = e.target.result; selloPreview.classList.remove('hidden'); }; reader.readAsDataURL(file); } else { selloPreview.src = ''; selloPreview.classList.add('hidden'); if (file) { showMessage('Solo se permiten archivos PNG.', 'error'); this.value = ''; } } });
+        
+        // Vista previa del sello
+        contadorSelloInput.addEventListener('change', function() { 
+            const file = this.files[0]; 
+            if (file && file.type === "image/png") { 
+                const reader = new FileReader(); 
+                reader.onload = (e) => { selloPreview.src = e.target.result; selloPreview.classList.remove('hidden'); }; 
+                reader.readAsDataURL(file); 
+            } else { 
+                selloPreview.src = ''; 
+                selloPreview.classList.add('hidden'); 
+                if (file) { showMessage('Solo se permiten archivos PNG.', 'error'); this.value = ''; } 
+            } 
+        });
 
+        // Cargar selects de Contadores y Clientes desde Firestore
         function loadDropdowns() {
             if (!currentUserId) return;
             const contadoresPath = getCollectionPath('contadores');
@@ -761,89 +849,88 @@
             }
         }
 
+        // Rellenar formularios al seleccionar
         function fillContadorForm(id) { if (!id) { clearFormContador(false); return; } const d = localContadores.find(c => c.id === id); if (d) { document.getElementById('contadorNombre').value = d.nombre; document.getElementById('contadorRif').value = d.rif; document.getElementById('contadorCpc').value = d.cpc; document.getElementById('deleteContadorBtn').style.display = 'inline-block'; document.getElementById('updateContadorBtn').style.display = 'inline-block'; } }
         function fillClienteForm(id) { if (!id) { clearFormCliente(false); return; } const d = localClientes.find(c => c.id === id); if (d) { document.getElementById('clienteTratamiento').value = d.tratamiento; document.getElementById('clienteNombre').value = d.nombre; document.getElementById('clienteCedula').value = d.cedula; document.getElementById('deleteClienteBtn').style.display = 'inline-block'; document.getElementById('updateClienteBtn').style.display = 'inline-block'; } }
 
+        // --- CRUD Contadores ---
         async function saveContador() { const d = { nombre: document.getElementById('contadorNombre').value, rif: document.getElementById('contadorRif').value, cpc: document.getElementById('contadorCpc').value, createdAt: serverTimestamp() }; if (!d.nombre || !d.cpc) return showMessage('Complete nombre y C.P.C.', 'error'); if (localContadores.some(c => c.cpc === d.cpc)) return showMessage('CPC ya existe.', 'error'); try { await addDoc(collection(db, getCollectionPath('contadores')), d); showMessage('Contador guardado.', 'success'); clearFormContador(); } catch (e) { showMessage('Error al guardar.', 'error'); } }
         async function updateContador() { const id = document.getElementById('selectContador').value; if (!id) return; const d = { nombre: document.getElementById('contadorNombre').value, rif: document.getElementById('contadorRif').value, cpc: document.getElementById('contadorCpc').value, updatedAt: serverTimestamp() }; if (!d.nombre || !d.cpc) return; if (localContadores.some(c => c.cpc === d.cpc && c.id !== id)) return showMessage('CPC duplicado.', 'error'); try { await updateDoc(doc(db, getCollectionPath('contadores'), id), d); showMessage('Contador actualizado.', 'success'); } catch (e) { showMessage('Error al actualizar.', 'error'); } }
         async function deleteContador() { const id = document.getElementById('selectContador').value; if (id) showConfirmationModal('¿Eliminar contador?', async () => { try { await deleteDoc(doc(db, getCollectionPath('contadores'), id)); showMessage('Eliminado.', 'success'); clearFormContador(); } catch (e) { showMessage('Error al eliminar.', 'error'); } }); }
 
+        // --- CRUD Clientes ---
         async function saveCliente() { const d = { tratamiento: document.getElementById('clienteTratamiento').value, nombre: document.getElementById('clienteNombre').value, cedula: document.getElementById('clienteCedula').value, createdAt: serverTimestamp() }; if (!d.nombre || !d.cedula) return showMessage('Complete datos.', 'error'); if (localClientes.some(c => c.cedula === d.cedula)) return showMessage('Cédula ya existe.', 'error'); try { await addDoc(collection(db, getCollectionPath('clientes')), d); showMessage('Cliente guardado.', 'success'); clearFormCliente(); } catch (e) { showMessage('Error al guardar.', 'error'); } }
         async function updateCliente() { const id = document.getElementById('selectCliente').value; if (!id) return; const d = { tratamiento: document.getElementById('clienteTratamiento').value, nombre: document.getElementById('clienteNombre').value, cedula: document.getElementById('clienteCedula').value, updatedAt: serverTimestamp() }; if (!d.nombre || !d.cedula) return; if (localClientes.some(c => c.cedula === d.cedula && c.id !== id)) return showMessage('Cédula duplicada.', 'error'); try { await updateDoc(doc(db, getCollectionPath('clientes'), id), d); showMessage('Cliente actualizado.', 'success'); } catch (e) { showMessage('Error al actualizar.', 'error'); } }
         async function deleteCliente() { const id = document.getElementById('selectCliente').value; if (id) showConfirmationModal('¿Eliminar cliente?', async () => { try { await deleteDoc(doc(db, getCollectionPath('clientes'), id)); showMessage('Eliminado.', 'success'); clearFormCliente(); } catch (e) { showMessage('Error al eliminar.', 'error'); } }); }
 
+        // --- CRUD Conceptos ---
         const DEFAULT_CONCEPTOS = ["Actividades Comerciales", "Alquiler de Inmueble", "Director de la Entidad", "Docente contratado tiempo completo", "Honorarios Profesionales de libre ejercicio", "Intereses generados por inversiones", "Servicios de Consultoría", "Servicios Técnicos", "Sueldos y Salarios"];
         
-        // --- INICIO DE LA CORRECCIÓN 1 (Poblar Datalist por defecto) ---
+        // Poblar el datalist estático por si Firestore falla
         function populateDefaultConceptosDatalist() {
             const datalist = document.getElementById('conceptos-list');
-            if (!datalist || datalist.options.length > 0) return; // Salir si no existe o ya tiene opciones
+            if (!datalist || datalist.options.length > 0) return; 
             DEFAULT_CONCEPTOS.forEach(c => {
                 const optD = document.createElement('option');
                 optD.value = c;
                 datalist.appendChild(optD);
             });
         }
-        // Llamar inmigiatamente para poblar los conceptos por defecto en la UI
         populateDefaultConceptosDatalist();
-        // --- FIN DE LA CORRECCIÓN 1 ---
 
-        // --- INICIO DE LA CORRECCIÓN (Error "offline") ---
+        // Inicializar conceptos por defecto en Firestore si no existen
         async function inicializarConceptos() {
             if (!currentUserId) return;
             const path = getCollectionPath('conceptos'); if (!path) return;
-            const defRef = doc(db, path, 'defaults_v6');
+            // Usamos un ID de documento único para marcar la inicialización
+            const defRef = doc(db, path, 'defaults_v6'); 
 
-            // Función interna para reintentar
             const attemptInitialization = async (retryCount = 0) => {
                 try {
-                    const snap = await getDoc(defRef); // <-- La llamada que puede fallar
+                    const snap = await getDoc(defRef); // La llamada que puede fallar
                     
                     if (!snap.exists()) {
+                        // Primera vez: verificar conceptos existentes y añadir los que falten
                         const q = query(collection(db, path));
                         const existingSnap = await getDocs(q);
                         const existingNames = new Set();
                         existingSnap.forEach(doc => { if (doc.data().nombre) existingNames.add(doc.data().nombre.toLowerCase()); });
+                        
                         const batch = writeBatch(db); let addedCount = 0;
-                        DEFAULT_CONCEPTOS.forEach(n => { if (!existingNames.has(n.toLowerCase())) { batch.set(doc(collection(db, path)), { nombre: n, createdAt: serverTimestamp(), isDefault: true }); addedCount++; } });
-                        batch.set(defRef, { inicializado: true }); await batch.commit(); console.log(`Conceptos inicializados (v6). Agregados: ${addedCount}`);
+                        DEFAULT_CONCEPTOS.forEach(n => { 
+                            if (!existingNames.has(n.toLowerCase())) { 
+                                batch.set(doc(collection(db, path)), { nombre: n, createdAt: serverTimestamp(), isDefault: true }); 
+                                addedCount++; 
+                            } 
+                        });
+                        batch.set(defRef, { inicializado: true }); // Marcar como inicializado
+                        await batch.commit(); 
+                        console.log(`Conceptos inicializados (v6). Agregados: ${addedCount}`);
                     }
                     
-                    // Si todo va bien (o ya existía), cargamos la UI
+                    // Cargar la UI (siempre)
                     cargarConceptosUI();
 
                 } catch (e) {
-                    // Verificamos si es el error "offline"
-                    // AUMENTAMOS LOS REINTENTOS Y EL TIEMPO
-                    if ( (e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 5 ) { // <-- CAMBIO: 4 a 5
-                        // Es un error de conexión, reintentamos
+                    // Manejo de error "offline" con reintentos
+                    // --- CORRECCIÓN: Aumentar reintentos y tiempo ---
+                    if ( (e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 7 ) {
                         console.warn(`Firestore offline, reintentando init... (Intento ${retryCount + 1})`);
-                        
-                        // --- CAMBIO CLAVE ---
-                        // 1. Creamos una promesa de 'delay'
                         const delay = ms => new Promise(res => setTimeout(res, ms));
-                        // 2. Esperamos (await) el tiempo necesario
-                        await delay(2500 * (retryCount + 1)); // <-- CAMBIO: 2000 a 2500 (2.5s, 5s, 7.5s, 10s, 12.5s)
-                        // 3. Llamamos y retornamos (return) el siguiente intento.
-                        //    Esto mantiene la cadena de promesas.
-                        return attemptInitialization(retryCount + 1);
-                        // --- FIN CAMBIO CLAVE ---
-
+                        await delay(2000 * (retryCount + 1)); // Backoff exponencial (2s, 4s, 6s...)
+                        return attemptInitialization(retryCount + 1); // Reintentar
                     } else {
-                        // Es un error diferente o ya reintentamos
+                        // Error final
                         console.error("Error init conceptos: Falló después de reintentos.", e);
                         showMessage("No se pudieron cargar los conceptos. Revisa tu conexión.", "error");
-                        // Aún así intentamos cargar la UI, puede que solo falle la inicialización
-                        cargarConceptosUI();
+                        cargarConceptosUI(); // Intentar cargar de todos modos (puede que funcione el listener)
                     }
                 }
             };
-
-            // Iniciamos el primer intento
             await attemptInitialization();
         }
-        // --- FIN DE LA CORRECCIÓN ---
 
+        // Cargar conceptos en Select y Datalist desde Firestore
         function cargarConceptosUI() {
             const path = getCollectionPath('conceptos'); if (!path) return;
             if (conceptosUnsubscribe) conceptosUnsubscribe();
@@ -852,12 +939,15 @@
                 const select = document.getElementById('conceptosSelect'), datalist = document.getElementById('conceptos-list');
                 select.innerHTML = '<option value="">-- Seleccionar Concepto --</option>'; datalist.innerHTML = ''; 
                 snapshot.forEach(doc => { if (doc.id !== 'defaults_v6') { localConceptos.push({ id: doc.id, ...doc.data() }); } });
-                localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+                localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); // Ordenar alfabéticamente
                 localConceptos.forEach(c => { const optS = document.createElement('option'); optS.value = c.id; optS.textContent = c.nombre; select.appendChild(optS); const optD = document.createElement('option'); optD.value = c.nombre; datalist.appendChild(optD); });
                 resetConceptoForm();
             }, (error) => { console.error("Error loading concepts:", error); showMessage('Error al cargar conceptos.', 'error'); });
         }
+        
         function resetConceptoForm() { document.getElementById('conceptoEditInput').value = ''; edicionConceptoId = null; document.getElementById('conceptoBtnAgregar').classList.remove('hidden'); document.getElementById('conceptoBtnGuardarEdicion').classList.add('hidden'); document.getElementById('conceptoBtnCancelarEdicion').classList.add('hidden'); document.getElementById('conceptosSelect').value = ""; }
+        
+        // Listeners del CRUD de Conceptos
         document.getElementById('conceptoBtnAgregar').addEventListener('click', async () => { const val = document.getElementById('conceptoEditInput').value.trim(); if (val) { if (localConceptos.some(c => c.nombre.toLowerCase() === val.toLowerCase())) return showMessage('Concepto ya existe.', 'error'); try { await addDoc(collection(db, getCollectionPath('conceptos')), { nombre: val, createdAt: serverTimestamp(), isDefault: false }); showMessage('Concepto agregado.', 'success'); document.getElementById('conceptoEditInput').value = ''; } catch (e) { showMessage('Error al agregar.', 'error'); } } });
         document.getElementById('conceptoBtnEditar').addEventListener('click', () => { const id = document.getElementById('conceptosSelect').value; const c = localConceptos.find(x => x.id === id); if (c) { document.getElementById('conceptoEditInput').value = c.nombre; edicionConceptoId = id; document.getElementById('conceptoBtnAgregar').classList.add('hidden'); document.getElementById('conceptoBtnGuardarEdicion').classList.remove('hidden'); document.getElementById('conceptoBtnCancelarEdicion').classList.remove('hidden'); } else { showMessage('Seleccione un concepto para editar.', 'error'); } });
         document.getElementById('conceptoBtnCancelarEdicion').addEventListener('click', resetConceptoForm);
@@ -865,23 +955,45 @@
         document.getElementById('conceptoBtnEliminar').addEventListener('click', () => { const id = document.getElementById('conceptosSelect').value; if (id) showConfirmationModal('¿Eliminar concepto?', async () => { try { await deleteDoc(doc(db, getCollectionPath('conceptos'), id)); showMessage('Eliminado.', 'success'); } catch (e) { showMessage('Error al eliminar.', 'error'); } }); else showMessage('Seleccione un concepto.', 'error'); });
 
         // --- Lógica de Formulario (Limpieza y Formato) ---
-        function clearFormContador(sel = true) { document.getElementById('contadorNombre').value = ''; document.getElementById('contadorRif').value = ''; document.getElementById('contadorCpc').value = ''; contadorSelloInput.value = ''; selloPreview.classList.add('hidden'); if (sel) document.getElementById('selectContador').value = ""; document.getElementById('deleteContadorBtn').style.display = 'none'; document.getElementById('updateContadorBtn').style.display = 'none'; }
+        function clearFormContador(sel = true) { document.getElementById('contadorNombre').value = ''; document.getElementById('contadorRif').value = ''; document.getElementById('contadorCpc').value = ''; contadorSelloInput.value = ''; selloPreview.classList.add('hidden'); selloPreview.src = ''; if (sel) document.getElementById('selectContador').value = ""; document.getElementById('deleteContadorBtn').style.display = 'none'; document.getElementById('updateContadorBtn').style.display = 'none'; }
         function clearFormCliente(sel = true) { document.getElementById('clienteTratamiento').value = 'Sr.'; document.getElementById('clienteNombre').value = ''; document.getElementById('clienteCedula').value = ''; if (sel) document.getElementById('selectCliente').value = ""; document.getElementById('deleteClienteBtn').style.display = 'none'; document.getElementById('updateClienteBtn').style.display = 'none'; }
         function clearForm() { document.getElementById('report-form').reset(); document.getElementById('income-details').innerHTML = ''; addIncomeItem(); clearFormContador(); clearFormCliente(); setFechasDefault(); }
+        
         document.getElementById('clearFormBtn').addEventListener('click', (e) => { e.preventDefault(); clearForm(); showMessage('Formulario limpiado.', 'success'); });
-        function showConfirmationModal(msg, onConfirm) { const ov = document.createElement('div'); ov.className = 'fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[101]'; ov.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><p class="mb-4 text-gray-800">${msg}</p><div class="flex justify-end gap-4"><button id="cfmCancel" class="py-2 px-4 bg-gray-200 rounded-full font-semibold">Cancelar</button><button id="cfmOk" class="py-2 px-4 bg-red-600 text-white rounded-full font-semibold">Eliminar</button></div></div>`; document.body.appendChild(ov); document.getElementById('cfmCancel').onclick = () => document.body.removeChild(ov); document.getElementById('cfmOk').onclick = () => { onConfirm(); document.body.removeChild(ov); }; }
+        
+        // Modal de confirmación genérico
+        function showConfirmationModal(msg, onConfirm) { 
+            const ov = document.createElement('div'); 
+            ov.className = 'fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[101]'; 
+            ov.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><p class="mb-4 text-gray-800">${msg}</p><div class="flex justify-end gap-4"><button id="cfmCancel" class="py-2 px-4 bg-gray-200 rounded-full font-semibold">Cancelar</button><button id="cfmOk" class="py-2 px-4 bg-red-600 text-white rounded-full font-semibold">Eliminar</button></div></div>`; 
+            document.body.appendChild(ov); 
+            document.getElementById('cfmCancel').onclick = () => document.body.removeChild(ov); 
+            document.getElementById('cfmOk').onclick = () => { onConfirm(); document.body.removeChild(ov); }; 
+        }
+        
+        // Auto-formato de Cédula y RIF
         document.getElementById('clienteCedula').addEventListener('input', (e) => { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); let l = (v.match(/^[VEve]/) || ['V'])[0].toUpperCase(); let n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '').substring(0, 8); e.target.value = `${l}-${n.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`; });
         document.getElementById('contadorRif').addEventListener('input', (e) => { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); let l = (v.match(/^[JGjgVEvePp]/) || ['V'])[0].toUpperCase(); let n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, ''); let m = n.substring(0, 8), d = n.length > 8 ? n.substring(8, 9) : ''; e.target.value = `${l}-${m.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${d ? '-' + d : ''}`; });
         document.getElementById('contadorCpc').addEventListener('input', (e) => { let v = e.target.value.replace(/[^\d]/g, ''); e.target.value = v ? new Intl.NumberFormat('es-VE').format(parseInt(v, 10)) : ''; });
+        
+        // Establecer fechas por defecto
         function setFechasDefault() { const now = new Date(); document.getElementById('fechaDocumento').value = now.toISOString().split('T')[0]; document.getElementById('fechaDesde').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; document.getElementById('fechaHasta').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]; }
+        
+        // Cargar defaults al cargar la página (si no hay usuario)
         document.addEventListener('DOMContentLoaded', () => { if (!auth.currentUser) { addIncomeItem(); setFechasDefault(); } });
+        
+        // Listeners de los selects y botones de guardado
         document.getElementById('selectContador').addEventListener('change', (e) => fillContadorForm(e.target.value));
         document.getElementById('selectCliente').addEventListener('change', (e) => fillClienteForm(e.target.value));
-        document.getElementById('saveContadorBtn').addEventListener('click', saveContador); document.getElementById('updateContadorBtn').addEventListener('click', updateContador); document.getElementById('deleteContadorBtn').addEventListener('click', deleteContador);
-        document.getElementById('saveClienteBtn').addEventListener('click', saveCliente); document.getElementById('updateClienteBtn').addEventListener('click', updateCliente); document.getElementById('deleteClienteBtn').addEventListener('click', deleteCliente);
+        document.getElementById('saveContadorBtn').addEventListener('click', saveContador); 
+        document.getElementById('updateContadorBtn').addEventListener('click', updateContador); 
+        document.getElementById('deleteContadorBtn').addEventListener('click', deleteContador);
+        document.getElementById('saveClienteBtn').addEventListener('click', saveCliente); 
+        document.getElementById('updateClienteBtn').addEventListener('click', updateCliente); 
+        document.getElementById('deleteClienteBtn').addEventListener('click', deleteCliente);
         document.getElementById('showPagoMovilBtn').addEventListener('click', showPagoMovilModal);
         
-        // --- Lógica de Ingresos (Items) ---
+        // --- Lógica de Ingresos (Items Dinámicos) ---
         window.addIncomeItem = function() {
             const c = document.getElementById('income-details');
             const d = document.createElement('div'); d.className = 'flex flex-col md:flex-row items-center gap-3 income-item';
@@ -898,25 +1010,39 @@
                     <span class="ml-1.5 md:hidden">Eliminar Ingreso</span>
                 </button>`;
             
+            // Formato de moneda al escribir
             d.querySelector('.income-amount').addEventListener('input', formatCurrencyInput);
+            // Botón de eliminar (solo si hay más de 1)
             d.querySelector('.btn-remove-income').onclick = () => c.querySelectorAll('.income-item').length > 1 ? c.removeChild(d) : showMessage('Debe haber al menos un concepto.', 'error');
             c.appendChild(d);
         };
         document.getElementById('addIncomeItemBtn').addEventListener('click', addIncomeItem);
-        function formatCurrencyInput(e) { let v = e.target.value.replace(/[^\d,]/g, ''), p = v.split(','); let i = p[0].replace(/\./g, ''); i = i ? new Intl.NumberFormat('es-VE').format(parseInt(i, 10)) : (p.length > 1 ? '0' : ''); e.target.value = i + (p[1] !== undefined ? ',' + p[1].substring(0, 2) : ''); }
+        
+        function formatCurrencyInput(e) { 
+            let v = e.target.value.replace(/[^\d,]/g, ''), p = v.split(','); 
+            let i = p[0].replace(/\./g, ''); 
+            i = i ? new Intl.NumberFormat('es-VE').format(parseInt(i, 10)) : (p.length > 1 ? '0' : ''); 
+            e.target.value = i + (p[1] !== undefined ? ',' + p[1].substring(0, 2) : ''); 
+        }
         
         // --- Lógica de Generación de PDF ---
+        
+        // Funciones Helper para el PDF
         function parseVal(s) { return parseFloat((s || '0').replace(/\./g, '').replace(',', '.')) || 0; }
-        function fmtDate(s, long = false) { if (!s) return ''; const d = s instanceof Date ? s : new Date(s + 'T00:00:00'); if (long) return `${d.getDate()} de ${["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()]} ${d.getFullYear()}`; return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; }
+        function fmtDate(s, long = false) { 
+            if (!s) return ''; 
+            const d = s instanceof Date ? s : new Date(s + 'T00:00:00'); // Corregir zona horaria
+            if (long) return `${d.getDate()} de ${["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()]} ${d.getFullYear()}`; 
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; 
+        }
         function fmtCur(n) { return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
-        // --- INICIO DE LA CORRECCIÓN 3 ---
-        // Nueva función para manejar la carga asíncrona del sello
+        // Cargar datos del sello (asíncrono)
         function getSealData() {
             return new Promise((resolve, reject) => {
                 const file = contadorSelloInput.files[0];
                 if (!file || file.type !== "image/png") {
-                    resolve({ data: null, width: 0, height: 0 });
+                    resolve({ data: null, width: 0, height: 0 }); // Resolver sin sello
                     return;
                 }
 
@@ -924,6 +1050,7 @@
                 r.onload = (e) => {
                     const img = new Image();
                     img.onload = function() {
+                        // Resolver con los datos y dimensiones de la imagen
                         resolve({ data: e.target.result, width: this.width, height: this.height });
                     };
                     img.onerror = (err) => {
@@ -942,65 +1069,90 @@
             });
         }
 
-        // Modificar buildPDF para que devuelva true/false indicando el éxito
+        /**
+         * Construye el PDF y devuelve true/false si tuvo éxito.
+         * Esta función es síncrona y bloquea el hilo principal.
+         */
         function buildPDF(sealData, sealW, sealH) {
             try {
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF('p', 'pt', 'letter');
                 const margin = 60, pageH = doc.internal.pageSize.getHeight(), usableW = doc.internal.pageSize.getWidth() - 120;
-                let y = 141.75; 
+                let y = 141.75; // Posición Y inicial (5cm)
 
+                // Recolectar datos del formulario
                 const getVal = (id) => document.getElementById(id).value;
                 const cNom = getVal('contadorNombre'), cCpc = getVal('contadorCpc'), cRif = getVal('contadorRif');
                 const clTrat = getVal('clienteTratamiento'), clNom = getVal('clienteNombre'), clCed = getVal('clienteCedula');
                 const fDoc = getVal('fechaDocumento'), fDes = getVal('fechaDesde'), fHas = getVal('fechaHasta');
 
+                // Recolectar datos de ingresos
                 let total = 0, data = [];
                 document.querySelectorAll('.income-item').forEach(i => { const m = parseVal(i.querySelector('.income-amount').value); if (m > 0) { data.push([i.querySelector('.income-concept').value, `Bs. ${fmtCur(m)}`]); total += m; } });
 
+                // Función helper para añadir texto con saltos de página
                 const addTxt = (txt, opts = {}) => {
                     doc.setFontSize(opts.fontSize || 11); doc.setFont('helvetica', opts.fontStyle || 'normal');
                     const lines = doc.splitTextToSize(txt, usableW - (opts.indent || 0));
                     const h = (lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5)) - ((opts.fontSize || 11) * ((opts.lineSpacing || 1.5) - 1));
-                    if (y + h > pageH - 70.86) { doc.addPage(); y = 141.75; }
+                    if (y + h > pageH - 70.86) { doc.addPage(); y = 141.75; } // Salto de página
                     doc.text(txt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - 60 : 60 + (opts.indent || 0)), y, { align: opts.align || 'justify', maxWidth: usableW - (opts.indent || 0), lineHeightFactor: opts.lineSpacing || 1.5 });
                     y += h + (opts.spacing || 15);
                 };
 
                 // --- PÁGINAS PDF ---
+                // Título
                 addTxt('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', { fontStyle: 'bold', align: 'center', spacing: 30 });
+                // Alcance
                 addTxt('Alcance', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`He revisado la evidencia inherente a los ingresos percibidos por el ${clTrat} ${clNom}, con cedula de identidad N.º ${clCed}, durante el periodo comprendido desde el ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, presentado en la relación de ingresos adjunta, correspondiente a su actividad económica según se detalla en el anexo.`, { indent: 20, spacing: 25 });
+                // Responsabilidad del cliente
                 addTxt('Responsabilidad de la persona que percibe los ingresos', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`El ${clTrat} ${clNom}, es responsable de la preparación y presentación del importe de sus ingresos que se adjunta en este informe, incluyendo la integridad, legalidad y veracidad de los documentos suministrados. Esta responsabilidad incluye la aseveración de que todos y cada uno de los ingresos detallados en la relación, provienen de actividades legítimas y de comprobable licito ejercicio.`, { indent: 20, spacing: 25 });
+                // Responsabilidad del contador
                 addTxt('Responsabilidad del Contador Público Independiente', { fontStyle: 'bold', spacing: 20 });
                 const respP1 = `Mi responsabilidad es expresar una opinión sobre la relación de ingresos obtenida por el ${clTrat} ${clNom}, durante el periodo señalado de acuerdo con mis procedimientos, los cuales he realizado de conformidad con la Norma Internacional para encargos de aseguramiento, los cuales he realizado de conformidad con la Normas Internacionales de Encargos de Aseguramiento NIEA 3000, esta norma prevé que cumpla con los requerimientos éticos y que planifique y realice los procedimientos para obtener una seguridad razonable de que, en todos los aspectos materiales, la relación está presentada razonablemente.`;
                 const respP2 = `Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clTrat} ${clNom}, para el periodo ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, con base al examen sobre la evidencia obtenida.`;
                 addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25 });
+                
                 doc.addPage(); y = 141.75;
+                // Criterio
                 addTxt('Identificación del criterio de evaluación', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clTrat} ${clNom}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25 });
+                // Opinión
                 addTxt('Opinión', { fontStyle: 'bold', spacing: 20 });
                 addTxt('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable y que los ingresos detallados en la relación, no provenga de actividades legítimas y de comprobable lícito ejercicio.', { indent: 20, spacing: 25 });
+                // Usuarios
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${getVal('entidadDirigida')} el cual lo ha requerido para ${getVal('motivoInforme')}.`, { indent: 20, spacing: 40 });
-                const sigH = (4 * 11 * 1) + (cRif ? 12 : 0);
-                let sigY = pageH - 85 - sigH; 
-                if (sealData) { const ratio = Math.min((5.3 * 28.35) / sealW, (2.1 * 28.35) / sealH); const sW = Math.min(sealW * ratio, sealW * 0.75), sH = Math.min(sealH * ratio, sealH * 0.75); doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - 60 - sW, sigY - sH - 6, sW, sH); }
-                y = sigY;
+                
+                // Firma y Sello
+                const sigH = (4 * 11 * 1) + (cRif ? 12 : 0); // Altura de las líneas de firma
+                let sigY = pageH - 85 - sigH; // Posición Y de la firma
+                // Añadir sello si existe
+                if (sealData) { 
+                    const ratio = Math.min((5.3 * 28.35) / sealW, (2.1 * 28.35) / sealH); // Calcular ratio de aspecto
+                    const sW = Math.min(sealW * ratio, sealW * 0.75), sH = Math.min(sealH * ratio, sealH * 0.75); // Dimensiones finales
+                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - 60 - sW, sigY - sH - 6, sW, sH); // Dibujar imagen
+                }
+                y = sigY; // Mover Y a la posición de la firma
                 addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                
+                // Fecha al final
                 y = pageH - 50; 
                 addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 0, lineSpacing: 1.5 });
                 
+                // --- PÁGINA 2: ANEXO ---
                 doc.addPage(); y = 141.75;
                 addTxt(clNom.toUpperCase(), { fontStyle: 'bold', align: 'center', spacing: 10 });
                 addTxt(clCed, { fontStyle: 'bold', align: 'center', spacing: 30 });
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
                 addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
                 
+                // Tabla de Ingresos
                 doc.autoTable({ 
                     head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
                     body: data, 
@@ -1013,39 +1165,46 @@
                     columnStyles: { 1: { halign: 'right' } } 
                 });
                 
-                y = doc.autoTable.previous.finalY + 30; 
+                y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
                 
+                // Legitimación de Capitales y Firma del Cliente
                 const clSigH = 100; if (y + clSigH > pageH - 70.86) { doc.addPage(); y = 141.75; }
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
                 addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
-                y = Math.max(y, pageH - 70.86 - 60);
+                y = Math.max(y, pageH - 70.86 - 60); // Asegurar espacio para la firma
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
-
+                // --- LÓGICA DE DESCARGA (CORREGIDA) ---
                 const safeClientName = clNom.replace(/[^a-zA-Z0-9]/g, '_');
                 const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
                 
                 try {
-                    const pdfBlob = doc.output('blob');
-                    const downloadUrl = URL.createObjectURL(pdfBlob);
+                    const pdfBlob = doc.output('blob'); // Generar PDF como Blob
+                    const downloadUrl = URL.createObjectURL(pdfBlob); // Crear URL
                     
                     const a = document.createElement('a');
                     a.href = downloadUrl;
                     a.download = fileName;
-                    document.body.appendChild(a); // Necesario para que funcione en Firefox
-                    a.click();
+                    document.body.appendChild(a); // Añadir al DOM
+                    a.click(); // Simular clic
                     
-                    // Limpiar
-                    URL.revokeObjectURL(downloadUrl);
-                    if (document.body.contains(a)) {
-                        document.body.removeChild(a);
-                    }
-                    return true; // <-- Indicar éxito
+                    // --- INICIO DE LA CORRECCIÓN ---
+                    // Añadir un retraso antes de revocar la URL y eliminar el enlace.
+                    // Esto le da tiempo al navegador para iniciar la descarga.
+                    setTimeout(() => {
+                        URL.revokeObjectURL(downloadUrl);
+                        if (document.body.contains(a)) {
+                            document.body.removeChild(a);
+                        }
+                    }, 100); // 100 milisegundos de retraso
+                    // --- FIN DE LA CORRECCIÓN ---
+                    
+                    return true; // Indicar éxito
 
                 } catch(e) {
-                    // Si todo lo demás falla, intentar el método original como último recurso
+                    // Fallback (menos probable que funcione en iFrame)
                     console.warn("Fallo el método de descarga Blob, intentando doc.save()", e);
                     doc.save(fileName);
                     return true; // Asumir que funcionó si no lanzó error
@@ -1054,7 +1213,7 @@
             } catch (error) {
                 console.error('Error al generar el PDF:', error);
                 showMessage('Error al generar el PDF: ' + error.message, 'error');
-                return false; // <-- Indicar fallo
+                return false; // Indicar fallo
             }
         }
         
@@ -1062,15 +1221,17 @@
         document.getElementById('report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Validar que los items de ingreso estén completos
             const items = document.querySelectorAll('.income-item');
             if ([...items].some(i => !i.querySelector('.income-concept').value || parseVal(i.querySelector('.income-amount').value) <= 0)) {
                 return showMessage('Revise conceptos y montos. Deben tener un valor válido.', 'error');
             }
 
+            // Verificar si el usuario puede generar el informe
             const check = canGenerateReport();
             
             if (check.allow) {
-                // Deshabilitar botón para evitar doble click
+                // Deshabilitar botón y mostrar spinner
                 const submitBtn = e.target.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
@@ -1082,21 +1243,25 @@
                     Generando...`;
 
                 try {
-                    // 1. Incrementar el contador PRIMERO
+                    // 1. Incrementar el contador en Firestore (asíncrono)
                     await incrementReportCount(check.type);
 
                     // 2. Preparar los datos del sello (asíncrono)
                     const seal = await getSealData();
 
-                    // 3. Generar el PDF y esperar a que termine
+                    // 3. Añadir un pequeño retardo (yield)
+                    // Esto permite que el DOM se actualice y muestre "Generando..."
+                    // ANTES de que buildPDF (síncrono) bloquee el hilo.
+                    await new Promise(resolve => setTimeout(resolve, 50)); 
+
+                    // 4. Generar el PDF (síncrono)
+                    // Esta función ahora contiene la lógica de descarga.
                     const pdfSuccess = buildPDF(seal.data, seal.width, seal.height);
 
-                    // 4. Mostrar mensaje SÓLO si el PDF se generó
+                    // 5. Mostrar mensaje SÓLO si el PDF se generó
                     if (pdfSuccess) {
                         if (check.type === 'free') {
-                            // Calcular informes restantes DESPUÉS de incrementar
-                            const reportsRemaining = (2 - userPlanStatus.reportsGenerated) - 1; // 2 - (0) - 1 = 1; 2 - (1) - 1 = 0
-                            showMessage(`Informe generado. Te quedan ${reportsRemaining < 0 ? 0 : reportsRemaining} informes gratuitos.`, 'success');
+                            showMessage(`Informe generado. Has usado tu informe gratuito.`, 'success');
                         } else {
                             showMessage("Informe Premium generado.", "success");
                         }
@@ -1104,7 +1269,7 @@
                     // Si pdfSuccess es false, buildPDF ya mostró el mensaje de error.
 
                 } catch (error) {
-                    // Capturar errores de getSealData
+                    // Capturar errores (ej. de getSealData)
                     console.error("Error en el proceso de envío:", error);
                     showMessage('Se produjo un error al procesar el sello. Inténtelo de nuevo.', 'error');
                 
@@ -1115,12 +1280,13 @@
                 }
 
             } else if (check.reason === 'limit_reached') {
+                // Si se alcanzó el límite, mostrar modal premium
                 showPremiumModal();
             } else {
+                // Si no está autenticado
                 showMessage('Debes iniciar sesión para generar informes.', 'error');
             }
         });
-        // --- FIN DE LA CORRECCIÓN 3 ---
 
     </script>
 </body>

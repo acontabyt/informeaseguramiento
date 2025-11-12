@@ -128,7 +128,7 @@
     <!-- Contenedor Principal de la Aplicación -->
     <div id="app-container" class="container max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden hidden">
         <div class="bg-purple-700 p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 class="text-3xl md:text-4xl font-bold text-white flex items-center font-dancing-script">
+            <h1 class="text-3xl md:text-4xl font-bold text-white flex items-center font-dancing-script drop-shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 Informe de Aseguramiento
             </h1>
@@ -1147,7 +1147,7 @@
                 // --- CORRECCIÓN: Firma y Sello fluyen naturalmente ---
                 
                 // Fecha (como en el PDF modelo)
-                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 40, lineSpacing: 1.5 });
+                // --- CORRECCIÓN: Se elimina la fecha de aquí y se mueve debajo de la firma ---
                 
                 const sealStartY = y; // Posición Y para el bloque de firma/sello
                 let sealH_pt = 0, sealW_pt = 0;
@@ -1167,12 +1167,16 @@
                 }
 
                 // Firma (centrada, como en el código original, pero fluyendo)
-                // Usamos 'align: 'center'' que se alinea al centro de la PÁGINA
-                addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
-                addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'center', spacing: 12, lineSpacing: 1 });
-                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                // --- CORRECCIÓN: Alineación de firma a la izquierda ---
+                addTxt('________________________________', { align: 'left', spacing: 12, lineSpacing: 1 });
+                addTxt(cNom, { align: 'left', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
+                addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'left', spacing: 12, lineSpacing: 1 });
+                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'left', spacing: 12, lineSpacing: 1 });
                 
+                // --- CORRECCIÓN: Añadir espacio y fecha debajo de la firma ---
+                y += 12; // Espacio en blanco
+                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
+
                 // --- PÁGINA 2: ANEXO ---
                 doc.addPage(); 
                 y = 85.03; // Resetear Y al margen superior

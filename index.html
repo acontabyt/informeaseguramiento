@@ -1088,6 +1088,7 @@
                 });
 
                 // Función helper para añadir texto con saltos de página
+                // 'y' es una variable global rastreada por esta función.
                 const addTxt = (txt, opts = {}) => {
                     const cleanTxt = sanitize(txt);
                     const fontSize = opts.fontSize || 11;
@@ -1098,23 +1099,23 @@
                     doc.setFontSize(fontSize); 
                     doc.setFont('helvetica', opts.fontStyle || 'normal');
                     
-                    // Ajuste para 'justify': la posición X se maneja de forma diferente
                     const xPos = (align === 'center') ? (doc.internal.pageSize.getWidth() / 2)
                                : (align === 'right') ? (doc.internal.pageSize.getWidth() - margin)
                                : (margin + indent); 
                                
                     const splitOptions = { align: align };
+                    let splitWidth = usableW - indent;
+                    
                     if (align === 'justify') {
-                        // Para justificar, el split debe conocer el ancho completo (usableW - indent)
-                        // y el doc.text() debe tener la misma info.
-                        splitOptions.maxWidth = usableW - indent;
+                        splitOptions.maxWidth = splitWidth;
                     }
 
-                    const lines = doc.splitTextToSize(cleanTxt, (align === 'justify' ? usableW - indent : usableW - indent));
+                    const lines = doc.splitTextToSize(cleanTxt, splitWidth);
                     
-                    const h = lines.length * fontSize * lineSpacing;
+                    // Comprobar si *este bloque* cabe
+                    const blockHeight = (lines.length * fontSize * lineSpacing) + (opts.spacing || 15);
                     
-                    if (y + h > pageH - marginBottom) { 
+                    if (y + blockHeight > pageH - marginBottom) { 
                         doc.addPage(); 
                         y = 85.03; // Resetear Y al margen superior
                     }
@@ -1122,6 +1123,11 @@
                     let currentY = y;
 
                     lines.forEach(line => {
+                        // Comprobar si *esta línea* cabe (para saltos de línea dentro de un bloque)
+                        if (currentY + (fontSize * lineSpacing) > pageH - marginBottom) {
+                            doc.addPage();
+                            currentY = 85.03;
+                        }
                         doc.text(line, xPos, currentY, splitOptions); 
                         currentY += fontSize * lineSpacing;
                     });
@@ -1129,7 +1135,7 @@
                     y = currentY + (opts.spacing || 15); // Actualizar Y global
                 };
 
-                // --- PÁGINA 1: INFORME ---
+                // --- PÁGINA 1 Y 2 (Flujo de Texto Principal) ---
                 // Título
                 addTxt('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', { fontStyle: 'bold', align: 'center', spacing: 30 });
                 // Alcance
@@ -1154,17 +1160,73 @@
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${sanitize(getVal('entidadDirigida'))} el cual lo ha requerido para ${sanitize(getVal('motivoInforme'))}.`, { indent: 20, spacing: 40, align: 'justify' });
                 
-                // --- FIN DE PÁGINA 1 ---
+                // --- FIN DE PÁGINA 1 / INICIO PÁGINA 2 ---
+                // 'y' global está ahora al final del último texto.
+
+                // --- INICIO BLOQUE FIRMA CONTADOR (PÁGINA 2) ---
+                const accountantSigHeight = 160; // Alto estimado
+                // Si la firma no cabe en la página actual, saltar a una nueva
+                if (y + accountantSigHeight > pageH - marginBottom) {
+                    doc.addPage();
+                    y = 85.03;
+                }
+
+                // Anclar al fondo de la página actual
+                y = Math.max(y, pageH - marginBottom - 140); 
                 
-                // --- PÁGINA 2: ANEXO Y FIRMA CONTADOR ---
+                const blockStartY = y; 
+                let sealH_pt = 0, sealW_pt = 0;
+
+                // Dibujar sello si existe (A LA DERECHA)
+                if (sealData) { 
+                    const maxW_pt = 5.3 * 28.35; // 5.3cm
+                    const maxH_pt = 2.1 * 28.35; // 2.1cm
+                    const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1);
+                    sealW_pt = sealW * ratio;
+                    sealH_pt = sealH * ratio;
+                    
+                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, blockStartY, sealW_pt, sealH_pt); 
+                }
+
+                // Dibujar bloque de firma (A LA IZQUIERDA)
+                // Usamos doc.text() manualmente para controlar la posición Y
+                // y no afectar la variable global 'y' de addTxt
+                doc.setFontSize(11); 
+                doc.setFont('helvetica', 'normal');
+                let textY = blockStartY + 20; // Empezar un poco más abajo
+                
+                doc.text('________________________________', margin, textY); 
+                textY += 18;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text(cNom, margin, textY); 
+                textY += 18;
+                
+                doc.setFont('helvetica', 'normal');
+                const cpcFmt = cCpc ? new Intl.NumberFormat('es-VE').format(parseInt(cCpc, 10)) : '';
+                doc.text(`Contador Público C.P.C. N ${cpcFmt}`, margin, textY); 
+                textY += 18;
+                
+                if (cRif) {
+                    doc.text(`Rif: ${cRif}`, margin, textY); 
+                    textY += 18;
+                }
+                
+                // Dibujar Fecha y Lugar (debajo del bloque izquierdo)
+                textY += 12; // Espacio extra
+                doc.text(`${sanitize(getVal('lugar'))}, ${fmtDate(fDoc, true)}`, margin, textY);
+                // --- FIN BLOQUE FIRMA CONTADOR ---
+
+
+                // --- PÁGINA 3: ANEXO, LEGITIMACIÓN Y FIRMA CLIENTE ---
                 doc.addPage(); 
                 y = 85.03; // Resetear Y al margen superior
                 
                 addTxt(clNom.toUpperCase(), { fontStyle: 'bold', align: 'center', spacing: 10 });
-                addTxt(clCed, { fontStyle: 'bold', align: 'center', spacing: 30 });
+                addTxt(clCed, { align: 'center', spacing: 30 }); // No es bold en la imagen
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
                 
-                addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
+                addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30, align: 'justify' }); // Justificado
                 
                 doc.autoTable({ 
                     head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
@@ -1189,62 +1251,25 @@
                 });
                 
                 y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
-
-                // --- INICIO BLOQUE FIRMA CONTADOR (ANCLADO AL FINAL) ---
-                const accountantSigHeight = 160; // Alto estimado para sello (60pt) + firma (60pt) + fecha (20pt)
-                // Si el espacio restante no es suficiente, crea una nueva página
-                if (y + accountantSigHeight > pageH - marginBottom) {
+                
+                // Legitimación de Capitales
+                addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
+                addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50, align: 'justify' });
+                
+                // Firma del Cliente (Anclada al final)
+                const clientSigHeight = 80; // Alto estimado
+                if (y + clientSigHeight > pageH - marginBottom) {
                     doc.addPage();
                     y = 85.03;
                 }
-
-                // Anclar al fondo de la página actual
-                // Dejamos 140pt de espacio para el bloque
-                y = Math.max(y, pageH - marginBottom - 140); 
-                
-                const sealStartY = y; 
-                let sealH_pt = 0, sealW_pt = 0;
-
-                // Añadir sello si existe (colocado a la derecha)
-                if (sealData) { 
-                    const maxW_pt = 5.3 * 28.35; // 5.3cm
-                    const maxH_pt = 2.1 * 28.35; // 2.1cm
-                    const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1);
-                    sealW_pt = sealW * ratio;
-                    sealH_pt = sealH * ratio;
-                    
-                    // Ya hemos comprobado el espacio, así que lo dibujamos
-                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); 
-                }
-
-                // Alineación de firma al CENTRO
-                addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
-                addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                const cpcFmt = cCpc ? new Intl.NumberFormat('es-VE').format(parseInt(cCpc, 10)) : '';
-                addTxt(`Contador Público C.P.C. N ${cpcFmt}`, { align: 'center', spacing: 12, lineSpacing: 1 });
-                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
-                
-                // Añadir espacio y fecha A LA IZQUIERDA (DESPUÉS de la firma)
-                y += 12; // Espacio en blanco
-                addTxt(`${sanitize(getVal('lugar'))}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
-                // --- FIN BLOQUE FIRMA CONTADOR ---
-
-
-                // --- PÁGINA 3: LEGITIMACIÓN Y FIRMA CLIENTE ---
-                doc.addPage(); 
-                y = 85.03; // Resetear Y al margen superior
-                
-                addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
-                addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50, align: 'justify' }); // <-- JUSTIFICADO
-                
-                // Anclar firma del cliente al final
-                y = Math.max(y, pageH - marginBottom - 60); // Dejamos 60pt para la firma
+                y = Math.max(y, pageH - marginBottom - 80); // Anclar al fondo
                 
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
+                // Corregido para que coincida con la imagen ("C.I." y sin "V-")
+                addTxt(`C.I. ${clCed.replace(/^[VEveJjGgPp]-/i, '')}`, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
-                // --- LÓGICA DE DESCARGA (CORREGIDA) ---
+                // --- LÓGICA DE DESCARGA ---
                 const safeClientName = clNom.normalize("NFD").replace(/[\u00A0-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, '_');
                 const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
                 

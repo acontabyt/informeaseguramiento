@@ -240,7 +240,7 @@
                 </datalist>
                 <div id="income-details" class="space-y-3 mb-4"></div>
                 <button type="button" id="addIncomeItemBtn" class="btn-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110 2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                     Agregar Concepto
                 </button>
             </fieldset>
@@ -263,7 +263,7 @@
                         <input type="text" id="conceptoEditInput" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" placeholder="Escribe el nombre del nuevo concepto aquí">
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button type="button" id="conceptoBtnAgregar" class="btn-save" title="Agregar Nuevo"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg></button>
+                        <button type="button" id="conceptoBtnAgregar" class="btn-save" title="Agregar Nuevo"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110 2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg></button>
                         <button type="button" id="conceptoBtnEditar" class="btn-warning" title="Cargar para Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg></button>
                         <button type="button" id="conceptoBtnGuardarEdicion" class="btn-save hidden" title="Guardar Cambios"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg></button>
                         <button type="button" id="conceptoBtnCancelarEdicion" class="p-2.5 font-semibold rounded-full shadow-md bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none hidden" title="Cancelar Edición"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></button>
@@ -431,18 +431,12 @@
             
             // Observador principal del estado de autenticación
             onAuthStateChanged(auth, async (user) => {
-                // loadingOverlay.classList.add('hidden'); // <-- MOVIMOS ESTO
                 if (user) {
-                    // --- INICIO DE LA CORRECCIÓN ---
                     // 1. Mostrar "Cargando..." MIENTRAS se verifica el perfil.
                     loadingOverlay.classList.remove('hidden');
                     
-                    // --- (CORRECCIÓN: Se eliminó la llamada a enableNetwork(db)) ---
-                    
                     currentUserId = user.uid;
                     userEmailDisplay.textContent = user.email;
-                    // appContainer.classList.remove('hidden'); // <-- NO MOSTRAR AÚN
-                    // authContainer.classList.add('hidden'); // <-- NO OCULTAR AÚN
                     
                     try {
                         // 2. Esperar a que el perfil se cargue (esta función ahora tiene reintentos)
@@ -463,7 +457,6 @@
                     
                     // 5. Ocultar "Cargando..." al final del proceso
                     loadingOverlay.classList.add('hidden');
-                    // --- FIN DE LA CORRECCIÓN ---
 
                 } else {
                     // Usuario ha cerrado sesión
@@ -535,7 +528,6 @@
                     await inicializarConceptos();
 
                     // 4. AHORA, adjuntar el listener `onSnapshot` para futuras actualizaciones
-                    // (por ejemplo, si el plan cambia mientras está en la página)
                     userProfileUnsubscribe = onSnapshot(profileRef, async (snap) => {
                         if (snap.exists()) {
                             userPlanStatus = snap.data();
@@ -549,13 +541,11 @@
                     });
 
                     // 5. Resolver la promesa principal. ¡La carga inicial está completa!
-                    return Promise.resolve(); // <-- Usar 'return' ya que estamos en una func async
+                    return Promise.resolve(); 
 
                 } catch (e) {
                     // --- MANEJO DE ERROR ---
-                    // --- CORRECCIÓN: Aumentar reintentos y tiempo ---
                     if ((e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 7) {
-                        // Es un error de conexión, reintentamos
                         console.warn(`Firestore offline, reintentando perfil... (Intento ${retryCount + 1})`);
                         const delay = ms => new Promise(res => setTimeout(res, ms));
                         await delay(2000 * (retryCount + 1)); // 2s, 4s, 6s...
@@ -642,7 +632,6 @@
                     // Solo incrementar si es 'free'
                     await updateDoc(profileRef, { reportsGenerated: increment(1) });
                 }
-                // No necesitamos hacer nada para 'premium'
                 console.log(`Informe de tipo ${type} registrado.`);
             } catch (e) {
                 console.error("Error al incrementar contador de informes:", e);
@@ -674,7 +663,6 @@
         // --- Lógica de PayPal ---
         function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
-            // No renderizar si ya hay botones o si PayPal SDK no se cargó
             if (!container || container.children.length > 0) return; 
 
             if (typeof paypal === 'undefined') {
@@ -733,7 +721,7 @@
                 await updateDoc(profileRef, {
                     plan: 'premium',
                     premiumUntil: Timestamp.fromDate(expiryDate),
-                    reportsGenerated: 0 // Resetear contador por si acaso
+                    reportsGenerated: 0 
                 });
             } catch (e) {
                 console.error("Error al actualizar a premium:", e);
@@ -743,7 +731,6 @@
 
         // --- Lógica de Pago Móvil ---
         pagoMovilProofInput.addEventListener('change', () => {
-            // Habilitar botón solo si hay un archivo
             submitPagoMovilBtn.disabled = pagoMovilProofInput.files.length === 0;
         });
 
@@ -755,23 +742,20 @@
             submitPagoMovilBtn.textContent = 'Subiendo...';
 
             try {
-                // Subir comprobante a Storage
                 const storagePath = `artifacts/${appId}/pagoMovilUploads/${currentUserId}/${Date.now()}-${file.name}`;
                 const storageRef = ref(storage, storagePath);
                 const snapshot = await uploadBytes(storageRef, file);
                 const downloadURL = await getDownloadURL(snapshot.ref);
 
-                // Crear documento de validación para el admin
                 const validationData = {
                     userId: currentUserId,
                     userEmail: auth.currentUser.email,
                     fileURL: downloadURL,
                     storagePath: storagePath,
-                    status: 'pending', // Pendiente de revisión
+                    status: 'pending', 
                     createdAt: serverTimestamp()
                 };
                 
-                // Guardar en una colección de "admin"
                 await addDoc(collection(db, `artifacts/${appId}/admin/pagoValidations`), validationData);
 
                 showMessage("Comprobante enviado. Estará en revisión y se activará en 24h.", "success");
@@ -866,7 +850,6 @@
         // --- CRUD Conceptos ---
         const DEFAULT_CONCEPTOS = ["Actividades Comerciales", "Alquiler de Inmueble", "Director de la Entidad", "Docente contratado tiempo completo", "Honorarios Profesionales de libre ejercicio", "Intereses generados por inversiones", "Servicios de Consultoría", "Servicios Técnicos", "Sueldos y Salarios"];
         
-        // Poblar el datalist estático por si Firestore falla
         function populateDefaultConceptosDatalist() {
             const datalist = document.getElementById('conceptos-list');
             if (!datalist || datalist.options.length > 0) return; 
@@ -878,11 +861,9 @@
         }
         populateDefaultConceptosDatalist();
 
-        // Inicializar conceptos por defecto en Firestore si no existen
         async function inicializarConceptos() {
             if (!currentUserId) return;
             const path = getCollectionPath('conceptos'); if (!path) return;
-            // Usamos un ID de documento único para marcar la inicialización
             const defRef = doc(db, path, 'defaults_v6'); 
 
             const attemptInitialization = async (retryCount = 0) => {
@@ -890,7 +871,6 @@
                     const snap = await getDoc(defRef); // La llamada que puede fallar
                     
                     if (!snap.exists()) {
-                        // Primera vez: verificar conceptos existentes y añadir los que falten
                         const q = query(collection(db, path));
                         const existingSnap = await getDocs(q);
                         const existingNames = new Set();
@@ -908,29 +888,24 @@
                         console.log(`Conceptos inicializados (v6). Agregados: ${addedCount}`);
                     }
                     
-                    // Cargar la UI (siempre)
                     cargarConceptosUI();
 
                 } catch (e) {
-                    // Manejo de error "offline" con reintentos
-                    // --- CORRECCIÓN: Aumentar reintentos y tiempo ---
                     if ( (e.code === 'unavailable' || (e.message && e.message.includes("offline"))) && retryCount < 7 ) {
                         console.warn(`Firestore offline, reintentando init... (Intento ${retryCount + 1})`);
                         const delay = ms => new Promise(res => setTimeout(res, ms));
-                        await delay(2000 * (retryCount + 1)); // Backoff exponencial (2s, 4s, 6s...)
-                        return attemptInitialization(retryCount + 1); // Reintentar
+                        await delay(2000 * (retryCount + 1)); 
+                        return attemptInitialization(retryCount + 1); 
                     } else {
-                        // Error final
                         console.error("Error init conceptos: Falló después de reintentos.", e);
                         showMessage("No se pudieron cargar los conceptos. Revisa tu conexión.", "error");
-                        cargarConceptosUI(); // Intentar cargar de todos modos (puede que funcione el listener)
+                        cargarConceptosUI(); 
                     }
                 }
             };
             await attemptInitialization();
         }
 
-        // Cargar conceptos en Select y Datalist desde Firestore
         function cargarConceptosUI() {
             const path = getCollectionPath('conceptos'); if (!path) return;
             if (conceptosUnsubscribe) conceptosUnsubscribe();
@@ -939,7 +914,7 @@
                 const select = document.getElementById('conceptosSelect'), datalist = document.getElementById('conceptos-list');
                 select.innerHTML = '<option value="">-- Seleccionar Concepto --</option>'; datalist.innerHTML = ''; 
                 snapshot.forEach(doc => { if (doc.id !== 'defaults_v6') { localConceptos.push({ id: doc.id, ...doc.data() }); } });
-                localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); // Ordenar alfabéticamente
+                localConceptos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); 
                 localConceptos.forEach(c => { const optS = document.createElement('option'); optS.value = c.id; optS.textContent = c.nombre; select.appendChild(optS); const optD = document.createElement('option'); optD.value = c.nombre; datalist.appendChild(optD); });
                 resetConceptoForm();
             }, (error) => { console.error("Error loading concepts:", error); showMessage('Error al cargar conceptos.', 'error'); });
@@ -947,7 +922,6 @@
         
         function resetConceptoForm() { document.getElementById('conceptoEditInput').value = ''; edicionConceptoId = null; document.getElementById('conceptoBtnAgregar').classList.remove('hidden'); document.getElementById('conceptoBtnGuardarEdicion').classList.add('hidden'); document.getElementById('conceptoBtnCancelarEdicion').classList.add('hidden'); document.getElementById('conceptosSelect').value = ""; }
         
-        // Listeners del CRUD de Conceptos
         document.getElementById('conceptoBtnAgregar').addEventListener('click', async () => { const val = document.getElementById('conceptoEditInput').value.trim(); if (val) { if (localConceptos.some(c => c.nombre.toLowerCase() === val.toLowerCase())) return showMessage('Concepto ya existe.', 'error'); try { await addDoc(collection(db, getCollectionPath('conceptos')), { nombre: val, createdAt: serverTimestamp(), isDefault: false }); showMessage('Concepto agregado.', 'success'); document.getElementById('conceptoEditInput').value = ''; } catch (e) { showMessage('Error al agregar.', 'error'); } } });
         document.getElementById('conceptoBtnEditar').addEventListener('click', () => { const id = document.getElementById('conceptosSelect').value; const c = localConceptos.find(x => x.id === id); if (c) { document.getElementById('conceptoEditInput').value = c.nombre; edicionConceptoId = id; document.getElementById('conceptoBtnAgregar').classList.add('hidden'); document.getElementById('conceptoBtnGuardarEdicion').classList.remove('hidden'); document.getElementById('conceptoBtnCancelarEdicion').classList.remove('hidden'); } else { showMessage('Seleccione un concepto para editar.', 'error'); } });
         document.getElementById('conceptoBtnCancelarEdicion').addEventListener('click', resetConceptoForm);
@@ -961,7 +935,6 @@
         
         document.getElementById('clearFormBtn').addEventListener('click', (e) => { e.preventDefault(); clearForm(); showMessage('Formulario limpiado.', 'success'); });
         
-        // Modal de confirmación genérico
         function showConfirmationModal(msg, onConfirm) { 
             const ov = document.createElement('div'); 
             ov.className = 'fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[101]'; 
@@ -971,18 +944,14 @@
             document.getElementById('cfmOk').onclick = () => { onConfirm(); document.body.removeChild(ov); }; 
         }
         
-        // Auto-formato de Cédula y RIF
         document.getElementById('clienteCedula').addEventListener('input', (e) => { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); let l = (v.match(/^[VEve]/) || ['V'])[0].toUpperCase(); let n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, '').substring(0, 8); e.target.value = `${l}-${n.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`; });
         document.getElementById('contadorRif').addEventListener('input', (e) => { let v = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); let l = (v.match(/^[JGjgVEvePp]/) || ['V'])[0].toUpperCase(); let n = v.replace(/^[VEveJjGgPp]/, '').replace(/\D/g, ''); let m = n.substring(0, 8), d = n.length > 8 ? n.substring(8, 9) : ''; e.target.value = `${l}-${m.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${d ? '-' + d : ''}`; });
         document.getElementById('contadorCpc').addEventListener('input', (e) => { let v = e.target.value.replace(/[^\d]/g, ''); e.target.value = v ? new Intl.NumberFormat('es-VE').format(parseInt(v, 10)) : ''; });
         
-        // Establecer fechas por defecto
         function setFechasDefault() { const now = new Date(); document.getElementById('fechaDocumento').value = now.toISOString().split('T')[0]; document.getElementById('fechaDesde').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; document.getElementById('fechaHasta').value = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]; }
         
-        // Cargar defaults al cargar la página (si no hay usuario)
         document.addEventListener('DOMContentLoaded', () => { if (!auth.currentUser) { addIncomeItem(); setFechasDefault(); } });
         
-        // Listeners de los selects y botones de guardado
         document.getElementById('selectContador').addEventListener('change', (e) => fillContadorForm(e.target.value));
         document.getElementById('selectCliente').addEventListener('change', (e) => fillClienteForm(e.target.value));
         document.getElementById('saveContadorBtn').addEventListener('click', saveContador); 
@@ -1010,9 +979,7 @@
                     <span class="ml-1.5 md:hidden">Eliminar Ingreso</span>
                 </button>`;
             
-            // Formato de moneda al escribir
             d.querySelector('.income-amount').addEventListener('input', formatCurrencyInput);
-            // Botón de eliminar (solo si hay más de 1)
             d.querySelector('.btn-remove-income').onclick = () => c.querySelectorAll('.income-item').length > 1 ? c.removeChild(d) : showMessage('Debe haber al menos un concepto.', 'error');
             c.appendChild(d);
         };
@@ -1027,7 +994,22 @@
         
         // --- Lógica de Generación de PDF ---
         
-        // Funciones Helper para el PDF
+        // *** NUEVA FUNCIÓN DE LIMPIEZA ***
+        /**
+         * Limpia una cadena de caracteres problemáticos que rompen jspdf.
+         * @param {string} str La cadena a limpiar.
+         * @returns {string} La cadena limpia.
+         */
+        function sanitize(str) {
+            if (!str) return '';
+            // Reemplaza caracteres comunes de "espacio" no estándar por un espacio normal
+            let s = str.replace(/[\u00A0\u202F\u2007\u2060]/g, ' ');
+            // Reemplaza comillas tipográficas por comillas rectas
+            s = s.replace(/[\u2018\u2019]/g, "'");
+            s = s.replace(/[\u201C\u201D]/g, '"');
+            return s;
+        }
+
         function parseVal(s) { return parseFloat((s || '0').replace(/\./g, '').replace(',', '.')) || 0; }
         function fmtDate(s, long = false) { 
             if (!s) return ''; 
@@ -1037,7 +1019,6 @@
         }
         function fmtCur(n) { return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
-        // Cargar datos del sello (asíncrono)
         function getSealData() {
             return new Promise((resolve, reject) => {
                 const file = contadorSelloInput.files[0];
@@ -1045,12 +1026,10 @@
                     resolve({ data: null, width: 0, height: 0 }); // Resolver sin sello
                     return;
                 }
-
                 const r = new FileReader();
                 r.onload = (e) => {
                     const img = new Image();
                     img.onload = function() {
-                        // Resolver con los datos y dimensiones de la imagen
                         resolve({ data: e.target.result, width: this.width, height: this.height });
                     };
                     img.onerror = (err) => {
@@ -1088,29 +1067,55 @@
 
                 // Recolectar datos del formulario
                 const getVal = (id) => document.getElementById(id).value;
-                const cNom = getVal('contadorNombre'), cCpc = getVal('contadorCpc'), cRif = getVal('contadorRif');
-                const clTrat = getVal('clienteTratamiento'), clNom = getVal('clienteNombre'), clCed = getVal('clienteCedula');
-                const fDoc = getVal('fechaDocumento'), fDes = getVal('fechaDesde'), fHas = getVal('fechaHasta');
+                // *** APLICAR SANITIZE a todas las entradas de texto ***
+                const cNom = sanitize(getVal('contadorNombre')), 
+                      cCpc = sanitize(getVal('contadorCpc')).replace(/[^\d]/g, ''), 
+                      cRif = sanitize(getVal('contadorRif'));
+                const clTrat = sanitize(getVal('clienteTratamiento')), 
+                      clNom = sanitize(getVal('clienteNombre')), 
+                      clCed = sanitize(getVal('clienteCedula'));
+                const fDoc = getVal('fechaDocumento'), 
+                      fDes = getVal('fechaDesde'), 
+                      fHas = getVal('fechaHasta');
 
                 // Recolectar datos de ingresos
                 let total = 0, data = [];
-                document.querySelectorAll('.income-item').forEach(i => { const m = parseVal(i.querySelector('.income-amount').value); if (m > 0) { data.push([i.querySelector('.income-concept').value, `Bs. ${fmtCur(m)}`]); total += m; } });
+                document.querySelectorAll('.income-item').forEach(i => { 
+                    const m = parseVal(i.querySelector('.income-amount').value); 
+                    if (m > 0) { 
+                        // *** APLICAR SANITIZE a los conceptos de la tabla ***
+                        data.push([
+                            sanitize(i.querySelector('.income-concept').value), 
+                            `Bs. ${fmtCur(m)}`
+                        ]); 
+                        total += m; 
+                    } 
+                });
 
                 // Función helper para añadir texto con saltos de página
                 const addTxt = (txt, opts = {}) => {
-                    doc.setFontSize(opts.fontSize || 11); doc.setFont('helvetica', opts.fontStyle || 'normal');
-                    const lines = doc.splitTextToSize(txt, usableW - (opts.indent || 0));
-                    // Calcular altura de las líneas
-                    const h = (lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5)) - ((opts.fontSize || 11) * ((opts.lineSpacing || 1.5) - 1));
+                    // *** APLICAR SANITIZE (como doble seguro) ***
+                    const cleanTxt = sanitize(txt);
+
+                    // *** REVERTIDO A HELVETICA (Original) ***
+                    doc.setFontSize(opts.fontSize || 11); 
+                    doc.setFont('helvetica', opts.fontStyle || 'normal');
                     
-                    // --- CORRECCIÓN: Lógica de Salto de Página ---
+                    const lines = doc.splitTextToSize(cleanTxt, usableW - (opts.indent || 0));
+                    
+                    // --- *** INICIO DE CORRECCIÓN DE ALTURA (Párrafos Faltantes) *** ---
+                    // Cálculo de altura incorrecto (original):
+                    // const h = (lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5)) - ((opts.fontSize || 11) * ((opts.lineSpacing || 1.5) - 1));
+                    // Cálculo de altura CORREGIDO:
+                    const h = lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5);
+                    // --- *** FIN DE CORRECCIÓN DE ALTURA *** ---
+                    
                     if (y + h > pageH - marginBottom) { 
                         doc.addPage(); 
                         y = 85.03; // Resetear Y al margen superior
                     }
                     
-                    // --- CORRECCIÓN: Posicionamiento X ---
-                    doc.text(txt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - margin : margin + (opts.indent || 0)), y, { 
+                    doc.text(cleanTxt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - margin : margin + (opts.indent || 0)), y, { 
                         align: opts.align || 'justify', 
                         maxWidth: usableW - (opts.indent || 0), 
                         lineHeightFactor: opts.lineSpacing || 1.5 
@@ -1142,40 +1147,43 @@
                 addTxt('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable y que los ingresos detallados en la relación, no provenga de actividades legítimas y de comprobable lícito ejercicio.', { indent: 20, spacing: 25 });
                 // Usuarios
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
-                addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${getVal('entidadDirigida')} el cual lo ha requerido para ${getVal('motivoInforme')}.`, { indent: 20, spacing: 40 });
+                addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${sanitize(getVal('entidadDirigida'))} el cual lo ha requerido para ${sanitize(getVal('motivoInforme'))}.`, { indent: 20, spacing: 40 });
                 
-                // --- CORRECCIÓN: Firma y Sello fluyen naturalmente ---
-                
-                // Fecha (como en el PDF modelo)
-                // --- CORRECCIÓN: Se elimina la fecha de aquí y se mueve debajo de la firma ---
+                // --- *** INICIO BLOQUE DE FIRMA (REVERTIDO AL ORIGINAL) *** ---
                 
                 const sealStartY = y; // Posición Y para el bloque de firma/sello
                 let sealH_pt = 0, sealW_pt = 0;
 
                 // Añadir sello si existe (colocado a la derecha)
                 if (sealData) { 
-                    const ratio = Math.min((5.3 * 28.35) / sealW, (2.1 * 28.35) / sealH); // Calcular ratio de aspecto
-                    sealW_pt = Math.min(sealW * ratio, sealW * 0.75);
-                    sealH_pt = Math.min(sealH * ratio, sealH * 0.75); // Dimensiones finales
+                    const maxW_pt = 5.3 * 28.35; // 5.3cm
+                    const maxH_pt = 2.1 * 28.35; // 2.1cm
+                    const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1);
+                    sealW_pt = sealW * ratio;
+                    sealH_pt = sealH * ratio;
                     
                     // Comprobar si el sello cabe antes de dibujarlo
                     if (y + sealH_pt > pageH - marginBottom) {
                         doc.addPage();
-                        y = margin;
+                        y = 85.03;
                     }
-                    // --- CORRECCIÓN: Alineado a la derecha, fluyendo con 'y' ---
+                    // Alineado a la derecha, fluyendo con 'y'
                     doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); // Dibujar imagen
                 }
 
-                // --- CORRECCIÓN: Alineación de firma al CENTRO ---
+                // Alineación de firma al CENTRO
                 addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                addTxt(`Contador Público C.P.C. N ${cCpc}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                const cpcFmt = cCpc ? new Intl.NumberFormat('es-VE').format(parseInt(cCpc, 10)) : '';
+                addTxt(`Contador Público C.P.C. N ${cpcFmt}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
                 
-                // --- CORRECCIÓN: Añadir espacio y fecha A LA IZQUIERDA ---
+                // Añadir espacio y fecha A LA IZQUIERDA (DESPUÉS de la firma)
                 y += 12; // Espacio en blanco
-                addTxt(`${getVal('lugar')}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
+                addTxt(`${sanitize(getVal('lugar'))}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
+
+                // --- *** FIN BLOQUE DE FIRMA (REVERTIDO AL ORIGINAL) *** ---
+
 
                 // --- PÁGINA 2: ANEXO ---
                 doc.addPage(); 
@@ -1188,19 +1196,31 @@
                 // --- CORRECCIÓN: Formato de fecha largo para el anexo ---
                 addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
                 
-                // Tabla de Ingresos
+                // --- *** INICIO TABLA (REVERTIDA AL ORIGINAL) *** ---
                 doc.autoTable({ 
                     head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
                     body: data, 
-                    foot: [[{ content: 'Total Ingresos', styles: { halign: 'left' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right' } }]], 
+                    foot: [[{ content: 'Total Ingresos', styles: { halign: 'left', fontStyle: 'bold' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right', fontStyle: 'bold' } }]], 
                     startY: y, 
-                    // --- CORRECCIÓN: Márgenes de la tabla ---
                     margin: { left: margin, right: margin, top: 85.03, bottom: marginBottom }, 
-                    theme: 'grid', 
+                    theme: 'grid', // REVERTIDO a 'grid'
+                    styles: {
+                        font: 'helvetica', // REVERTIDO a 'helvetica'
+                        fontSize: 11
+                    },
                     headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center' }, 
-                    footStyles: { fillColor: [243, 244, 246], textColor: [0, 0, 0], fontStyle: 'bold' }, 
+                    // --- *** INICIO CORRECCIÓN BORDE DE TABLA *** ---
+                    footStyles: { 
+                        fillColor: [243, 244, 246], 
+                        textColor: [0, 0, 0], 
+                        fontStyle: 'bold',
+                        lineWidth: 0.5, // Añadido
+                        lineColor: [221, 221, 221] // Añadido (color de la rejilla)
+                    }, 
+                    // --- *** FIN CORRECCIÓN BORDE DE TABLA *** ---
                     columnStyles: { 1: { halign: 'right' } } 
                 });
+                // --- *** FIN TABLA (REVERTIDA AL ORIGINAL) *** ---
                 
                 y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
                 
@@ -1211,15 +1231,14 @@
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
                 addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
                 
-                // --- CORRECCIÓN: Anclar firma del cliente al pie de página ---
-                y = Math.max(y, pageH - marginBottom - 60); // Asegurar espacio para la firma
+                // --- REVERTIDO: Anclar firma del cliente al pie de página ---
+                y = Math.max(y, pageH - marginBottom - 60); 
                 
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
                 // --- LÓGICA DE DESCARGA (CORREGIDA) ---
-                // --- CORRECCIÓN: Limpiar nombre del cliente para el archivo ---
                 const safeClientName = clNom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, '_');
                 const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
                 
@@ -1291,7 +1310,7 @@
 
                     // 3. Añadir un pequeño retardo (yield)
                     // Esto permite que el DOM se actualice y muestre "Generando..."
-                    // ANTES de que buildPDF (síncrono) bloquee el hilo.
+                    // ANTES de buildPDF (síncrono) bloquee el hilo.
                     await new Promise(resolve => setTimeout(resolve, 50)); 
 
                     // 4. Generar el PDF (síncrono)

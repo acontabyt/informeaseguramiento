@@ -1109,9 +1109,11 @@
                     };
                     let splitWidth = usableW - indent;
                     
-                    if (align === 'justify') {
-                        splitOptions.maxWidth = splitWidth;
-                    }
+                    // --- INICIO DE LA CORRECCIÓN ---
+                    // Se asigna SIEMPRE un 'maxWidth' para forzar el ajuste de línea (wrapping)
+                    // en todos los tipos de alineación (left, center, justify).
+                    splitOptions.maxWidth = splitWidth;
+                    // --- FIN DE LA CORRECCIÓN ---
 
                     // Calculate height *with the line spacing*
                     const lines = doc.splitTextToSize(cleanTxt, splitWidth);

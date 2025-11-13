@@ -1310,7 +1310,9 @@
                 addTxt('Responsabilidad del Contador Público Independiente', { fontStyle: 'bold', spacing: 20 });
                 const respP1 = `Mi responsabilidad es expresar una opinión sobre la relación de ingresos obtenida por el ${clTrat} ${clNom}, durante el periodo señalado de acuerdo con mis procedimientos, los cuales he realizado de conformidad con la Norma Internacional para encargos de aseguramiento, los cuales he realizado de conformidad con la Normas Internacionales de Encargos de Aseguramiento NIEA 3000, esta norma prevé que cumpla con los requerimientos éticos y que planifique y realice los procedimientos para obtener una seguridad razonable de que, en todos los aspectos materiales, la relación está presentada razonablemente.`;
                 const respP2 = `Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clTrat} ${clNom}, para el periodo ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, con base al examen sobre la evidencia obtenida.`;
-                addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25, align: 'justify' });
+                // --- CORRECCIÓN PDF: Separar párrafos y AHORA justificado ---
+                addTxt(respP1, { indent: 20, spacing: 15, align: 'justify' });
+                addTxt(respP2, { indent: 20, spacing: 25, align: 'justify' });
                 
                 // Criterio
                 addTxt('Identificación del criterio de evaluación', { fontStyle: 'bold', spacing: 20 });
@@ -1398,7 +1400,10 @@
                     const sealX = Math.min(pageCenterX + 100, pageW - marginRight - sealW_pt);
                     
                     // Posición Y: Alinear verticalmente con el bloque de texto
-                    const sealY = blockStartY + (textBlockHeight / 2) - (sealH_pt / 2); // Centrado verticalmente con el texto
+                    // const sealY = blockStartY + (textBlockHeight / 2) - (sealH_pt / 2); // Centrado verticalmente con el texto
+                    
+                    // --- CORRECCIÓN POSICIÓN SELLO: Alinear arriba ---
+                    const sealY = blockStartY + 20; // Alinea la parte superior del sello con la línea de la firma
                     
                     doc.addImage(sealData, 'PNG', sealX, sealY, sealW_pt, sealH_pt);
                 }
@@ -1420,7 +1425,7 @@
                 addTxt(clCed, { align: 'center', spacing: 30 }); // No es bold en la imagen
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
                 
-                addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 }); // <-- 'align: justify' eliminado
+                addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30, align: 'left' });
                 
                 doc.autoTable({ 
                     head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
@@ -1448,7 +1453,7 @@
                 
                 // Legitimación de Capitales
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
-                addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 }); // <-- 'align: justify' eliminado
+                addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50, align: 'left' }); // <-- Dejar 'left' como en la imagen
                 
                 // Firma del Cliente (Anclada al final)
                 const clientSigHeight = 80; // Alto estimado

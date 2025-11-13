@@ -1098,7 +1098,19 @@
                     doc.setFontSize(fontSize); 
                     doc.setFont('helvetica', opts.fontStyle || 'normal');
                     
-                    const lines = doc.splitTextToSize(cleanTxt, usableW - indent);
+                    // Ajuste para 'justify': la posición X se maneja de forma diferente
+                    const xPos = (align === 'center') ? (doc.internal.pageSize.getWidth() / 2)
+                               : (align === 'right') ? (doc.internal.pageSize.getWidth() - margin)
+                               : (margin + indent); 
+                               
+                    const splitOptions = { align: align };
+                    if (align === 'justify') {
+                        // Para justificar, el split debe conocer el ancho completo (usableW - indent)
+                        // y el doc.text() debe tener la misma info.
+                        splitOptions.maxWidth = usableW - indent;
+                    }
+
+                    const lines = doc.splitTextToSize(cleanTxt, (align === 'justify' ? usableW - indent : usableW - indent));
                     
                     const h = lines.length * fontSize * lineSpacing;
                     
@@ -1108,75 +1120,43 @@
                     }
                     
                     let currentY = y;
-                    const xPos = (align === 'center') ? (doc.internal.pageSize.getWidth() / 2)
-                               : (align === 'right') ? (doc.internal.pageSize.getWidth() - margin)
-                               : (margin + indent); 
 
                     lines.forEach(line => {
-                        doc.text(line, xPos, currentY, { align: align }); 
+                        doc.text(line, xPos, currentY, splitOptions); 
                         currentY += fontSize * lineSpacing;
                     });
                     
                     y = currentY + (opts.spacing || 15); // Actualizar Y global
                 };
 
-                // --- PÁGINAS PDF ---
+                // --- PÁGINA 1: INFORME ---
                 // Título
                 addTxt('INFORME DE ENCARGOS DE ASEGURAMIENTO DEL CONTADOR PÚBLICO INDEPENDIENTE', { fontStyle: 'bold', align: 'center', spacing: 30 });
                 // Alcance
                 addTxt('Alcance', { fontStyle: 'bold', spacing: 20 });
-                addTxt(`He revisado la evidencia inherente a los ingresos percibidos por el ${clTrat} ${clNom}, con cedula de identidad N.º ${clCed}, durante el periodo comprendido desde el ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, presentado en la relación de ingresos adjunta, correspondiente a su actividad económica según se detalla en el anexo.`, { indent: 20, spacing: 25 });
+                addTxt(`He revisado la evidencia inherente a los ingresos percibidos por el ${clTrat} ${clNom}, con cedula de identidad N.º ${clCed}, durante el periodo comprendido desde el ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, presentado en la relación de ingresos adjunta, correspondiente a su actividad económica según se detalla en el anexo.`, { indent: 20, spacing: 25, align: 'justify' });
                 // Responsabilidad del cliente
                 addTxt('Responsabilidad de la persona que percibe los ingresos', { fontStyle: 'bold', spacing: 20 });
-                addTxt(`El ${clTrat} ${clNom}, es responsable de la preparación y presentación del importe de sus ingresos que se adjunta en este informe, incluyendo la integridad, legalidad y veracidad de los documentos suministrados. Esta responsabilidad incluye la aseveración de que todos y cada uno de los ingresos detallados en la relación, provienen de actividades legítimas y de comprobable licito ejercicio.`, { indent: 20, spacing: 25 });
+                addTxt(`El ${clTrat} ${clNom}, es responsable de la preparación y presentación del importe de sus ingresos que se adjunta en este informe, incluyendo la integridad, legalidad y veracidad de los documentos suministrados. Esta responsabilidad incluye la aseveración de que todos y cada uno de los ingresos detallados en la relación, provienen de actividades legítimas y de comprobable licito ejercicio.`, { indent: 20, spacing: 25, align: 'justify' });
                 // Responsabilidad del contador
                 addTxt('Responsabilidad del Contador Público Independiente', { fontStyle: 'bold', spacing: 20 });
                 const respP1 = `Mi responsabilidad es expresar una opinión sobre la relación de ingresos obtenida por el ${clTrat} ${clNom}, durante el periodo señalado de acuerdo con mis procedimientos, los cuales he realizado de conformidad con la Norma Internacional para encargos de aseguramiento, los cuales he realizado de conformidad con la Normas Internacionales de Encargos de Aseguramiento NIEA 3000, esta norma prevé que cumpla con los requerimientos éticos y que planifique y realice los procedimientos para obtener una seguridad razonable de que, en todos los aspectos materiales, la relación está presentada razonablemente.`;
                 const respP2 = `Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clTrat} ${clNom}, para el periodo ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, con base al examen sobre la evidencia obtenida.`;
-                addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25 });
+                addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25, align: 'justify' });
                 
                 // Criterio
                 addTxt('Identificación del criterio de evaluación', { fontStyle: 'bold', spacing: 20 });
-                addTxt(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clTrat} ${clNom}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25 });
+                addTxt(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clTrat} ${clNom}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25, align: 'justify' });
                 // Opinión
                 addTxt('Opinión', { fontStyle: 'bold', spacing: 20 });
-                addTxt('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable y que los ingresos detallados en la relación, no provenga de actividades legítimas y de comprobable lícito ejercicio.', { indent: 20, spacing: 25 });
+                addTxt('Con base en el trabajo efectuado descrito en este informe, no ha llamado mi atención algo que me haga pensar que la relación de ingresos que se anexa, en todos los aspectos importantes, no sea razonable y que los ingresos detallados en la relación, no provenga de actividades legítimas y de comprobable lícito ejercicio.', { indent: 20, spacing: 25, align: 'justify' });
                 // Usuarios
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
-                addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${sanitize(getVal('entidadDirigida'))} el cual lo ha requerido para ${sanitize(getVal('motivoInforme'))}.`, { indent: 20, spacing: 40 });
+                addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${sanitize(getVal('entidadDirigida'))} el cual lo ha requerido para ${sanitize(getVal('motivoInforme'))}.`, { indent: 20, spacing: 40, align: 'justify' });
                 
+                // --- FIN DE PÁGINA 1 ---
                 
-                const sealStartY = y; 
-                let sealH_pt = 0, sealW_pt = 0;
-
-                // Añadir sello si existe (colocado a la derecha)
-                if (sealData) { 
-                    const maxW_pt = 5.3 * 28.35; // 5.3cm
-                    const maxH_pt = 2.1 * 28.35; // 2.1cm
-                    const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1);
-                    sealW_pt = sealW * ratio;
-                    sealH_pt = sealH * ratio;
-                    
-                    if (y + sealH_pt > pageH - marginBottom) {
-                        doc.addPage();
-                        y = 85.03;
-                    }
-                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); 
-                }
-
-                // Alineación de firma al CENTRO
-                addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
-                addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
-                const cpcFmt = cCpc ? new Intl.NumberFormat('es-VE').format(parseInt(cCpc, 10)) : '';
-                addTxt(`Contador Público C.P.C. N ${cpcFmt}`, { align: 'center', spacing: 12, lineSpacing: 1 });
-                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
-                
-                // Añadir espacio y fecha A LA IZQUIERDA (DESPUÉS de la firma)
-                y += 12; // Espacio en blanco
-                addTxt(`${sanitize(getVal('lugar'))}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
-
-
-                // --- PÁGINA 2: ANEXO ---
+                // --- PÁGINA 2: ANEXO Y FIRMA CONTADOR ---
                 doc.addPage(); 
                 y = 85.03; // Resetear Y al margen superior
                 
@@ -1209,15 +1189,56 @@
                 });
                 
                 y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
+
+                // --- INICIO BLOQUE FIRMA CONTADOR (ANCLADO AL FINAL) ---
+                const accountantSigHeight = 160; // Alto estimado para sello (60pt) + firma (60pt) + fecha (20pt)
+                // Si el espacio restante no es suficiente, crea una nueva página
+                if (y + accountantSigHeight > pageH - marginBottom) {
+                    doc.addPage();
+                    y = 85.03;
+                }
+
+                // Anclar al fondo de la página actual
+                // Dejamos 140pt de espacio para el bloque
+                y = Math.max(y, pageH - marginBottom - 140); 
                 
-                // Legitimación de Capitales y Firma del Cliente
-                const clSigH = 100; // Espacio estimado para firma
-                if (y + clSigH > pageH - marginBottom) { doc.addPage(); y = 85.03; }
+                const sealStartY = y; 
+                let sealH_pt = 0, sealW_pt = 0;
+
+                // Añadir sello si existe (colocado a la derecha)
+                if (sealData) { 
+                    const maxW_pt = 5.3 * 28.35; // 5.3cm
+                    const maxH_pt = 2.1 * 28.35; // 2.1cm
+                    const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1);
+                    sealW_pt = sealW * ratio;
+                    sealH_pt = sealH * ratio;
+                    
+                    // Ya hemos comprobado el espacio, así que lo dibujamos
+                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); 
+                }
+
+                // Alineación de firma al CENTRO
+                addTxt('________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
+                addTxt(cNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
+                const cpcFmt = cCpc ? new Intl.NumberFormat('es-VE').format(parseInt(cCpc, 10)) : '';
+                addTxt(`Contador Público C.P.C. N ${cpcFmt}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                if (cRif) addTxt(`Rif: ${cRif}`, { align: 'center', spacing: 12, lineSpacing: 1 });
+                
+                // Añadir espacio y fecha A LA IZQUIERDA (DESPUÉS de la firma)
+                y += 12; // Espacio en blanco
+                addTxt(`${sanitize(getVal('lugar'))}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
+                // --- FIN BLOQUE FIRMA CONTADOR ---
+
+
+                // --- PÁGINA 3: LEGITIMACIÓN Y FIRMA CLIENTE ---
+                doc.addPage(); 
+                y = 85.03; // Resetear Y al margen superior
                 
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
-                addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
+                addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50, align: 'justify' }); // <-- JUSTIFICADO
                 
-                y = Math.max(y, pageH - marginBottom - 60); 
+                // Anclar firma del cliente al final
+                y = Math.max(y, pageH - marginBottom - 60); // Dejamos 60pt para la firma
                 
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
                 addTxt(clNom, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
@@ -1284,7 +1305,6 @@
                     </svg>
                     Generando...`;
 
-                // --- INICIO DE LA CORRECCIÓN ---
                 try {
                     // 1. Incrementar el contador en Firestore (asíncrono)
                     await incrementReportCount(check.type);
@@ -1317,15 +1337,8 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnText;
                 }
-                // --- FIN DE LA CORRECCIÓN ---
-
-            // } // <--- Esta '}' extra fue eliminada
             
-            // --- INICIO DE LA CORRECCIÓN ---
-            // Se eliminó el listener duplicado que estaba aquí.
-            // El 'else if' y 'else' ahora se conectan al 'if (check.allow)' de arriba.
             } else if (check.reason === 'limit_reached') {
-            // --- FIN DE LA CORRECCIÓN ---
                 // Si se alcanzó el límite, mostrar modal premium
                 showPremiumModal();
             } else {

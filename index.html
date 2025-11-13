@@ -994,7 +994,6 @@
         
         // --- Lógica de Generación de PDF ---
         
-        // *** NUEVA FUNCIÓN DE LIMPIEZA ***
         /**
          * Limpia una cadena de caracteres problemáticos que rompen jspdf.
          * @param {string} str La cadena a limpiar.
@@ -1057,17 +1056,14 @@
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF('p', 'pt', 'letter');
                 
-                // --- INICIO DE LA CORRECCIÓN DE FORMATO ---
                 const margin = 56.69; // 2cm (Laterales)
                 const marginBottom = 70.86; // 2.5cm (Inferior)
                 const pageH = doc.internal.pageSize.getHeight();
                 const usableW = doc.internal.pageSize.getWidth() - (margin * 2);
                 let y = 85.03; // 3cm (Superior)
-                // --- FIN DE LA CORRECCIÓN ---
 
                 // Recolectar datos del formulario
                 const getVal = (id) => document.getElementById(id).value;
-                // *** APLICAR SANITIZE a todas las entradas de texto ***
                 const cNom = sanitize(getVal('contadorNombre')), 
                       cCpc = sanitize(getVal('contadorCpc')).replace(/[^\d]/g, ''), 
                       cRif = sanitize(getVal('contadorRif'));
@@ -1083,7 +1079,6 @@
                 document.querySelectorAll('.income-item').forEach(i => { 
                     const m = parseVal(i.querySelector('.income-amount').value); 
                     if (m > 0) { 
-                        // *** APLICAR SANITIZE a los conceptos de la tabla ***
                         data.push([
                             sanitize(i.querySelector('.income-concept').value), 
                             `Bs. ${fmtCur(m)}`
@@ -1094,33 +1089,35 @@
 
                 // Función helper para añadir texto con saltos de página
                 const addTxt = (txt, opts = {}) => {
-                    // *** APLICAR SANITIZE (como doble seguro) ***
                     const cleanTxt = sanitize(txt);
+                    const fontSize = opts.fontSize || 11;
+                    const lineSpacing = opts.lineSpacing || 1.5;
+                    const indent = opts.indent || 0;
+                    const align = opts.align || 'left'; 
 
-                    // *** REVERTIDO A HELVETICA (Original) ***
-                    doc.setFontSize(opts.fontSize || 11); 
+                    doc.setFontSize(fontSize); 
                     doc.setFont('helvetica', opts.fontStyle || 'normal');
                     
-                    const lines = doc.splitTextToSize(cleanTxt, usableW - (opts.indent || 0));
+                    const lines = doc.splitTextToSize(cleanTxt, usableW - indent);
                     
-                    // --- *** INICIO DE CORRECCIÓN DE ALTURA (Párrafos Faltantes) *** ---
-                    // Cálculo de altura incorrecto (original):
-                    // const h = (lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5)) - ((opts.fontSize || 11) * ((opts.lineSpacing || 1.5) - 1));
-                    // Cálculo de altura CORREGIDO:
-                    const h = lines.length * (opts.fontSize || 11) * (opts.lineSpacing || 1.5);
-                    // --- *** FIN DE CORRECCIÓN DE ALTURA *** ---
+                    const h = lines.length * fontSize * lineSpacing;
                     
                     if (y + h > pageH - marginBottom) { 
                         doc.addPage(); 
                         y = 85.03; // Resetear Y al margen superior
                     }
                     
-                    doc.text(cleanTxt, opts.align === 'center' ? doc.internal.pageSize.getWidth() / 2 : (opts.align === 'right' ? doc.internal.pageSize.getWidth() - margin : margin + (opts.indent || 0)), y, { 
-                        align: opts.align || 'justify', 
-                        maxWidth: usableW - (opts.indent || 0), 
-                        lineHeightFactor: opts.lineSpacing || 1.5 
+                    let currentY = y;
+                    const xPos = (align === 'center') ? (doc.internal.pageSize.getWidth() / 2)
+                               : (align === 'right') ? (doc.internal.pageSize.getWidth() - margin)
+                               : (margin + indent); 
+
+                    lines.forEach(line => {
+                        doc.text(line, xPos, currentY, { align: align }); 
+                        currentY += fontSize * lineSpacing;
                     });
-                    y += h + (opts.spacing || 15); // Avanzar Y
+                    
+                    y = currentY + (opts.spacing || 15); // Actualizar Y global
                 };
 
                 // --- PÁGINAS PDF ---
@@ -1138,7 +1135,6 @@
                 const respP2 = `Un Encargo de Aseguramiento implica llevar a cabo procedimientos para obtener evidencia acerca de la razonabilidad de las aseveraciones emitidas por el responsable. Los procedimientos seleccionados dependen del juicio profesional del contador público, que incluye evaluar los riesgos acerca de que los ingresos no estén presentados razonablemente. El objetivo es obtener una seguridad razonable como base de una forma positiva de expresión. Por lo tanto, mi responsabilidad es expresar una opinión sobre los ingresos del ${clTrat} ${clNom}, para el periodo ${fmtDate(fDes)} hasta el ${fmtDate(fHas)}, con base al examen sobre la evidencia obtenida.`;
                 addTxt(`${respP1}\n\n${respP2}`, { indent: 20, spacing: 25 });
                 
-                // --- CORRECCIÓN: Movido a flujo normal ---
                 // Criterio
                 addTxt('Identificación del criterio de evaluación', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Mi trabajo consistió, en examinar los estados de cuenta de bancos, declaraciones de impuesto, contratos, entre otros documentos inherentes, comprobar y confirmar los ingresos relacionados por el ${clTrat} ${clNom}, para el periodo señalado. Mi opinión se formó sobre la base de la evidencia obtenida suficiente y adecuada. El criterio utilizado para emitirla fue la definición de ingresos contenida en la sección 2, conceptos y principios generales, de las normas internacionales de información financiera para las pequeñas y medianas entidades aun cuando no le son aplicables a personas naturales no comerciantes.`, { indent: 20, spacing: 25 });
@@ -1149,9 +1145,8 @@
                 addTxt('Usuarios Previstos y Propósitos', { fontStyle: 'bold', spacing: 20 });
                 addTxt(`Este informe y la relación que se adjunta están dirigidos únicamente al ${sanitize(getVal('entidadDirigida'))} el cual lo ha requerido para ${sanitize(getVal('motivoInforme'))}.`, { indent: 20, spacing: 40 });
                 
-                // --- *** INICIO BLOQUE DE FIRMA (REVERTIDO AL ORIGINAL) *** ---
                 
-                const sealStartY = y; // Posición Y para el bloque de firma/sello
+                const sealStartY = y; 
                 let sealH_pt = 0, sealW_pt = 0;
 
                 // Añadir sello si existe (colocado a la derecha)
@@ -1162,13 +1157,11 @@
                     sealW_pt = sealW * ratio;
                     sealH_pt = sealH * ratio;
                     
-                    // Comprobar si el sello cabe antes de dibujarlo
                     if (y + sealH_pt > pageH - marginBottom) {
                         doc.addPage();
                         y = 85.03;
                     }
-                    // Alineado a la derecha, fluyendo con 'y'
-                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); // Dibujar imagen
+                    doc.addImage(sealData, 'PNG', doc.internal.pageSize.getWidth() - margin - sealW_pt, sealStartY, sealW_pt, sealH_pt); 
                 }
 
                 // Alineación de firma al CENTRO
@@ -1182,8 +1175,6 @@
                 y += 12; // Espacio en blanco
                 addTxt(`${sanitize(getVal('lugar'))}, ${fmtDate(fDoc, true)}`, { align: 'left', spacing: 12, lineSpacing: 1 });
 
-                // --- *** FIN BLOQUE DE FIRMA (REVERTIDO AL ORIGINAL) *** ---
-
 
                 // --- PÁGINA 2: ANEXO ---
                 doc.addPage(); 
@@ -1193,34 +1184,29 @@
                 addTxt(clCed, { fontStyle: 'bold', align: 'center', spacing: 30 });
                 addTxt('INGRESOS MENSUALES EXPRESADO EN BOLÍVARES (BS)', { fontStyle: 'bold', align: 'center', spacing: 20 });
                 
-                // --- CORRECCIÓN: Formato de fecha largo para el anexo ---
                 addTxt(`Los ingresos corresponden al período desde el ${fmtDate(fDes, true)} hasta el ${fmtDate(fHas, true)} y los mismos se derivan de:`, { spacing: 30 });
                 
-                // --- *** INICIO TABLA (REVERTIDA AL ORIGINAL) *** ---
                 doc.autoTable({ 
                     head: [['Detalle de los ingresos del periodo:', 'Bolívares']], 
                     body: data, 
                     foot: [[{ content: 'Total Ingresos', styles: { halign: 'left', fontStyle: 'bold' } }, { content: `Bs. ${fmtCur(total)}`, styles: { halign: 'right', fontStyle: 'bold' } }]], 
                     startY: y, 
                     margin: { left: margin, right: margin, top: 85.03, bottom: marginBottom }, 
-                    theme: 'grid', // REVERTIDO a 'grid'
+                    theme: 'grid', 
                     styles: {
-                        font: 'helvetica', // REVERTIDO a 'helvetica'
+                        font: 'helvetica', 
                         fontSize: 11
                     },
                     headStyles: { fillColor: [221, 214, 254], textColor: [31, 41, 55], fontStyle: 'bold', halign: 'center' }, 
-                    // --- *** INICIO CORRECCIÓN BORDE DE TABLA *** ---
                     footStyles: { 
                         fillColor: [243, 244, 246], 
                         textColor: [0, 0, 0], 
                         fontStyle: 'bold',
-                        lineWidth: 0.5, // Añadido
-                        lineColor: [221, 221, 221] // Añadido (color de la rejilla)
+                        lineWidth: 0.5, 
+                        lineColor: [221, 221, 221] 
                     }, 
-                    // --- *** FIN CORRECCIÓN BORDE DE TABLA *** ---
                     columnStyles: { 1: { halign: 'right' } } 
                 });
-                // --- *** FIN TABLA (REVERTIDA AL ORIGINAL) *** ---
                 
                 y = doc.autoTable.previous.finalY + 30; // Obtener Y después de la tabla
                 
@@ -1231,7 +1217,6 @@
                 addTxt('LEGITIMACION DE CAPITALES', { fontStyle: 'bold', align: 'center', spacing: 15 });
                 addTxt('Los ingresos descritos en la presente relación proceden de actividad lícita, lo cual puede ser corroborado por los organismos competentes y no tienen relación alguna con actividades, acciones o hechos ilícitos contemplados en las leyes venezolanas.', { spacing: 50 });
                 
-                // --- REVERTIDO: Anclar firma del cliente al pie de página ---
                 y = Math.max(y, pageH - marginBottom - 60); 
                 
                 addTxt('_____________________________________', { align: 'center', spacing: 12, lineSpacing: 1 });
@@ -1239,34 +1224,32 @@
                 addTxt(clCed, { align: 'center', spacing: 12, fontStyle: 'bold', lineSpacing: 1 });
                 
                 // --- LÓGICA DE DESCARGA (CORREGIDA) ---
-                const safeClientName = clNom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, '_');
+                const safeClientName = clNom.normalize("NFD").replace(/[\u00A0-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, '_');
                 const fileName = `Informe_Aseguramiento_${safeClientName}.pdf`;
                 
                 try {
-                    const pdfBlob = doc.output('blob'); // Generar PDF como Blob
-                    const downloadUrl = URL.createObjectURL(pdfBlob); // Crear URL
+                    const pdfBlob = doc.output('blob'); 
+                    const downloadUrl = URL.createObjectURL(pdfBlob); 
                     
                     const a = document.createElement('a');
                     a.href = downloadUrl;
                     a.download = fileName;
-                    document.body.appendChild(a); // Añadir al DOM
-                    a.click(); // Simular clic
+                    document.body.appendChild(a); 
+                    a.click(); 
                     
-                    // Añadir un retraso antes de revocar la URL y eliminar el enlace.
                     setTimeout(() => {
                         URL.revokeObjectURL(downloadUrl);
                         if (document.body.contains(a)) {
                             document.body.removeChild(a);
                         }
-                    }, 100); // 100 milisegundos de retraso
+                    }, 100); 
                     
                     return true; // Indicar éxito
 
                 } catch(e) {
-                    // Fallback (menos probable que funcione en iFrame)
                     console.warn("Fallo el método de descarga Blob, intentando doc.save()", e);
                     doc.save(fileName);
-                    return true; // Asumir que funcionó si no lanzó error
+                    return true; 
                 }
 
             } catch (error) {
@@ -1301,6 +1284,7 @@
                     </svg>
                     Generando...`;
 
+                // --- INICIO DE LA CORRECCIÓN ---
                 try {
                     // 1. Incrementar el contador en Firestore (asíncrono)
                     await incrementReportCount(check.type);
@@ -1309,12 +1293,9 @@
                     const seal = await getSealData();
 
                     // 3. Añadir un pequeño retardo (yield)
-                    // Esto permite que el DOM se actualice y muestre "Generando..."
-                    // ANTES de buildPDF (síncrono) bloquee el hilo.
                     await new Promise(resolve => setTimeout(resolve, 50)); 
 
                     // 4. Generar el PDF (síncrono)
-                    // Esta función ahora contiene la lógica de descarga.
                     const pdfSuccess = buildPDF(seal.data, seal.width, seal.height);
 
                     // 5. Mostrar mensaje SÓLO si el PDF se generó
@@ -1328,17 +1309,23 @@
                     // Si pdfSuccess es false, buildPDF ya mostró el mensaje de error.
 
                 } catch (error) {
-                    // Capturar errores (ej. de getSealData)
                     console.error("Error en el proceso de envío:", error);
                     showMessage('Se produjo un error al procesar el sello. Inténtelo de nuevo.', 'error');
                 
                 } finally {
-                    // 5. Reactivar el botón
+                    // 5. Reactivar el botón (Restaurado)
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnText;
                 }
+                // --- FIN DE LA CORRECCIÓN ---
 
+            // } // <--- Esta '}' extra fue eliminada
+            
+            // --- INICIO DE LA CORRECCIÓN ---
+            // Se eliminó el listener duplicado que estaba aquí.
+            // El 'else if' y 'else' ahora se conectan al 'if (check.allow)' de arriba.
             } else if (check.reason === 'limit_reached') {
+            // --- FIN DE LA CORRECCIÓN ---
                 // Si se alcanzó el límite, mostrar modal premium
                 showPremiumModal();
             } else {

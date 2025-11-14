@@ -10,7 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     
     <!-- SDK de PayPal -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexxBKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexxBKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD" 
+            onerror="console.error('CRITICAL: El script de PayPal SDK no se pudo cargar. Revisa la conexión o bloqueadores de anuncios.')"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -165,7 +166,12 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sello del Contador (Opcional)</label>
                     <input type="file" id="contadorSello" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" accept="image/png">
                     <small class="text-xs text-gray-500">Subir PNG. Máx: 5.30cm (ancho) x 2.10cm (alto).</small>
-                    <img id="selloPreview" src="" alt="Vista previa del sello" class="mt-2 h-16 object-contain hidden" />
+                    <!-- INICIO: Contenedor para Sello y Botón 'X' -->
+                    <div class="relative inline-block mt-2">
+                        <img id="selloPreview" src="" alt="Vista previa del sello" class="h-16 object-contain hidden border border-gray-200" />
+                        <button type="button" id="removeSelloBtn" class="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm font-bold leading-none hidden" title="Eliminar Sello">&times;</button>
+                    </div>
+                    <!-- FIN: Contenedor para Sello y Botón 'X' -->
                 </div>
                 <div class="text-right mt-4 space-x-2">
                     <button type="button" id="deleteContadorBtn" class="gestion-btn" title="Eliminar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>
@@ -318,9 +324,9 @@
             
             <div class="p-4 bg-blue-50 rounded-lg mb-4 text-gray-700 space-y-2">
                 <!-- Reemplaza con tus datos reales -->
-                <p><strong>Banco:</strong> [Nombre de tu Banco]</p>
-                <p><strong>CI:</strong> [Tu Cédula]</p>
-                <p><strong>Teléfono:</strong> [Tu Teléfono]</p>
+                <p><strong>Banco:</strong> (0191) Banco Nacional de Crédito</p>
+                <p><strong>CI:</strong> 14538402</p>
+                <p><strong>Teléfono:</strong> 04245303548</p>
                 <p><strong>Monto:</strong> 15 USD (o su equivalente en Bs. a la tasa BCV del día)</p>
             </div>
 
@@ -368,6 +374,7 @@
         
         let userPlanStatus = null; // Almacena el estado del plan del usuario ('free', 'premium', etc.)
         let localContadores = [], localClientes = [], localConceptos = [], edicionConceptoId = null;
+        let isSealMarkedForDeletion = false; // <-- NUEVO: Estado para rastrear borrado de sello
 
         // --- Selectores de DOM (UI Principal) ---
         const authContainer = document.getElementById('auth-container');
@@ -378,6 +385,7 @@
         const userPlanInfo = document.getElementById('userPlanInfo');
         const contadorSelloInput = document.getElementById('contadorSello');
         const selloPreview = document.getElementById('selloPreview');
+        const removeSelloBtn = document.getElementById('removeSelloBtn'); // <-- NUEVO: Selector Botón 'X'
 
         // --- Selectores de DOM (Modales) ---
         const premiumModal = document.getElementById('premium-modal');
@@ -640,9 +648,13 @@
         }
         
         // --- Lógica de Modales (Planes y Pagos) ---
-        function hideModals() {
+        // --- CORRECCIÓN 1: Se asigna la función a 'window' para hacerla global ---
+        // Esto permite que los atributos 'onclick' en el HTML la encuentren.
+        window.hideModals = function() {
             premiumModal.classList.add('hidden');
             premiumModal.classList.remove('visible');
+            // --- CORRECCIÓN 2: Se usa la variable 'pagomovilModal' (camelCase) ---
+            // El nombre 'pagomovil-modal' con guion no es una variable válida.
             pagomovilModal.classList.add('hidden');
             pagomovilModal.classList.remove('visible');
         }
@@ -661,19 +673,41 @@
         }
 
         // --- Lógica de PayPal ---
-        function renderPayPalButtons() {
+        function renderPayPalButtons(retryCount = 0) {
             const container = document.getElementById('paypal-button-container');
-            if (!container || container.children.length > 0) return; 
+            if (!container) return; // Si el modal no existe, salir.
 
-            if (typeof paypal === 'undefined') {
-                console.error("SDK de PayPal no se ha cargado. 'paypal' no está definido.");
+            // Limpiar el contenedor solo si se está reintentando (para quitar msj de error)
+            if (retryCount > 0) {
+                container.innerHTML = '';
+            }
+            
+            // Si ya está renderizado (y no es un reintento), no hacer nada.
+            if (container.children.length > 0 && retryCount === 0) return; 
+
+            // --- CORRECCIÓN 3: Se usa 'window.paypal' ---
+            // Esto busca explícitamente la variable 'paypal' en el ámbito global (window),
+            // que es donde la carga el script de PayPal.
+            if (typeof window.paypal === 'undefined') {
+                console.error(`SDK de PayPal no se ha cargado. 'paypal' no está definido. (Intento ${retryCount + 1})`);
+                
+                // --- NUEVA CORRECCIÓN: Reintentar ---
+                if (retryCount < 5) { // Reintentar 5 veces (500ms * 5 = 2.5s)
+                    setTimeout(() => renderPayPalButtons(retryCount + 1), 500);
+                    return;
+                }
+                // --- FIN NUEVA CORRECCIÓN ---
+
                 showMessage("Error al cargar la opción de pago. Refresca la página.", "error");
                 container.innerHTML = '<p class="text-center text-red-600">Error al cargar el botón de pago. Por favor, refresca la página.</p>';
                 return;
             }
             
             try {
-                paypal.Buttons({
+                // Limpiar el contenedor de cualquier texto/error anterior antes de renderizar
+                container.innerHTML = ''; 
+                
+                window.paypal.Buttons({
                     createOrder: (data, actions) => {
                         return actions.order.create({
                             purchase_units: [{
@@ -801,14 +835,34 @@
             const file = this.files[0]; 
             if (file && file.type === "image/png") { 
                 const reader = new FileReader(); 
-                reader.onload = (e) => { selloPreview.src = e.target.result; selloPreview.classList.remove('hidden'); }; 
+                reader.onload = (e) => { 
+                    selloPreview.src = e.target.result; 
+                    selloPreview.classList.remove('hidden'); 
+                    removeSelloBtn.classList.remove('hidden'); // <-- AÑADIDO: Mostrar 'X'
+                }; 
                 reader.readAsDataURL(file); 
+                isSealMarkedForDeletion = false; // <-- AÑADIDO: Si sube nuevo, no borrar
             } else { 
-                selloPreview.src = ''; 
-                selloPreview.classList.add('hidden'); 
+                // No ocultar si ya hay una imagen cargada de la DB
+                if (!selloPreview.src.startsWith('http')) {
+                    selloPreview.src = ''; 
+                    selloPreview.classList.add('hidden'); 
+                    removeSelloBtn.classList.add('hidden'); // <-- AÑADIDO: Ocultar 'X'
+                }
                 if (file) { showMessage('Solo se permiten archivos PNG.', 'error'); this.value = ''; } 
             } 
         });
+
+        // <-- INICIO: Listener para el botón 'X' de eliminar sello -->
+        removeSelloBtn.addEventListener('click', () => {
+            selloPreview.src = '';
+            selloPreview.classList.add('hidden');
+            removeSelloBtn.classList.add('hidden');
+            contadorSelloInput.value = '';
+            isSealMarkedForDeletion = true; // <-- Marcar para borrado en la DB
+            showMessage('Sello eliminado. Haz clic en "Actualizar" para guardar el cambio.', 'info');
+        });
+        // <-- FIN: Listener para el botón 'X' de eliminar sello -->
 
         // Cargar selects de Contadores y Clientes desde Firestore
         function loadDropdowns() {
@@ -846,10 +900,14 @@
                 contadorSelloInput.value = ''; 
                 selloPreview.src = '';
                 selloPreview.classList.add('hidden');
+                removeSelloBtn.classList.add('hidden'); // <-- AÑADIDO: Ocultar 'X'
+                isSealMarkedForDeletion = false; // <-- AÑADIDO: Resetear estado
+                
                 // Si el contador guardado tiene una URL de sello, mostrarla
                 if (d.selloURL) {
                     selloPreview.src = d.selloURL;
                     selloPreview.classList.remove('hidden');
+                    removeSelloBtn.classList.remove('hidden'); // <-- AÑADIDO: Mostrar 'X'
                 }
                 // --- FIN CAMBIO SELLO ---
                 document.getElementById('deleteContadorBtn').style.display = 'inline-block'; 
@@ -937,11 +995,27 @@
                     if (selloURL) {
                         d.selloURL = selloURL; // Añadir/Actualizar la URL del sello
                     }
+                } else if (isSealMarkedForDeletion) { // 2. Verificar si se marcó para borrar
+                    d.selloURL = null; // Establecer a null para borrar de la DB
+                    
+                    // 3. Intentar borrar de Storage
+                    try {
+                        const storagePath = `artifacts/${appId}/users/${currentUserId}/contadores/${id}/sello.png`;
+                        const storageRef = ref(storage, storagePath);
+                        await deleteObject(storageRef);
+                    } catch (storageError) {
+                        // Ignorar si el archivo no existe
+                        if (storageError.code !== 'storage/object-not-found') {
+                            console.warn("No se pudo eliminar el sello de Storage:", storageError);
+                        }
+                    }
                 }
+                // Si no hay archivo nuevo Y no está marcado, no se toca d.selloURL (queda fuera del update)
                 
                 // 2. Actualizar el documento del contador
                 await updateDoc(doc(db, getCollectionPath('contadores'), id), d); 
                 showMessage('Contador actualizado.', 'success'); 
+                isSealMarkedForDeletion = false; // Resetear estado
             } catch (e) { 
                 console.error("Error actualizando contador:", e);
                 showMessage('Error al actualizar.', 'error'); 
@@ -1063,7 +1137,19 @@
         document.getElementById('conceptoBtnEliminar').addEventListener('click', () => { const id = document.getElementById('conceptosSelect').value; if (id) showConfirmationModal('¿Eliminar concepto?', async () => { try { await deleteDoc(doc(db, getCollectionPath('conceptos'), id)); showMessage('Eliminado.', 'success'); } catch (e) { showMessage('Error al eliminar.', 'error'); } }); else showMessage('Seleccione un concepto.', 'error'); });
 
         // --- Lógica de Formulario (Limpieza y Formato) ---
-        function clearFormContador(sel = true) { document.getElementById('contadorNombre').value = ''; document.getElementById('contadorRif').value = ''; document.getElementById('contadorCpc').value = ''; contadorSelloInput.value = ''; selloPreview.classList.add('hidden'); selloPreview.src = ''; if (sel) document.getElementById('selectContador').value = ""; document.getElementById('deleteContadorBtn').style.display = 'none'; document.getElementById('updateContadorBtn').style.display = 'none'; }
+        function clearFormContador(sel = true) { 
+            document.getElementById('contadorNombre').value = ''; 
+            document.getElementById('contadorRif').value = ''; 
+            document.getElementById('contadorCpc').value = ''; 
+            contadorSelloInput.value = ''; 
+            selloPreview.classList.add('hidden'); 
+            selloPreview.src = ''; 
+            removeSelloBtn.classList.add('hidden'); // <-- AÑADIDO: Ocultar 'X'
+            isSealMarkedForDeletion = false; // <-- AÑADIDO: Resetear estado
+            if (sel) document.getElementById('selectContador').value = ""; 
+            document.getElementById('deleteContadorBtn').style.display = 'none'; 
+            document.getElementById('updateContadorBtn').style.display = 'none'; 
+        }
         function clearFormCliente(sel = true) { document.getElementById('clienteTratamiento').value = 'Sr.'; document.getElementById('clienteNombre').value = ''; document.getElementById('clienteCedula').value = ''; if (sel) document.getElementById('selectCliente').value = ""; document.getElementById('deleteClienteBtn').style.display = 'none'; document.getElementById('updateClienteBtn').style.display = 'none'; }
         function clearForm() { document.getElementById('report-form').reset(); document.getElementById('income-details').innerHTML = ''; addIncomeItem(); clearFormContador(); clearFormCliente(); setFechasDefault(); }
         
@@ -1152,65 +1238,90 @@
         }
         function fmtCur(n) { return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
 
+        // <-- INICIO: NUEVA FUNCIÓN HELPER para convertir URL a Base64 sin error CORS -->
+        /**
+         * Convierte una URL de imagen (incluso cross-origin) a Base64 Data URL.
+         * @param {string} url La URL de la imagen.
+         * @returns {Promise<{data: string, width: number, height: number}>}
+         */
+        function getImageDataFromUrl(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // ¡Clave para Firebase Storage!
+                
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const dataURL = canvas.toDataURL('image/png');
+                    resolve({ data: dataURL, width: img.width, height: img.height });
+                };
+                
+                img.onerror = (err) => {
+                    console.error("Error al cargar imagen desde URL:", err);
+                    reject(new Error('No se pudo cargar la imagen del sello guardada.'));
+                };
+                
+                img.src = url;
+            });
+        }
+        // <-- FIN: NUEVA FUNCIÓN HELPER -->
+
+
         /**
          * Obtiene los datos de la imagen del sello, priorizando el input sobre la preview.
          * @returns {Promise<{data: string, width: number, height: number}>}
          */
-        function getSealData() {
-            return new Promise((resolve, reject) => {
-                const file = contadorSelloInput.files[0];
-                const previewSrc = selloPreview.src;
+        async function getSealData() {
+            const file = contadorSelloInput.files[0];
+            const previewSrc = selloPreview.src;
 
+            try {
                 // Prioridad 1: Usar el archivo recién subido (si es PNG)
                 if (file && file.type === "image/png") {
-                    const r = new FileReader();
-                    r.onload = (e) => {
-                        const img = new Image();
-                        img.onload = function() {
-                            resolve({ data: e.target.result, width: this.width, height: this.height });
-                        };
-                        img.onerror = (err) => reject(new Error('Error al cargar la imagen del sello (FileReader).'));
-                        img.src = e.target.result;
-                    };
-                    r.onerror = (err) => reject(new Error('Error al leer el archivo del sello.'));
-                    r.readAsDataURL(file);
-
-                // Prioridad 2: Usar la imagen de la vista previa (si existe y no es un archivo local)
-                } else if (previewSrc && (previewSrc.startsWith('http') || previewSrc.startsWith('data:'))) {
-                    // Evitar 'tainted canvas' usando fetch y convirtiendo a data URL
-                    fetch(previewSrc)
-                        .then(response => response.blob())
-                        .then(blob => {
-                            const r = new FileReader();
-                            r.onload = (e) => {
-                                const img = new Image();
-                                img.onload = function() {
-                                    resolve({ data: e.target.result, width: this.width, height: this.height });
-                                };
-                                img.onerror = (err) => reject(new Error('Error al cargar la imagen del sello (Preview).'));
-                                img.src = e.target.result;
-                            };
-                            r.onerror = (err) => reject(new Error('Error al leer blob del sello.'));
-                            r.readAsDataURL(blob);
-                        })
-                        .catch(err => {
-                            console.error("Error al 'fetchear' la imagen de preview:", err);
-                            // Fallback: intentar usar la URL directamente (puede fallar por CORS)
+                    return new Promise((resolve, reject) => {
+                        const r = new FileReader();
+                        r.onload = (e) => {
                             const img = new Image();
                             img.onload = function() {
-                                // Esto es un truco, convertiremos a dataURL en un canvas
-                                // pero por ahora solo pasamos las dimensiones y la dataURL
-                                resolve({ data: previewSrc, width: this.width, height: this.height });
+                                resolve({ data: e.target.result, width: this.width, height: this.height });
                             };
-                            img.onerror = () => resolve({ data: null, width: 0, height: 0 }); // Falló
-                            img.src = previewSrc;
-                        });
-                
-                // Prioridad 3: No hay sello
-                } else {
-                    resolve({ data: null, width: 0, height: 0 });
+                            img.onerror = (err) => reject(new Error('Error al cargar la imagen del sello (FileReader).'));
+                            img.src = e.target.result;
+                        };
+                        r.onerror = (err) => reject(new Error('Error al leer el archivo del sello.'));
+                        r.readAsDataURL(file);
+                    });
                 }
-            });
+
+                // Prioridad 2: Usar la imagen de la vista previa (si existe y es una URL 'http')
+                if (previewSrc && previewSrc.startsWith('http')) {
+                    // Usar el helper para convertir URL a Base64 sin 'taint'
+                    return await getImageDataFromUrl(previewSrc);
+                }
+                
+                // Prioridad 3: Si la previewSrc es una dataURL (de un archivo recién subido pero no guardado)
+                if (previewSrc && previewSrc.startsWith('data:')) {
+                     return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = function() {
+                            resolve({ data: previewSrc, width: this.width, height: this.height });
+                        };
+                        img.onerror = (err) => reject(new Error('Error al cargar la imagen del sello (DataURL).'));
+                        img.src = previewSrc;
+                    });
+                }
+
+                // Prioridad 4: No hay sello
+                return { data: null, width: 0, height: 0 };
+
+            } catch (error) {
+                console.error("Error en getSealData:", error);
+                showMessage("Error al procesar la imagen del sello. " + error.message, 'error');
+                throw error; // Lanzar el error para que el 'submit' listener lo atrape
+            }
         }
 
         /**
@@ -1554,7 +1665,8 @@
 
                 } catch (error) {
                     console.error("Error en el proceso de envío:", error);
-                    showMessage('Se produjo un error al procesar el sello. Inténtelo de nuevo.', 'error');
+                    // El error ya se muestra en getSealData o buildPDF, pero por si acaso:
+                    showMessage('Se produjo un error al generar el informe.', 'error');
                 
                 } finally {
                     // 5. Reactivar el botón (Restaurado)

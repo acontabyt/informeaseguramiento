@@ -530,8 +530,19 @@
                         await createFreeUserProfile(profileRef);
                     } else {
                         userPlanStatus = docSnap.data();
-                        await checkPremiumExpiry(profileRef, userPlanStatus);
+                        // NO llamamos a checkPremiumExpiry aquí
                     }
+                    
+                    // NUEVO: Verificar pagos aprobados
+                    // Esto actualizará userPlanStatus si encuentra un pago
+                    // Se pasa la referencia del perfil (profileRef) y el estado actual (userPlanStatus)
+                    await checkForApprovedPayment(profileRef, userPlanStatus);
+
+                    // AHORA, verificamos la expiración
+                    // Si el pago lo acaba de activar, esta función no hará nada.
+                    // Si estaba premium y expiró, y no hay pago nuevo, lo degradará.
+                    await checkPremiumExpiry(profileRef, userPlanStatus);
+                    
                     updatePlanUI();
 
                     // 3. Cargar el resto de los datos (dependencias)
@@ -605,6 +616,72 @@
                 }
             }
         }
+
+        // --- INICIO: NUEVA FUNCIÓN ---
+        /**
+         * Revisa si el usuario actual tiene pagos aprobados que deban activar su plan.
+         * Esta función es llamada AL INICIAR SESIÓN.
+         */
+        async function checkForApprovedPayment(profileRef, status) {
+            // Solo revisamos si el usuario es 'free' o si su premium ha expirado
+            const now = new Date();
+            // Comprobamos si el plan es 'free' O si tiene fecha de expiración y ya pasó
+            const needsCheck = status.plan === 'free' || (status.premiumUntil && status.premiumUntil.toDate() < now);
+            
+            if (!needsCheck) {
+                return; // Es premium y está activo, no hacer nada.
+            }
+
+            // El usuario busca en la colección pública sus propios pagos aprobados
+            const validationsPath = `artifacts/${appId}/public/data/pagoValidations`;
+            const q = query(
+                collection(db, validationsPath),
+                where("userId", "==", currentUserId), // El usuario logueado busca sus propios pagos
+                where("status", "==", "approved")
+            );
+
+            try {
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) return; // No hay pagos aprobados
+
+                let latestExpiry = null;
+                querySnapshot.forEach(doc => {
+                    const payment = doc.data();
+                    // Buscamos la fecha de expiración más lejana entre todos sus pagos aprobados
+                    if (payment.premiumUntil) {
+                        const expiryDate = payment.premiumUntil.toDate();
+                        if (expiryDate > now && (!latestExpiry || expiryDate > latestExpiry)) {
+                            latestExpiry = expiryDate;
+                        }
+                    }
+                });
+
+                if (latestExpiry) {
+                    // Encontramos una aprobación válida y futura.
+                    // Verificamos si es más nueva que el premium actual (que podría estar expirado).
+                    const currentExpiry = status.premiumUntil ? status.premiumUntil.toDate() : null;
+                    
+                    if (!currentExpiry || latestExpiry > currentExpiry) {
+                        // Actualizar el perfil del usuario (ESTO SÍ LO PUEDE HACER)
+                        await updateDoc(profileRef, {
+                            plan: 'premium',
+                            premiumUntil: Timestamp.fromDate(latestExpiry),
+                            reportsGenerated: 0
+                        });
+                        // Actualizar el estado local para que la UI lo refleje inmediatamente
+                        userPlanStatus.plan = 'premium';
+                        userPlanStatus.premiumUntil = Timestamp.fromDate(latestExpiry);
+                        
+                        // Notificar al usuario (no modal, solo un toast)
+                        showMessage("¡Tu plan Premium ha sido activado!", "success");
+                    }
+                }
+            } catch (e) {
+                console.error("Error al verificar pagos aprobados:", e);
+                showMessage("Error al verificar la activación de tu plan.", "error");
+            }
+        }
+        // --- FIN: NUEVA FUNCIÓN ---
 
         function updatePlanUI() {
             if (!userPlanStatus) {
@@ -925,26 +1002,26 @@
                     adminId: currentUserId // Registrar qué admin aprobó
                 });
 
-                // 3. Referencia al perfil del usuario a actualizar
-                const userProfileRef = doc(db, `artifacts/${appId}/users/${userIdToUpgrade}/profile`, 'status');
+                // 3. Referencia al perfil del usuario a actualizar - ¡ELIMINADO!
+                // const userProfileRef = doc(db, `artifacts/${appId}/users/${userIdToUpgrade}/profile`, 'status');
+                
                 // Dar 1 año de premium
                 const expiryDate = new Date();
-                expiryDate.setFullYear(expiryDate.getFullYear() + 1); // <-- CAMBIO: 30 días a 1 año
+                expiryDate.setFullYear(expiryDate.getFullYear() + 1);
                 
-                batch.update(userProfileRef, {
-                    plan: "premium",
-                    premiumUntil: Timestamp.fromDate(expiryDate),
-                    reportsGenerated: 0 // Resetear contador por si acaso
-                });
+                // --- INICIO DE LA CORRECCIÓN ---
+                // Se elimina la escritura en el perfil del usuario (que causaba el error)
+                // batch.set(userProfileRef, { ... });
 
-                // 4. (Opcional pero recomendado) Enviar una notificación al usuario
-                const userNotifRef = doc(collection(db, `artifacts/${appId}/users/${userIdToUpgrade}/notifications`));
-                batch.set(userNotifRef, {
-                    title: "¡Pago Aprobado!",
-                    message: "Tu plan Premium ha sido activado. Ahora tienes 1 año de informes ilimitados.", // <-- CAMBIO: Mensaje
-                    createdAt: serverTimestamp(),
-                    read: false
+                // EN SU LUGAR: Añadimos la fecha de expiración al propio documento de validación
+                batch.update(validationRef, {
+                    premiumUntil: Timestamp.fromDate(expiryDate)
                 });
+                // --- FIN DE LA CORRECCIÓN ---
+
+                // 4. (Opcional pero recomendado) Enviar una notificación al usuario - ¡ELIMINADO!
+                // const userNotifRef = doc(collection(db, `artifacts/${appId}/users/${userIdToUpgrade}/notifications`));
+                // batch.set(userNotifRef, { ... });
 
                 // 5. Ejecutar el batch
                 await batch.commit();

@@ -669,6 +669,9 @@
             if (userPlanStatus.plan === 'premium') {
                 userPlanInfo.textContent = `⭐ Usuario Premium (Vence: ${fmtDate(userPlanStatus.premiumUntil.toDate().toISOString().split('T')[0])})`;
                 userPlanInfo.className = 'text-xs text-yellow-300 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
+            } else if (userPlanStatus.role === 'admin') { // <-- BLOQUE AÑADIDO
+                userPlanInfo.textContent = `👑 Administrador (Acceso Ilimitado)`;
+                userPlanInfo.className = 'text-xs text-yellow-300 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
             } else {
                 const reportsLeft = 1 - userPlanStatus.reportsGenerated; // Límite de 1 informe gratis
                 userPlanInfo.textContent = `Plan Free (${reportsLeft < 0 ? 0 : reportsLeft} informe gratis)`;
@@ -1654,7 +1657,7 @@
                 textBlockHeight = textY - blockStartY; // Altura total del bloque de texto
 
                 // Dibujar sello si existe (A LA DERECHA)
-                if (sealData) { 
+                if (sealData && sealW > 0 && sealH > 0) { // <-- MODIFICADO: Añadir chequeo de dimensiones
                     const maxW_pt = 5.3 * 28.35; // 5.3cm
                     const maxH_pt = 2.1 * 28.35; // 2.1cm
                     const ratio = Math.min(maxW_pt / sealW, maxH_pt / sealH, 1);

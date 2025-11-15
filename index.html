@@ -9,9 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     
-    <!-- SDK de PayPal -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AUUF15iZoI3UDwEVb9b39OgWcGxsyEcebTzuIexxBKj7o-2LftGVE4Zq4qCZNtOjMj3wQmBMOWBBUN9l&currency=USD" 
-            onerror="console.error('CRITICAL: El script de PayPal SDK no se pudo cargar. Revisa la conexión o bloqueadores de anuncios.')"></script>
+    <!-- SDK de PayPal ELIMINADO -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -287,63 +285,84 @@
         </form>
     </div>
 
-    <!-- ========= MODALES DE PLANES Y PAGOS ========= -->
-
-    <!-- Modal: Límite Alcanzado / Premium -->
-    <div id="premium-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 class="text-2xl font-bold text-purple-800 mb-4 font-dancing-script">¡Has alcanzado tu límite!</h3>
-            <p class="mb-4 text-gray-600">Has usado tu informe gratuito. Para generar informes ilimitados, actualiza a Premium.</p>
-            
-            <div class="p-4 bg-purple-50 rounded-lg mb-4">
-                <h4 class="font-semibold text-purple-700">Plan Premium - $15.00 USD</h4>
-                <p class="text-sm text-purple-600">Acceso ilimitado a la generación de informes durante 1 año.</p>
-            </div>
-
-            <div class="space-y-4">
-                <!-- Opción 1: PayPal -->
-                <div id="paypal-button-container" class="w-full">
-                    <!-- Los botones de PayPal se renderizarán aquí -->
-                </div>
-                
-                <!-- Opción 2: Pago Móvil -->
-                <button id="showPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95">
-                    Pagar con Pago Móvil
-                </button>
-            </div>
-
-            <button onclick="hideModals()" class="mt-6 text-sm text-gray-500 hover:text-gray-700 w-full text-center">Cancelar</button>
+    <!-- ========= INICIO: PANEL DE ADMINISTRACIÓN (NUEVO) ========= -->
+    <div id="admin-panel-container" class="container max-w-4xl mx-auto bg-gray-800 text-white shadow-xl rounded-lg overflow-hidden hidden mt-8">
+        <div class="bg-yellow-500 p-4 md:p-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center font-dancing-script">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Panel de Administración
+            </h2>
+            <p class="text-sm text-gray-800">Validaciones de Pago Pendientes</p>
+        </div>
+        <div id="admin-payment-list" class="p-6 md:p-8 space-y-4">
+            <!-- Los pagos pendientes se cargarán aquí -->
+            <p class="text-gray-400">Cargando validaciones...</p>
         </div>
     </div>
+    <!-- ========= FIN: PANEL DE ADMINISTRACIÓN (NUEVO) ========= -->
 
-    <!-- Modal: Pago Móvil -->
+
+    <!-- ========= MODALES DE PLANES Y PAGOS ========= -->
+
+    <!-- Modal: Límite Alcanzado / Premium (ELIMINADO) -->
+    
+    <!-- Modal: Pago Móvil (MODIFICADO) -->
     <div id="pagomovil-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 class="text-2xl font-bold text-blue-700 mb-4 font-dancing-script">Pago Móvil</h3>
-            <p class="mb-4 text-gray-600">Realiza el pago a los siguientes datos y sube el comprobante. Tu cuenta se activará manualmente en un plazo de 24h.</p>
+            <h3 class="text-2xl font-bold text-blue-700 mb-4 font-dancing-script">¡Has alcanzado tu límite!</h3>
+            <p class="mb-6 text-gray-600">Has usado tu informe gratuito. Para generar informes ilimitados, realiza el pago a los siguientes datos e ingresa la información para verificación. Tu cuenta se activará manualmente en un plazo de 24h.</p>
             
             <div class="p-4 bg-blue-50 rounded-lg mb-4 text-gray-700 space-y-2">
-                <!-- Reemplaza con tus datos reales -->
+                <h4 class="font-semibold text-blue-800">Plan Premium - $15.00 USD</h4>
                 <p><strong>Banco:</strong> (0191) Banco Nacional de Crédito</p>
                 <p><strong>CI:</strong> 14538402</p>
                 <p><strong>Teléfono:</strong> 04245303548</p>
                 <p><strong>Monto:</strong> 15 USD (o su equivalente en Bs. a la tasa BCV del día)</p>
             </div>
 
-            <div class="space-y-4">
+            <!-- INICIO: Formulario de Notificación de Pago Móvil -->
+            <form id="pagoMovilForm" class="space-y-4">
                 <div>
-                    <label for="pagoMovilProof" class="block text-sm font-medium text-gray-700 mb-1">Subir Comprobante (Imagen)</label>
-                    <input type="file" id="pagoMovilProof" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*">
+                    <label for="pagoMovilFecha" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Pago</label>
+                    <input type="date" id="pagoMovilFecha" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
                 </div>
-                <button id="submitPagoMovilBtn" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95 disabled:opacity-50" disabled>
-                    Subir y Notificar Pago
+                <div>
+                    <label for="pagoMovilCedula" class="block text-sm font-medium text-gray-700 mb-1">Cédula/RIF (Emisor)</label>
+                    <input type="text" id="pagoMovilCedula" placeholder="Ej: V-12345678" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label for="pagoMovilTelefono" class="block text-sm font-medium text-gray-700 mb-1">N° Teléfono (Emisor)</label>
+                    <input type="tel" id="pagoMovilTelefono" placeholder="Ej: 0414-1234567" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label for="pagoMovilMonto" class="block text-sm font-medium text-gray-700 mb-1">Monto Pagado (Bs.)</Tlabel>
+                    <input type="text" id="pagoMovilMonto" inputmode="decimal" placeholder="Ej: 1500,00" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <button id="submitPagoMovilBtn" type="submit" class="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95 disabled:opacity-50" disabled>
+                    Notificar Pago
                 </button>
-            </div>
+            </form>
+            <!-- FIN: Formulario de Notificación de Pago Móvil -->
             
-            <button onclick="hideModals()" class="mt-6 text-sm text-gray-500 hover:text-gray-700 w-full text-center">Volver</button>
+            <button onclick="hideModals()" class="mt-6 text-sm text-gray-500 hover:text-gray-700 w-full text-center">Cancelar</button>
         </div>
     </div>
     
+    <!-- ========= INICIO: NUEVO MODAL DE NOTIFICACIÓN ========= -->
+    <div id="notification-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="notification-title" class="text-2xl font-bold text-green-700 mb-4 font-dancing-script"></h3>
+            <p id="notification-message" class="mb-6 text-gray-600"></p>
+            <button id="notification-close-btn" class="w-full py-2.5 px-4 bg-green-600 text-white font-semibold rounded-full shadow-md hover:bg-green-700 transition-transform duration-150 ease-in-out active:scale-95">
+                Entendido
+            </button>
+        </div>
+    </div>
+    <!-- ========= FIN: NUEVO MODAL DE NOTIFICACIÓN ========= -->
+
     <!-- ========= FIN MODALES ========= -->
 
     <script type="module">
@@ -351,7 +370,8 @@
         // Se usa la versión 12.5.0 para asegurar compatibilidad
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, writeBatch, serverTimestamp, setLogLevel, getDocs, increment, Timestamp, enableNetwork } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        // AÑADIDO 'where' para la nueva función de notificaciones
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, writeBatch, serverTimestamp, setLogLevel, getDocs, increment, Timestamp, enableNetwork, where } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
         // --- Configuración y Variables Globales ---
@@ -371,6 +391,7 @@
         
         // Descriptores de suscripciones de Firestore
         let contadoresUnsubscribe = () => {}, clientesUnsubscribe = () => {}, conceptosUnsubscribe = () => {}, userProfileUnsubscribe = () => {};
+        let adminValidationsUnsubscribe = () => {}; // <-- NUEVA VARIABLE
         
         let userPlanStatus = null; // Almacena el estado del plan del usuario ('free', 'premium', etc.)
         let localContadores = [], localClientes = [], localConceptos = [], edicionConceptoId = null;
@@ -387,11 +408,23 @@
         const selloPreview = document.getElementById('selloPreview');
         const removeSelloBtn = document.getElementById('removeSelloBtn'); // <-- NUEVO: Selector Botón 'X'
 
-        // --- Selectores de DOM (Modales) ---
-        const premiumModal = document.getElementById('premium-modal');
+        // --- INICIO: Selectores para Pago Móvil ---
         const pagomovilModal = document.getElementById('pagomovil-modal');
-        const pagoMovilProofInput = document.getElementById('pagoMovilProof');
+        const pagoMovilForm = document.getElementById('pagoMovilForm');
         const submitPagoMovilBtn = document.getElementById('submitPagoMovilBtn');
+        const pagoMovilFecha = document.getElementById('pagoMovilFecha');
+        const pagomovilCedula = document.getElementById('pagoMovilCedula');
+        const pagoMovilTelefono = document.getElementById('pagoMovilTelefono');
+        const pagoMovilMonto = document.getElementById('pagoMovilMonto');
+        // --- FIN: Nuevos campos Pago Móvil ---
+        
+        // --- INICIO: Selectores para el nuevo Modal de Notificación ---
+        const notificationModal = document.getElementById('notification-modal');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const notificationCloseBtn = document.getElementById('notification-close-btn');
+        // --- FIN: Selectores para el nuevo Modal de Notificación ---
+
 
         // --- Constantes de Estilo Botones (para DRY) ---
         const btnBase = "py-2 px-3 text-sm font-semibold rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-transform duration-150 ease-in-out active:scale-95 inline-flex items-center justify-center";
@@ -433,7 +466,7 @@
             auth = getAuth(app);
             db = getFirestore(app); 
             storage = getStorage(app); 
-            setLogLevel('Debug'); // Descomentar para ver logs detallados de Firestore
+            // setLogLevel('Debug'); // Descomentar para ver logs detallados de Firestore
 
             setupAuthListeners();
             
@@ -453,6 +486,9 @@
                         // 3. SOLO SI TIENE ÉXITO, mostrar la app
                         appContainer.classList.remove('hidden');
                         authContainer.classList.add('hidden');
+
+                        // 4. NUEVO: Revisar notificaciones pendientes
+                        await checkUserNotifications();
 
                     } catch (error) {
                         // 4. Si el perfil falla al cargar, cerrar sesión y mostrar error
@@ -478,6 +514,7 @@
                     if (clientesUnsubscribe) clientesUnsubscribe();
                     if (conceptosUnsubscribe) conceptosUnsubscribe();
                     if (userProfileUnsubscribe) userProfileUnsubscribe();
+                    if (adminValidationsUnsubscribe) adminValidationsUnsubscribe(); // <-- AÑADIDO
                     
                     clearForm(); // Limpiar el formulario
 
@@ -616,6 +653,17 @@
                 userPlanInfo.textContent = `Plan Free (${reportsLeft < 0 ? 0 : reportsLeft} informe gratis)`;
                 userPlanInfo.className = 'text-xs text-gray-200 bg-black bg-opacity-20 px-2 py-1 rounded-full inline-block mt-1';
             }
+
+            // --- INICIO: LÓGICA DEL PANEL DE ADMIN (NUEVO) ---
+            const adminPanel = document.getElementById('admin-panel-container');
+            if (userPlanStatus.role === 'admin') {
+                adminPanel.classList.remove('hidden');
+                loadAdminValidations(); // Cargar los datos del admin
+            } else {
+                adminPanel.classList.add('hidden');
+                if (adminValidationsUnsubscribe) adminValidationsUnsubscribe(); // Dejar de escuchar si no es admin
+            }
+            // --- FIN: LÓGICA DEL PANEL DE ADMIN (NUEVO) ---
         }
 
         // --- Lógica de Generación de Informes (Validación) ---
@@ -648,23 +696,21 @@
         }
         
         // --- Lógica de Modales (Planes y Pagos) ---
-        // --- CORRECCIÓN 1: Se asigna la función a 'window' para hacerla global ---
-        // Esto permite que los atributos 'onclick' en el HTML la encuentren.
+        // Se asigna la función a 'window' para hacerla global
         window.hideModals = function() {
-            premiumModal.classList.add('hidden');
-            premiumModal.classList.remove('visible');
-            // --- CORRECCIÓN 2: Se usa la variable 'pagomovilModal' (camelCase) ---
-            // El nombre 'pagomovil-modal' con guion no es una variable válida.
+            // premiumModal.classList.add('hidden'); // ELIMINADO
+            // premiumModal.classList.remove('visible'); // ELIMINADO
             pagomovilModal.classList.add('hidden');
             pagomovilModal.classList.remove('visible');
+            // AÑADIDO: Ocultar también el modal de notificación
+            if (notificationModal) {
+                notificationModal.classList.add('hidden');
+                notificationModal.classList.remove('visible');
+            }
         }
 
-        function showPremiumModal() {
-            hideModals();
-            premiumModal.classList.remove('hidden');
-            setTimeout(() => premiumModal.classList.add('visible'), 10);
-            renderPayPalButtons();
-        }
+        // function showPremiumModal() { // ELIMINADA
+        // }
 
         function showPagoMovilModal() {
             hideModals();
@@ -672,138 +718,202 @@
             setTimeout(() => pagomovilModal.classList.add('visible'), 10);
         }
 
-        // --- Lógica de PayPal ---
-        function renderPayPalButtons(retryCount = 0) {
-            const container = document.getElementById('paypal-button-container');
-            if (!container) return; // Si el modal no existe, salir.
+        // --- Lógica de PayPal (ELIMINADA) ---
+        // function renderPayPalButtons(retryCount = 0) { // ELIMINADA
+        // function grantPremiumAccess() { // ELIMINADA
+        // }
 
-            // Limpiar el contenedor solo si se está reintentando (para quitar msj de error)
-            if (retryCount > 0) {
-                container.innerHTML = '';
-            }
+        // --- INICIO: NUEVAS FUNCIONES DE NOTIFICACIÓN (IN-APP) ---
+
+        /**
+         * Muestra el modal de notificación con un título y mensaje.
+         */
+        function showNotificationModal(title, message) {
+            if (!notificationModal || !notificationTitle || !notificationMessage) return;
             
-            // Si ya está renderizado (y no es un reintento), no hacer nada.
-            if (container.children.length > 0 && retryCount === 0) return; 
+            notificationTitle.textContent = title || "¡Notificación!";
+            notificationMessage.textContent = message || "Tienes un nuevo mensaje.";
+            
+            hideModals(); // Ocultar otros modales si están abiertos
+            notificationModal.classList.remove('hidden');
+            setTimeout(() => notificationModal.classList.add('visible'), 10);
+        }
 
-            // --- CORRECCIÓN 3: Se usa 'window.paypal' ---
-            // Esto busca explícitamente la variable 'paypal' en el ámbito global (window),
-            // que es donde la carga el script de PayPal.
-            if (typeof window.paypal === 'undefined') {
-                console.error(`SDK de PayPal no se ha cargado. 'paypal' no está definido. (Intento ${retryCount + 1})`);
+        /**
+         * Revisa Firestore en busca de notificaciones no leídas para el usuario actual.
+         * Muestra la primera y marca todas como leídas.
+         */
+        async function checkUserNotifications() {
+            if (!currentUserId) return;
+            
+            // Ruta a la subcolección de notificaciones del usuario
+            const notifCollectionPath = `artifacts/${appId}/users/${currentUserId}/notifications`;
+            // Buscar notificaciones donde read == false
+            const q = query(collection(db, notifCollectionPath), where("read", "==", false));
+            
+            try {
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) return; // No hay notificaciones nuevas
+
+                const batch = writeBatch(db);
+                let firstNotification = true;
+
+                querySnapshot.forEach((docSnap) => {
+                    const notification = docSnap.data();
+                    
+                    // Mostrar solo la primera notificación no leída (para no abrumar)
+                    if (firstNotification) {
+                        // Usamos los datos del documento de Firestore
+                        showNotificationModal(notification.title, notification.message);
+                        firstNotification = false;
+                    }
+                    
+                    // Marcar esta notificación como leída en el batch
+                    batch.update(docSnap.ref, { read: true });
+                });
                 
-                // --- NUEVA CORRECCIÓN: Reintentar ---
-                if (retryCount < 5) { // Reintentar 5 veces (500ms * 5 = 2.5s)
-                    setTimeout(() => renderPayPalButtons(retryCount + 1), 500);
+                // Enviar todos los updates (marcar como leídas) a Firestore
+                await batch.commit(); 
+
+            } catch (e) {
+                console.error("Error al verificar notificaciones:", e);
+                // No mostramos error al usuario, es un proceso de fondo
+            }
+        }
+        
+        // Añadir listener al botón de cierre del nuevo modal
+        if (notificationCloseBtn) {
+            notificationCloseBtn.addEventListener('click', () => {
+                notificationModal.classList.add('hidden');
+                notificationModal.classList.remove('visible');
+            });
+        }
+
+        // --- INICIO: NUEVAS FUNCIONES DE ADMINISTRACIÓN ---
+
+        /**
+         * Carga la lista de validaciones de pago pendientes desde Firestore.
+         */
+        function loadAdminValidations() {
+            if (!currentUserId || userPlanStatus?.role !== 'admin') return;
+
+            // Dejar de escuchar la suscripción anterior para evitar duplicados
+            if (adminValidationsUnsubscribe) adminValidationsUnsubscribe();
+
+            const validationsPath = `artifacts/${appId}/public/data/pagoValidations`;
+            const q = query(collection(db, validationsPath), where("status", "==", "pending"));
+            const listContainer = document.getElementById('admin-payment-list');
+
+            adminValidationsUnsubscribe = onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    listContainer.innerHTML = '<p class="text-gray-400">No hay pagos pendientes de aprobación.</p>';
                     return;
                 }
-                // --- FIN NUEVA CORRECCIÓN ---
 
-                showMessage("Error al cargar la opción de pago. Refresca la página.", "error");
-                container.innerHTML = '<p class="text-center text-red-600">Error al cargar el botón de pago. Por favor, refresca la página.</p>';
-                return;
-            }
-            
-            try {
-                // Limpiar el contenedor de cualquier texto/error anterior antes de renderizar
-                container.innerHTML = ''; 
-                
-                window.paypal.Buttons({
-                    createOrder: (data, actions) => {
-                        return actions.order.create({
-                            purchase_units: [{
-                                description: "Plan Premium 1 Año - Informe de Aseguramiento",
-                                amount: {
-                                    value: "15.00", // Precio
-                                    currency_code: "USD"
-                                }
-                            }]
-                        });
-                    },
-                    onApprove: async (data, actions) => {
-                        try {
-                            const details = await actions.order.capture();
-                            console.log("Pago completado:", details);
-                            await grantPremiumAccess(); // Activar premium en Firestore
-                            showMessage("¡Pago completado! Ahora eres Premium.", "success");
-                            hideModals();
-                        } catch (err) {
-                            console.error("Error en la aprobación de PayPal:", err);
-                            showMessage("Error al procesar el pago.", "error");
-                        }
-                    },
-                    onError: (err) => {
-                        console.error("Error de PayPal:", err);
-                        showMessage("Ocurrió un error con PayPal.", "error");
-                    }
-                }).render('#paypal-button-container');
-
-            } catch (error) {
-                console.error("Error al renderizar botones de PayPal:", error);
-                showMessage("Error al mostrar el botón de pago.", "error");
-                container.innerHTML = '<p class="text-center text-red-600">Error al mostrar el botón de pago.</p>';
-            }
-        }
-
-        async function grantPremiumAccess() {
-            const profileRef = getUserProfileRef();
-            if (!profileRef) return;
-            
-            const expiryDate = new Date();
-            expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Premium por 1 año
-            
-            try {
-                await updateDoc(profileRef, {
-                    plan: 'premium',
-                    premiumUntil: Timestamp.fromDate(expiryDate),
-                    reportsGenerated: 0 
+                listContainer.innerHTML = ''; // Limpiar lista
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const docId = docSnap.id;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
+                    
+                    const infoHtml = `
+                        <div class="flex-grow">
+                            <p class="font-semibold text-lg text-yellow-300">${data.userEmail || 'Email no registrado'}</p>
+                            <p class="text-sm text-gray-300"><strong>Monto:</strong> ${data.montoBs} Bs.</p>
+                            <p class="text-sm text-gray-300"><strong>Fecha:</strong> ${fmtDate(data.fechaPago)}</p>
+                            <p class="text-sm text-gray-300"><strong>CI:</strong> ${data.cedulaRif} | <strong>Tel:</strong> ${data.telefonoEmisor}</p>
+                            <p class="text-xs text-gray-400 pt-1">User ID: ${data.userId}</p>
+                        </div>
+                    `;
+                    
+                    const actionsHtml = `
+                        <div class="flex-shrink-0 w-full md:w-auto">
+                            <button data-doc-id="${docId}" data-user-id="${data.userId}" 
+                                    class="w-full md:w-auto py-2 px-5 bg-green-500 text-white font-semibold rounded-full shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-transform duration-150 ease-in-out active:scale-95 btn-approve">
+                                Aprobar
+                            </button>
+                        </div>
+                    `;
+                    
+                    item.innerHTML = infoHtml + actionsHtml;
+                    
+                    // Añadir listener al botón de aprobar
+                    item.querySelector('.btn-approve').addEventListener('click', handleApprovePayment);
+                    
+                    listContainer.appendChild(item);
                 });
+            }, (error) => {
+                console.error("Error al cargar validaciones (admin):", error);
+                listContainer.innerHTML = '<p class="text-red-400">Error al cargar datos.</p>';
+            });
+        }
+
+        /**
+         * Maneja el clic en el botón "Aprobar" del panel de admin.
+         * Realiza una transacción (batch) para actualizar el pago y el perfil del usuario.
+         */
+        async function handleApprovePayment(event) {
+            const btn = event.currentTarget;
+            const docId = btn.dataset.docId;
+            const userIdToUpgrade = btn.dataset.userId;
+
+            if (!docId || !userIdToUpgrade) {
+                return showMessage('Error: ID de documento o de usuario no encontrado.', 'error');
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Procesando...';
+
+            try {
+                // 1. Crear un batch de escritura
+                const batch = writeBatch(db);
+
+                // 2. Referencia al documento de validación
+                const validationRef = doc(db, `artifacts/${appId}/public/data/pagoValidations`, docId);
+                batch.update(validationRef, {
+                    status: "approved",
+                    approvedAt: serverTimestamp(),
+                    adminId: currentUserId // Registrar qué admin aprobó
+                });
+
+                // 3. Referencia al perfil del usuario a actualizar
+                const userProfileRef = doc(db, `artifacts/${appId}/users/${userIdToUpgrade}/profile`, 'status');
+                // Dar 1 año de premium
+                const expiryDate = new Date();
+                expiryDate.setFullYear(expiryDate.getFullYear() + 1); // <-- CAMBIO: 30 días a 1 año
+                
+                batch.update(userProfileRef, {
+                    plan: "premium",
+                    premiumUntil: Timestamp.fromDate(expiryDate),
+                    reportsGenerated: 0 // Resetear contador por si acaso
+                });
+
+                // 4. (Opcional pero recomendado) Enviar una notificación al usuario
+                const userNotifRef = doc(collection(db, `artifacts/${appId}/users/${userIdToUpgrade}/notifications`));
+                batch.set(userNotifRef, {
+                    title: "¡Pago Aprobado!",
+                    message: "Tu plan Premium ha sido activado. Ahora tienes 1 año de informes ilimitados.", // <-- CAMBIO: Mensaje
+                    createdAt: serverTimestamp(),
+                    read: false
+                });
+
+                // 5. Ejecutar el batch
+                await batch.commit();
+
+                showMessage('Pago aprobado. El usuario ahora es Premium.', 'success');
+                // El listener onSnapshot se encargará de quitar el item de la UI automáticamente.
+
             } catch (e) {
-                console.error("Error al actualizar a premium:", e);
-                showMessage("Pago recibido, pero hubo un error al activar tu cuenta. Contacta a soporte.", "error");
+                console.error("Error al aprobar el pago:", e);
+                showMessage('Error al procesar la aprobación. Inténtalo de nuevo.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Aprobar';
             }
         }
 
-        // --- Lógica de Pago Móvil ---
-        pagoMovilProofInput.addEventListener('change', () => {
-            submitPagoMovilBtn.disabled = pagoMovilProofInput.files.length === 0;
-        });
-
-        submitPagoMovilBtn.addEventListener('click', async () => {
-            const file = pagoMovilProofInput.files[0];
-            if (!file || !currentUserId) return;
-
-            submitPagoMovilBtn.disabled = true;
-            submitPagoMovilBtn.textContent = 'Subiendo...';
-
-            try {
-                const storagePath = `artifacts/${appId}/pagoMovilUploads/${currentUserId}/${Date.now()}-${file.name}`;
-                const storageRef = ref(storage, storagePath);
-                const snapshot = await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(snapshot.ref);
-
-                const validationData = {
-                    userId: currentUserId,
-                    userEmail: auth.currentUser.email,
-                    fileURL: downloadURL,
-                    storagePath: storagePath,
-                    status: 'pending', 
-                    createdAt: serverTimestamp()
-                };
-                
-                await addDoc(collection(db, `artifacts/${appId}/admin/pagoValidations`), validationData);
-
-                showMessage("Comprobante enviado. Estará en revisión y se activará en 24h.", "success");
-                hideModals();
-                pagoMovilProofInput.value = '';
-
-            } catch (e) {
-                console.error("Error al subir pago móvil:", e);
-                showMessage("Error al subir el comprobante. Inténtalo de nuevo.", "error");
-            } finally {
-                submitPagoMovilBtn.disabled = false;
-                submitPagoMovilBtn.textContent = 'Subir y Notificar Pago';
-            }
-        });
+        // --- FIN: NUEVAS FUNCIONES DE ADMINISTRACIÓN ---
 
         // --- Aplicar Estilos de Botones (Centralizado) ---
         function applyButtonStyles() {
@@ -821,7 +931,7 @@
                 document.getElementById('conceptoBtnEditar').className = btnLilac;
                 document.getElementById('conceptoBtnGuardarEdicion').className = `${btnLilac} hidden`; 
                 document.getElementById('conceptoBtnEliminar').className = btnLilac;
-                document.getElementById('showPagoMovilBtn').className = "w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-transform duration-150 ease-in-out active:scale-95";
+                // Línea de showPagoMovilBtn ELIMINADA
             } catch (e) {
                 console.warn("Error aplicando estilos a botones (puede ocurrir en carga inicial):", e);
             }
@@ -1180,7 +1290,7 @@
         document.getElementById('saveClienteBtn').addEventListener('click', saveCliente); 
         document.getElementById('updateClienteBtn').addEventListener('click', updateCliente); 
         document.getElementById('deleteClienteBtn').addEventListener('click', deleteCliente);
-        document.getElementById('showPagoMovilBtn').addEventListener('click', showPagoMovilModal);
+        // Listener de showPagoMovilBtn ELIMINADO
         
         // --- Lógica de Ingresos (Items Dinámicos) ---
         window.addIncomeItem = function() {
@@ -1675,8 +1785,8 @@
                 }
             
             } else if (check.reason === 'limit_reached') {
-                // Si se alcanzó el límite, mostrar modal premium
-                showPremiumModal();
+                // Si se alcanzó el límite, mostrar modal de Pago Móvil DIRECTAMENTE
+                showPagoMovilModal();
             } else {
                 // Si no está autenticado
                 showMessage('Debes iniciar sesión para generar informes.', 'error');

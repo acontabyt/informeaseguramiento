@@ -510,6 +510,7 @@
                     userPlanStatus = null;
                     appContainer.classList.add('hidden');
                     authContainer.classList.remove('hidden');
+                    document.getElementById('admin-panel-container').classList.add('hidden'); // <-- ¡CORRECCIÓN AÑADIDA!
                     
                     // Detener todas las suscripciones de Firestore
                     if (contadoresUnsubscribe) contadoresUnsubscribe();
